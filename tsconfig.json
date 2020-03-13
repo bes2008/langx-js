@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "ES3",
+    "sourceMap": true,
+    "charset": "utf8",
+
+    "outDir": "dist",
+
+    "noImplicitAny": false,
+    "strict": false,
+    "removeComments": true,
+    "pretty": true,
+    "allowJs": true,
+    "checkJs": true,
+    "declaration": true,
+    "traceResolution":true,
+    "suppressImplicitAnyIndexErrors" : false,
+    "strictNullChecks": true,
+    "strictPropertyInitialization": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": false
+  },
+  "include": [
+    "src/main/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/*.spec.ts"
+  ]
+}
