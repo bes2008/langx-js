@@ -6,3 +6,5 @@ let Objects = {
 
     }
 };
+
+module.exports = Objects;

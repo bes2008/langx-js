@@ -3,7 +3,7 @@ let Emptys = {
         return obj==undefined || obj == null;
     },
 
-    misArray: function (obj : any) {
+    isArray: function (obj : any) {
         Array.isArray(obj);
     }
 };
