@@ -19,4 +19,4 @@ let typescriptProjectBabelConfig = {
     "presets":["@babel/preset-typescript"]
 };
 
-module.exports = typescriptProjectBabelConfig;
+module.exports = commonBabelConfig;
