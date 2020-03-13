@@ -2,8 +2,15 @@
   "name": "langx-js",
   "version": "1.0.0",
   "description": "JavaScript language extensions",
-  "author": "fs1194361820@163.com",
-  "license": "Apache-2.0",
+  "author": {
+    "name": "jinuo.fang",
+    "email":"fs1194361820@163.com",
+    "url":"https://github.com/fangjinuo"
+  },
+  "licenses": [{
+    "type": "Apache-2.0",
+    "url": "https://github.com/fangjinuo/langx-js/blob/master/LICENSE"
+  }],
   "homepage": "https://github.com/fangjinuo/langx-js",
 
   "dependencies": {
@@ -11,5 +18,10 @@
   },
   "devDependencies": {
 
-  }
+  },
+  "files": [
+    "package.json",
+    "README",
+    "LICENSE"
+  ]
 }
