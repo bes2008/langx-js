@@ -1,4 +1,4 @@
-let babelConfig = {
+let commonBabelConfig = {
     "presets": [
         [
             "@babel/env",
@@ -15,4 +15,8 @@ let babelConfig = {
     ]
 };
 
-module.exports = babelConfig;
+let typescriptProjectBabelConfig = {
+    "presets":["@babel/preset-typescript"]
+};
+
+module.exports = typescriptProjectBabelConfig;
