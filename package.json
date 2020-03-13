@@ -12,6 +12,10 @@
     "url": "https://github.com/fangjinuo/langx-js/blob/master/LICENSE"
   }],
   "homepage": "https://github.com/fangjinuo/langx-js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fangjinuo/langx-js.git"
+  },
 
   "dependencies": {
     
