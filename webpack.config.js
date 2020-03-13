@@ -1,12 +1,24 @@
+const htmlWebpackPlugin = require("html-webpack-plugin");
+const path = require('path');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const ManifestPlugin = require('webpack-manifest-plugin');
+
+
 module.exports = {
     entry: "./src/main/index.ts",
     output: {
-        path: '/dist',
+        path: path.resolve(__dirname, './dist'),
         filename: "bundle.js"
     },
     resolve: {
         extensions: [".tsx", ".ts", ".js", ".json"]
     },
+
+    plugins: [
+        new CleanWebpackPlugin(),
+        new ManifestPlugin()
+    ],
+
     module: {
         rules: [
             // all files with a '.ts' or '.tsx' extension will be handled by 'ts-loader'
