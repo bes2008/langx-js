@@ -14,6 +14,10 @@ module.exports = {
         extensions: [".tsx", ".ts", ".js", ".json"]
     },
 
+    mode: "development",
+
+    devtool: "inline-source-map",
+
     plugins: [
         new CleanWebpackPlugin(),
         new ManifestPlugin()
