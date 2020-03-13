@@ -1,0 +1,15 @@
+{
+  "name": "langx-js",
+  "version": "1.0.0",
+  "description": "JavaScript language extensions",
+  "author": "fs1194361820@163.com",
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/fangjinuo/langx-js",
+
+  "dependencies": {
+    
+  },
+  "devDependencies": {
+
+  }
+}
