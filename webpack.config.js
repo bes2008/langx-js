@@ -20,6 +20,9 @@ module.exports = {
 
     plugins: [
         new CleanWebpackPlugin(),
+        new CleanWebpackPlugin({
+            outputPath:"src/test/result"
+        }),
         new ManifestPlugin()
     ],
 
