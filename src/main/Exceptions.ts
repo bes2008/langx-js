@@ -1,9 +1,8 @@
+import * as Types from './Types';
 export class RuntimeException extends Error{
-    message: string;
-    constructor(message: string | Function) {
+    constructor(message: string| String | Function) {
         super();
-        if()
-        this.message = message;
-
+        this.message = Types.isFunction(message) ? (<Function>message)() : message;
     }
+
 }

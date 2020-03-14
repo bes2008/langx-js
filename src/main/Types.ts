@@ -39,10 +39,22 @@ export function getType (object: any) : any {
     return type;
 }
 
+export function isString(object: any) {
+    return getType(object) == String;
+}
+
+export function isNumber(object: any) {
+    return getType(object) == Number;
+}
+
 export function isFunction(object: any) {
     return getType(object) == Function;
 }
 
 export function isArray(object:any) {
     return getType(object)==Array;
+}
+
+export function isDate(object:any) {
+    return getType(object)==Date;
 }
