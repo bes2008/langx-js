@@ -1,8 +1,8 @@
-export interface Func<I, O> extends Function{
+export interface Func<I, O> {
     apply(input: I): O;
 }
 
-export interface Func2<I1, I2, O>  extends Function{
+export interface Func2<I1, I2, O> {
     apply(i1: I1, i2: I2): O;
 }
 
@@ -33,13 +33,15 @@ export interface Predicate<I> {
 export interface Predicate2<I1, I2> {
     test(i1: I1, i2: I2): boolean;
 }
-import Emptys from "./Emptys";
-export class IsNullPredicate implements Predicate<any>{
+
+import * as Emptys from "./Emptys";
+
+export class IsNullPredicate implements Predicate<any> {
     test(i: any): boolean {
         return Emptys.isNull(i);
     }
 }
 
-export function isNullPredicate() : Predicate<any> {
+export function isNullPredicate(): Predicate<any> {
     return new IsNullPredicate();
 }
