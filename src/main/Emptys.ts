@@ -14,5 +14,9 @@ export function getLength(obj: any): number {
     if(Types.isArray(obj)){
         return (<Array<any>>obj).length;
     }
+
+    if(Types.isWeakSet(obj)){
+
+    }
     return 1;
 }

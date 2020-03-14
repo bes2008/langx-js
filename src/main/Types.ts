@@ -36,6 +36,22 @@ export function getType (object: any) : any {
     if (Array.isArray(object)) {
         return Array;
     }
+
+    if(object instanceof Map){
+        return Map;
+    }
+
+    if(object instanceof WeakMap){
+        return WeakMap;
+    }
+
+    if(object instanceof Set){
+        return Set;
+    }
+    if(object instanceof WeakSet){
+        return WeakSet;
+    }
+
     return type;
 }
 
@@ -47,6 +63,14 @@ export function isNumber(object: any) {
     return getType(object) == Number;
 }
 
+export function isBoolean(object: any) {
+    return getType(object) == Boolean;
+}
+
+export function isDate(object:any) {
+    return getType(object)==Date;
+}
+
 export function isFunction(object: any) {
     return getType(object) == Function;
 }
@@ -55,6 +79,20 @@ export function isArray(object:any) {
     return getType(object)==Array;
 }
 
-export function isDate(object:any) {
-    return getType(object)==Date;
+export function isSet(object:any) {
+    let type:any = getType(object);
+    return type == Set || type == WeakSet;
+}
+
+export function isWeakSet(object: any) {
+    return getType(object) == WeakSet;
+}
+
+export function isMap(object:any) {
+    let type:any = getType(object);
+    return type == Map || type == WeakMap;
+}
+
+export function isWeakMap(object:any) {
+    return getType(object) == WeakMap;
 }
