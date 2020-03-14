@@ -23,9 +23,7 @@ All java collection written in Iterables.ts module
 |Preconditions    |Preconditions        |
 |Collects       |Collects |
 
-
-
-##References
+## References
 + [W3School 中文站](https://www.w3cschool.cn/)
 + [TypeScript docs](http://www.typescriptlang.org/docs/home.html) | [TypeScript 中文文档](http://bigsec.net/b52/typescript-handbook/)
 + [NPM docs](https://docs.npmjs.com/cli-documentation/) | [NPM 中文文档](https://www.npmjs.cn/)
