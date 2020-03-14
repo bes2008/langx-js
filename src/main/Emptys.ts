@@ -1,13 +1,18 @@
-export default {
-    isNull : function (obj : any) {
-        return obj==undefined || obj == null;
-    },
+import * as Types from "./Types";
+export function isNull(obj: any): boolean {
+    return obj == undefined || obj == null;
+}
 
-    isNotNull: function(obj : any){
-        return !this.isNull(obj);
-    },
+export function isNotNull(obj: any): boolean {
+    return !this.isNull(obj);
+}
 
-    isArray: function (obj : any) {
-        Array.isArray(obj);
+export function getLength(obj: any): number {
+    if (isNull(obj)) {
+        return 0;
     }
-};
+    if(Types.isArray(obj)){
+        return (<Array<any>>obj).length;
+    }
+    return 1;
+}
