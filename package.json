@@ -11,7 +11,8 @@
     "clean": "rimraf target/*",
     "compile": "./node_modules/.bin/babel src/main --out-dir target/scourejs",
     "testCompile": "./node_modules/.bin/babel src/test --out-dir target/testjs",
-    "package": "webpack"
+    "package": "webpack",
+    "test": "jest"
   },
   "license": "Apache-2.0",
   "licenses": [
@@ -49,6 +50,7 @@
     "ts-jest": "^25.2.1",
     "papaparse": "^4.5.0",
     "jest": ">=25 <26",
+    "@types/jest": "^25.1.0",
     "ts-loader": "^6.2.1",
     "typescript": "^3.8.3",
     "webpack": "^4.42.0",
