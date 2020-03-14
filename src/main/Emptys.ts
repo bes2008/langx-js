@@ -4,7 +4,7 @@ export function isNull(obj: any): boolean {
 }
 
 export function isNotNull(obj: any): boolean {
-    return !this.isNull(obj);
+    return !isNull(obj);
 }
 
 export function getLength(obj: any): number {
@@ -19,4 +19,12 @@ export function getLength(obj: any): number {
 
     }
     return 1;
+}
+
+export function isEmpty(obj:any):boolean {
+    return getLength(obj)==0;
+}
+
+export function isNotEmpty(obj:any): boolean {
+    return !isEmpty(obj);
 }

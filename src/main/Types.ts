@@ -1,3 +1,5 @@
+import {AbstractCollection} from "./Iterables";
+
 export function getType (object: any) : any {
     let typeString = typeof object;
     var type: any = undefined;
@@ -51,6 +53,9 @@ export function getType (object: any) : any {
     if(object instanceof WeakSet){
         return WeakSet;
     }
+    if(object instanceof Error){
+        return Error;
+    }
 
     return type;
 }
@@ -79,7 +84,7 @@ export function isArray(object:any) {
     return getType(object)==Array;
 }
 
-export function isSet(object:any) {
+export function isJsSet(object:any) {
     let type:any = getType(object);
     return type == Set || type == WeakSet;
 }
@@ -88,11 +93,31 @@ export function isWeakSet(object: any) {
     return getType(object) == WeakSet;
 }
 
-export function isMap(object:any) {
+export function isJsMap(object:any) {
     let type:any = getType(object);
     return type == Map || type == WeakMap;
 }
 
 export function isWeakMap(object:any) {
     return getType(object) == WeakMap;
+}
+
+export function isError(object:any) {
+    return getType(object) ==Error;
+}
+
+export function isCollection(object:any) {
+    return isArray(object) || isJsSet(object) || object instanceof AbstractCollection;
+}
+
+export function isCustomObject(object:any) {
+    return !isFunction(object)
+        && !isNumber(object)
+        && !isString(object)
+        && !isBoolean(object)
+        && !isDate(object)
+        && !isJsMap(object)
+        && !isCollection(object)
+        && !isError(object)
+        ;
 }

@@ -1,15 +1,10 @@
-import * as Emptys from './Emptys';
 import * as Types from './Types';
-import * as Objects from './Objects';
-import {isArray} from "./Types";
-import {isSet} from "./Types";
-import {isMap} from "./Types";
-import {isFunction} from "./Types";
 
 export function isIterable(object:any):boolean{
-    return isArray(object) || isSet(object) || isMap(object) || isFunction(object["next"]) ;
+    return Types.isArray(object) || Types.isJsSet(object) || Types.isJsMap(object) || Types.isFunction(object[Symbol.iterator]);
 }
 
-export function asIterable() {
-
+import * as Iterables from './Iterables';
+export function asIterable(obj:any): Iterable<any> {
+    return Iterables.asIterable(obj);
 }

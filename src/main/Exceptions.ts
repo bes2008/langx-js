@@ -4,5 +4,13 @@ export class RuntimeException extends Error{
         super();
         this.message = Types.isFunction(message) ? (<Function>message)() : message;
     }
+}
 
+export class IndexOutboundException extends RuntimeException{
+    constructor (message?: string| String | Function|undefined|null){
+        if(message==null){
+            message = "Index outbound";
+        }
+        super(message);
+    }
 }
