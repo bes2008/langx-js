@@ -573,18 +573,27 @@ export class LinkedListIterator<E extends any> extends LikeJavaIterator<any>{
 
 }
 
-export interface LikeJavaSet<E> extends Collection<E> {
+export interface LikeJavaSet<E extends any> extends Collection<E> {
+
+}
+
+export abstract class AbstractSet<E extends any> extends AbstractCollection<E> implements LikeJavaSet<E>{
+
 
 }
 
 
-export interface LikeJavaMap<K, V> {
+export interface LikeJavaMap<K extends any, V extends any> {
+    size():number;
+}
 
+export abstract class AbstractJavaMap<K extends any, V extends any> implements LikeJavaMap<K, V>{
+    abstract size(): number;
 }
 
 
 export function asIterable(object: any): Iterable<any> {
-    if (Types.isCustomObject(object)) {
+    if (Types.isSimpleObject(object)) {
         object[Symbol.iterator] = function (): IterableIterator<any> {
             return new ObjectPropertiesIterator(object);
         }

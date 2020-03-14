@@ -8,7 +8,10 @@ describe("Emptys tests", ()=>{
         expect(Emptys.isNull(null)).toBe(true);
         expect(Emptys.isNull(undefined)).toBe(true);
         expect(Emptys.isNull(3)).toBe(false);
+        expect(Emptys.isNull({})).toBe(false);
     });
+
+
 });
 
 

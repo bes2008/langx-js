@@ -1,4 +1,4 @@
-import {AbstractCollection} from "./Iterables";
+import {AbstractCollection, AbstractJavaMap, AbstractSet} from "./Iterables";
 
 export function getType (object: any) : any {
     let typeString = typeof object;
@@ -60,63 +60,85 @@ export function getType (object: any) : any {
     return type;
 }
 
-export function isString(object: any) {
+export function isString(object: any):boolean {
     return getType(object) == String;
 }
 
-export function isNumber(object: any) {
+export function isNumber(object: any) :boolean{
     return getType(object) == Number;
 }
 
-export function isBoolean(object: any) {
+export function isBoolean(object: any):boolean {
     return getType(object) == Boolean;
 }
 
-export function isDate(object:any) {
+export function isDate(object:any):boolean {
     return getType(object)==Date;
 }
 
-export function isFunction(object: any) {
+export function isFunction(object: any):boolean {
     return getType(object) == Function;
 }
 
-export function isArray(object:any) {
+export function isArray(object:any):boolean {
     return getType(object)==Array;
 }
 
-export function isJsSet(object:any) {
-    let type:any = getType(object);
-    return type == Set || type == WeakSet;
-}
 
-export function isWeakSet(object: any) {
+
+export function isWeakSet(object: any):boolean {
     return getType(object) == WeakSet;
 }
 
-export function isJsMap(object:any) {
+export function isJsMap(object:any):boolean {
     let type:any = getType(object);
     return type == Map || type == WeakMap;
 }
 
-export function isWeakMap(object:any) {
+export function isMap(object:any) {
+    return isJsMap(object) || isJavaMap(object);
+}
+
+export function isWeakMap(object:any):boolean {
     return getType(object) == WeakMap;
 }
 
-export function isError(object:any) {
+export function isError(object:any):boolean {
     return getType(object) ==Error;
 }
 
-export function isCollection(object:any) {
-    return isArray(object) || isJsSet(object) || object instanceof AbstractCollection;
+export function isCollection(object:any) :boolean{
+    return isArray(object) || isJsSet(object) || isJavaCollection(object);
 }
 
-export function isCustomObject(object:any) {
+export function isJavaCollection(object:any) {
+    return object instanceof AbstractCollection;
+}
+
+export function isJavaMap(object:any) {
+    return object instanceof AbstractJavaMap;
+}
+
+export function isJavaSet(object:any) {
+    return object instanceof AbstractSet;
+}
+
+export function isJsSet(object:any) :boolean{
+    let type:any = getType(object);
+    return type == Set;
+}
+
+export function isSet(object:any) {
+    return isJsSet(object) || isJavaSet(object);
+}
+
+export function isSimpleObject(object:any):boolean {
     return !isFunction(object)
         && !isNumber(object)
         && !isString(object)
         && !isBoolean(object)
         && !isDate(object)
-        && !isJsMap(object)
+        && !isMap(object)
         && !isCollection(object)
         && !isError(object)
         ;
