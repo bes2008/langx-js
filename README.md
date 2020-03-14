@@ -1,6 +1,6 @@
 JavaScript language extensions, write JavaScript using Java API for a javaer
 
-## Migrate Java Collection
+## Migrate [Java API](https://docs.oracle.com/javase/7/docs/api/)
 
 All java collection written in Iterables.ts module
 
@@ -15,7 +15,7 @@ All java collection written in Iterables.ts module
 |logger      |Logger        |
 |Exceptions| some java.lang.RuntimeException (s)|
 
-## Migrate langx-java Utilities
+## Migrate [langx-java](https://github.com/fangjinuo/langx-java) Utilities
 |TypeScript Class or Module | langx-java Class    |
 |-----------------|---------------------|
 |Emptys           |Emptys               |
