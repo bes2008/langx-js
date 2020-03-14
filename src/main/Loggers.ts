@@ -1,14 +1,15 @@
-export var logger = {
-    debug: function (args: Array<any>) {
-        console.debug(args);
-    },
-    info: function (args: Array<any>) {
-        console.log(args);
-    },
-    warn: function (args: Array<any>) {
-        console.warn(args);
-    },
-    error: function (args: Array<any>) {
-        console.error(args);
-    }
-};
+export function debug(args: Array<any>): void {
+    console.debug(args);
+}
+
+export function info(args: Array<any>): void {
+    console.log(args);
+}
+
+export function warn(args: Array<any>): void {
+    console.warn(args);
+}
+
+export function error(args: Array<any>): void {
+    console.error(args);
+}
