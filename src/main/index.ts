@@ -2,7 +2,7 @@ import "./Types";
 import "./Emptys";
 import "./Objects";
 import "./Exceptions";
-import "./Loggers";
+import "./logger";
 import "./Functions";
 import "./Preconditions";
 import "./Iterables";
