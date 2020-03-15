@@ -207,6 +207,7 @@ export function hashcode(object: any) {
     if (Types.isString(object)) {
         return Strings.hashcode(<string>object);
     }
+    return 0;
 }
 
 
