@@ -31,5 +31,5 @@ All java collection written in Iterables.ts module
 + [Webpack docs](https://webpack.js.org/) | [Webpack 中文文档](https://www.webpackjs.com/concepts/)
 + [Babel docs](https://babeljs.io/docs/en/) | [Babel 中文文档](https://www.babeljs.cn/docs/)
 + [Jest](https://jestjs.io/) | [Jest 快速访问站点](https://www.w3cschool.cn/doc_jest/)
-+ [NodeJs Debugging Guide](https://nodejs.org/en/docs/guides/debugging-getting-started/) | [Jest TypeScript Debugging](https://www.cnblogs.com/f1194361820/p/12497298.html)
++ [Node.js Debugging Guide](https://nodejs.org/en/docs/guides/debugging-getting-started/) | [Jest TypeScript Debugging Guide](https://www.cnblogs.com/f1194361820/p/12497298.html)
 

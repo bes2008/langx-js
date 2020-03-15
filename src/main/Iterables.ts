@@ -1,8 +1,13 @@
 import * as Types from "./Types";
 import * as Objects from "./Objects";
 import * as Preconditions from "./Preconditions";
+import exp = require("constants");
 
-export abstract class LikeJavaIterator<E extends any> implements Iterator<E>{
+export interface LikeJavaIterator<E extends any> extends Iterator<E>{
+    hasNext():boolean;
+}
+
+export abstract class AbstractJavaIterator<E extends any> implements LikeJavaIterator<E>{
     abstract hasNext():boolean;
     abstract next(...args): IteratorYieldResult<E> | IteratorReturnResult<any> ;
 
@@ -24,7 +29,7 @@ export abstract class LikeJavaIterator<E extends any> implements Iterator<E>{
     }
 }
 
-export class ObjectPropertiesIterator extends LikeJavaIterator<any> implements IterableIterator<any> {
+export class ObjectPropertiesIterator extends AbstractJavaIterator<any> implements LikeJavaIterator<any>, IterableIterator<any> {
     private readonly obj: Object;
     private keys: Array<string>;
     private index: number = -1;
@@ -66,7 +71,7 @@ export class NullIterable implements Iterable<any> {
     }
 }
 
-export class NullIterator extends LikeJavaIterator<any>{
+export class NullIterator extends AbstractJavaIterator<any>{
     next(...args: [] | [undefined]): IteratorYieldResult<any> | IteratorReturnResult<any> {
         return {
             done: true,
@@ -310,7 +315,7 @@ export class ArrayList<E> extends AbstractList<E> {
     }
 }
 
-export class ArrayListIterator<E> extends LikeJavaIterator<E> {
+export class ArrayListIterator<E> extends AbstractJavaIterator<E> {
     private index: number = -1;
     private array: ArrayList<E>;
 
@@ -531,7 +536,7 @@ export class LinkedList<E> extends AbstractList<E>{
 
 }
 
-export class LinkedListIterator<E extends any> extends LikeJavaIterator<any>{
+export class LinkedListIterator<E extends any> extends AbstractJavaIterator<any>{
     private node:LinkedListNode<E>;
     private list:LinkedList<E>;
     constructor(list:LinkedList<E>) {
@@ -582,15 +587,116 @@ export abstract class AbstractSet<E extends any> extends AbstractCollection<E> i
 
 }
 
+export interface MapEntry<K,V> {
+    getKey():K;
+    setKey(key:K):void;
+    getValue():V;
+    setValue(value:V):void;
+}
 
 export interface LikeJavaMap<K extends any, V extends any> {
+    clear():void;
+    containsKey(key:K):boolean;
+    containsValue(value:V):boolean;
+    get(key:K):V;
+    keySet():AbstractSet<K>;
+    values():Collection<V>;
+    entrySet():AbstractSet<MapEntry<K, V>>;
+    put(key:K, value:V):V;
+    putAll(map:LikeJavaMap<K, V>):void;
+    remove(key:K):V;
+    isEmpty():boolean;
     size():number;
 }
 
-export abstract class AbstractJavaMap<K extends any, V extends any> implements LikeJavaMap<K, V>{
+export abstract class AbstractMap<K extends any, V extends any> implements LikeJavaMap<K, V>{
     abstract size(): number;
+    isEmpty():boolean {
+        return this.size()==0;
+    }
+    abstract clear(): void;
+    abstract clear():void;
+    abstract containsKey(key:K):boolean;
+    abstract containsValue(value:V):boolean;
+    abstract get(key:K):V;
+    abstract keySet():AbstractSet<K>;
+    abstract values():Collection<V>;
+    abstract entrySet():AbstractSet<MapEntry<K, V>>;
+    abstract put(key:K, value:V):V;
+    abstract putAll(map:LikeJavaMap<K, V>):void;
+    abstract remove(key:K):V;
 }
 
+export class HashMap<K extends any, V extends any> extends AbstractMap<K, V>{
+    private length:number = 0;
+    private array:Array<List<MapEntry<K, V>>> = [];
+
+    constructor(map?:LikeJavaMap<K, V>) {
+        super();
+        if(map!=null){
+            this.putAll(map);
+        }
+    }
+
+    clear(): void {
+        for(let list of this.array){
+            list.clear();
+        }
+        this.length =0;
+    }
+
+    containsKey(key: K): boolean {
+        return false;
+    }
+
+    containsValue(value: V): boolean {
+        return false;
+    }
+
+    entrySet():AbstractSet<MapEntry<K, V>> {
+    }
+
+    get(key: K): V {
+        return undefined;
+    }
+
+    keySet() :AbstractSet<K>{
+    }
+
+    put(key: K, value: V): V {
+        if(key==null){
+            return <V>Objects.unknownNull();
+        }
+        const oldValue:V = this.get(key);
+        if(oldValue==null){
+
+        }
+        return oldValue;
+    }
+
+    putAll(map: LikeJavaMap<K, V>): void {
+        if(map!=null){
+            let iter = map.entrySet().iterator();
+            while (iter.hasNext()){
+                let entry : MapEntry<K,V> = iter.next().value
+                this.put(entry.getKey(), entry.getValue());
+            }
+        }
+    }
+
+    remove(key: K): V {
+        return undefined;
+    }
+
+    size(): number {
+        return this.length;
+    }
+
+    values(): Collection<V> {
+        return undefined;
+    }
+
+}
 
 export function asIterable(object: any): Iterable<any> {
     if (Types.isSimpleObject(object)) {
