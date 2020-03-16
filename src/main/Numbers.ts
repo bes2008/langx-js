@@ -13,7 +13,7 @@ export function isFloat(n:number|string):boolean{
     return Number["isFloat"].call(Number, n1);
 }
 
-export function isInteger(n:number|string):boolean {
+export function isInteger(n:number|string|any):boolean {
     let n1:Number= Number(n);
     if(!Types.isFunction(Number["isInteger"])){
         Number["isInteger"]  = (n2)=> {
