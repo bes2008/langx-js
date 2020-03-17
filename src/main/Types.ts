@@ -1,6 +1,21 @@
-import {AbstractCollection, AbstractMap, AbstractSet} from "./Iterables";
+
+import {
+    AbstractCollection,
+    AbstractList,
+    AbstractMap,
+    AbstractSet,
+    ArrayList,
+    HashMap,
+    HashSet,
+    LinkedList
+} from "./Iterables";
+
+import * as Objects from "./Objects";
 
 export function getType (object: any) : any {
+    if(Objects.isNull(object)){
+        return undefined;
+    }
     let typeString = typeof object;
     var type: any = undefined;
     switch (typeString) {
@@ -47,16 +62,44 @@ export function getType (object: any) : any {
         return WeakMap;
     }
 
+    if(object instanceof AbstractMap){
+        if(object instanceof HashMap){
+            return HashMap;
+        }
+        return AbstractMap;
+    }
+
     if(object instanceof Set){
         return Set;
     }
     if(object instanceof WeakSet){
         return WeakSet;
     }
+
+    if(object instanceof AbstractSet){
+        if(object instanceof HashSet){
+            return HashSet;
+        }
+        return AbstractSet;
+    }
+
+    if(object instanceof AbstractList){
+        if(object instanceof ArrayList){
+            return ArrayList;
+        }
+        if(object instanceof LinkedList){
+            return LinkedList;
+        }
+        return AbstractList;
+    }
+
+    if(object instanceof AbstractCollection){
+        return AbstractCollection;
+    }
+
     if(object instanceof Error){
         return Error;
     }
-
     return type;
 }
 
