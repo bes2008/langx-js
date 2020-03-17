@@ -4,7 +4,7 @@ import * as Preconditions from "./Preconditions";
 import * as Numbers from "./Numbers";
 import * as Collects from "./Collects";
 import * as Booleans from "./Booleans";
-import * as Streams from "./Streams";
+import * as Pipeline from "./Pipeline";
 
 export interface LikeJavaIterator<E extends any> extends Iterator<E> {
     hasNext(): boolean;
@@ -787,12 +787,12 @@ export class HashMap<K extends any, V extends any> extends AbstractMap<K, V> {
     }
 
     entrySet(): LikeJavaSet<MapEntry<K, V>> {
-        return Streams.of(this.array).flatMap().toSet();
+        return Pipeline.of(this.array).flatMap().toSet();
     }
 
     get(key: K): V {
         const list: List<MapEntry<K, V>> = this.getKeySlotList(key);
-        return Streams.of(list).first({
+        return Pipeline.of(list).first({
             test: function (entry: MapEntry<K, V>) {
                 return key == entry.key;
             }
@@ -801,7 +801,7 @@ export class HashMap<K extends any, V extends any> extends AbstractMap<K, V> {
 
 
     keySet(): LikeJavaSet<K> {
-        return Streams.of(this.array).flatMap({
+        return Pipeline.of(this.array).flatMap({
             apply(entry: MapEntry<K, V>): K {
                 return entry.key;
             }
@@ -814,7 +814,7 @@ export class HashMap<K extends any, V extends any> extends AbstractMap<K, V> {
         }
 
         let list: List<MapEntry<K, V>> = this.getKeySlotList(key);
-        let oldEntry: MapEntry<K, V> = Streams.of(list).first({
+        let oldEntry: MapEntry<K, V> = Pipeline.of(list).first({
             test: function (entry: MapEntry<K, V>) {
                 return key == entry.key;
             }
@@ -845,7 +845,7 @@ export class HashMap<K extends any, V extends any> extends AbstractMap<K, V> {
         }
 
         let list: List<MapEntry<K, V>> = this.getKeySlotList(key);
-        let oldEntry: MapEntry<K, V> = Streams.of(list).first({
+        let oldEntry: MapEntry<K, V> = Pipeline.of(list).first({
             test: function (entry: MapEntry<K, V>) {
                 return key == entry.key;
             }
@@ -869,7 +869,7 @@ export class HashMap<K extends any, V extends any> extends AbstractMap<K, V> {
     }
 
     values(): Collection<V> {
-        return Streams.of(this.array).flatMap({
+        return Pipeline.of(this.array).flatMap({
             apply(entry: MapEntry<K, V>): V {
                 return entry.value == null ? <V>Objects.unknownNull() : entry.value;
             }

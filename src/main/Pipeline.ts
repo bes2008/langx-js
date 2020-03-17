@@ -2,11 +2,11 @@ import {ArrayList, Collection, HashSet, List} from "./Iterables";
 import * as Collects from "./Collects";
 import {Consumer, Consumer2, Func, Func2, Predicate, Predicate2} from "./Functions";
 
-export class Stream<E extends any> {
+export class Pipeline<E extends any> {
     private readonly collection: Collection<E>;
 
     new(list?: Collection<E> | Array<E> | Set<E> | Iterable<E> | IterableIterator<E>) {
-        return new Stream(list);
+        return new Pipeline(list);
     }
 
     constructor(list?: Collection<E> | Array<E> | Set<E> | Iterable<E> | IterableIterator<E>) {
@@ -21,16 +21,16 @@ export class Stream<E extends any> {
         Collects.foreach(this.collection, consumer);
     }
 
-    map(mapper: Func<E, any> | Func2<number, E, any> | Function): Stream<E> {
-        return new Stream(Collects.map(this.collection, mapper));
+    map(mapper: Func<E, any> | Func2<number, E, any> | Function): Pipeline<E> {
+        return new Pipeline(Collects.map(this.collection, mapper));
     }
 
-    filter(predicate: Predicate<E> | Predicate2<number, E> | Function): Stream<E> {
-        return new Stream(Collects.filter(this.collection, predicate));
+    filter(predicate: Predicate<E> | Predicate2<number, E> | Function): Pipeline<E> {
+        return new Pipeline(Collects.filter(this.collection, predicate));
     }
 
-    firstN(predicate: Predicate<E> | Predicate2<number, E> | Function, count: number): Stream<E> {
-        return new Stream(Collects.firstN(this.collection, predicate, count));
+    firstN(predicate: Predicate<E> | Predicate2<number, E> | Function, count: number): Pipeline<E> {
+        return new Pipeline(Collects.firstN(this.collection, predicate, count));
     }
 
     first(predicate: Predicate<E> | Predicate2<number, E> | Function): null | E {
@@ -50,11 +50,11 @@ export class Stream<E extends any> {
     }
 
     cleanNulls() {
-        return new Stream(Collects.cleanNulls(this.collection));
+        return new Pipeline(Collects.cleanNulls(this.collection));
     }
 
     flatMap(mapper?: Func<any, any> | Func2<any, any, any> | Function) {
-        return new Stream(Collects.flatMap(this.collection, mapper));
+        return new Pipeline(Collects.flatMap(this.collection, mapper));
     }
 
     anyMatch(predicate: Predicate<any> | Predicate2<any, any> | Function): boolean {
@@ -72,7 +72,7 @@ export class Stream<E extends any> {
 
 
 export function of(list?: Collection<any> | Array<any> | Set<any> | Iterable<any> | IterableIterator<any>) {
-    return new Stream(list);
+    return new Pipeline(list);
 }
 
-Stream["of"] = of;
+Pipeline["of"] = of;
