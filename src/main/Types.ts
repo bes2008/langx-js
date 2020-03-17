@@ -1,4 +1,4 @@
-import {AbstractCollection, AbstractJavaMap, AbstractSet} from "./Iterables";
+import {AbstractCollection, AbstractMap, AbstractSet} from "./Iterables";
 
 export function getType (object: any) : any {
     let typeString = typeof object;
@@ -116,7 +116,7 @@ export function isJavaCollection(object:any) {
 }
 
 export function isJavaMap(object:any) {
-    return object instanceof AbstractJavaMap;
+    return object instanceof AbstractMap;
 }
 
 export function isJavaSet(object:any) {

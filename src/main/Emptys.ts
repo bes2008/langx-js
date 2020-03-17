@@ -1,5 +1,5 @@
 import * as Types from "./Types";
-import {AbstractCollection, AbstractJavaMap, LikeJavaSet} from "./Iterables";
+import {AbstractCollection, AbstractMap, LikeJavaSet} from "./Iterables";
 
 export function isNull(obj: any): boolean {
     return obj == undefined || obj == null;
@@ -50,7 +50,7 @@ export function getLength(obj: any): number {
             return (<Map<any, any>>obj).size;
         }
         if (Types.isJavaMap(obj)) {
-            return (<AbstractJavaMap<any, any>>obj).size();
+            return (<AbstractMap<any, any>>obj).size();
         }
     }
 
@@ -86,7 +86,7 @@ export function isEmpty(obj: any): boolean {
     }
 
     if(Types.isJavaMap(obj)){
-        return (<AbstractJavaMap<any, any>>obj).size()==0;
+        return (<AbstractMap<any, any>>obj).size()==0;
     }
 
     if(Types.isJsMap(obj)){
