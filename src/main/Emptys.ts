@@ -93,6 +93,10 @@ export function isEmpty(obj: any): boolean {
         return (<Map<any,any>>obj).size==0;
     }
 
+    if(Types.isSimpleObject(obj)){
+        return isEmpty(Object.keys(obj));
+    }
+
     return false;
 }
 

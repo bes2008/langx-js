@@ -20,6 +20,7 @@ describe("Emptys tests", ()=>{
         expect(Emptys.isEmpty({})).toBe(false);
         expect(Emptys.isEmpty(0)).toBe(true);
         expect(Emptys.isEmpty(2)).toBe(false);
+        expect(Emptys)
     });
 
 });
