@@ -45,7 +45,7 @@ export function emptyLinkedList(): LinkedList<any> {
     return new LinkedList<any>();
 }
 
-export function asIterable(obj: any): Iterable<any> {
+export function asIterable(obj: any): List<any> {
     return Iterables.asIterable(obj);
 }
 

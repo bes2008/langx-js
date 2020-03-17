@@ -1,20 +1,19 @@
-import {ArrayList, Collection, HashSet, List} from "./Iterables";
+import {Collection, HashSet, List} from "./Iterables";
 import * as Collects from "./Collects";
 import {Consumer, Consumer2, Func, Func2, Predicate, Predicate2} from "./Functions";
 
 export class Pipeline<E extends any> {
     private readonly collection: Collection<E>;
 
-    new(list?: Collection<E> | Array<E> | Set<E> | Iterable<E> | IterableIterator<E>) {
+    new(list?: Iterable<E> | Iterator<E> | any) {
         return new Pipeline(list);
     }
 
-    constructor(list?: Collection<E> | Array<E> | Set<E> | Iterable<E> | IterableIterator<E>) {
+    constructor(list?: Iterable<E> | Iterator<E> | any) {
         if (list == null) {
             this.collection = Collects.emptyArrayList();
-        } else {
-            this.collection = new ArrayList(Collects.toArray(list));
         }
+        this.collection = Collects.asIterable(list);
     }
 
     foreach(consumer: Consumer<E> | Consumer2<number, E> | Function): void {
@@ -71,7 +70,7 @@ export class Pipeline<E extends any> {
 }
 
 
-export function of(list?: Collection<any> | Array<any> | Set<any> | Iterable<any> | IterableIterator<any>) {
+export function of(list?: Iterable<any> | Iterator<any> | any) {
     return new Pipeline(list);
 }
 

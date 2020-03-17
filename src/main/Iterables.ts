@@ -884,10 +884,18 @@ export class HashMap<K extends any, V extends any> extends AbstractMap<K, V> {
 
 export function isIterator(obj: any): boolean {
     if (obj != null) {
-        if (!Objects.hasProperty(obj, "next") || !Objects.hasProperty(obj, "throw") || !Objects.hasProperty(obj, "return")) {
+        if (!Objects.hasProperty(obj, "next")) {
             return false;
         }
-        if (Types.isFunction(obj["next"]) && Types.isFunction(obj["throw"]) && Types.isFunction(obj["return"])) {
+        if (Types.isFunction(obj["next"])) {
+            let throwType = Types.getType(obj["throw"]);
+            let returnType = Types.getType(obj["return"]);
+            if (throwType != Function || throwType != undefined) {
+                return false;
+            }
+            if (returnType != Function || returnType != undefined) {
+                return false;
+            }
             return true;
         }
     }
@@ -898,10 +906,7 @@ export function isIterable(obj: any): boolean {
     if (obj == null) {
         return false;
     }
-    if (Types.isCollection(obj) || obj instanceof AbstractLikeJavaIterator || Types.isFunction(obj[Symbol.iterator])) {
-        return true;
-    }
-    if (Types.isMap(obj)) {
+    if (Types.isCollection(obj) || obj instanceof AbstractLikeJavaIterator || obj instanceof AbstractMap || Types.isFunction(obj[Symbol.iterator])) {
         return true;
     }
     return false;
@@ -917,22 +922,18 @@ export function propertiesAsIterable(object: any) {
 }
 
 
-export function asIterable(object: any): Iterable<any> {
+export function asIterable(object: any): ArrayList<any> {
     if (object == null) {
         return Collects.emptyArrayList();
     }
+
     if (isIterable(object)) {
         return new ArrayList(object);
+    } else {
+        if (isIterator(object)) {
+            return new ArrayList(...new IteratorIterable(<Iterator<any>>object));
+        }
     }
-
-    if (Types.isMap(object)) {
-        return new ArrayList((<LikeJavaMap<any, any>>object).entrySet());
-    }
-
-    if (isIterator(object)) {
-        return new IteratorIterable(<Iterator<any, IteratorReturnResult<any>, any>>object);
-    }
-
     return new ArrayList([object]);
 }
 
