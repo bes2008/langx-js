@@ -11,9 +11,11 @@
     "clean": "rimraf src/test/result",
     "compile": "./node_modules/.bin/babel src/main --out-dir target/scourejs",
     "testCompile": "./node_modules/.bin/babel src/test --out-dir target/testjs",
-    "package": "webpack",
+    "package": "npm run clean && npm install && webpack",
+    "packageOnly": "webpack",
+    "prepack": "npm run package",
     "test": "jest",
-    "debug":"node --inspect ./node_modules/jest/bin/jest --runInBand --no-cache --no-watchman"
+    "debug": "node --inspect ./node_modules/jest/bin/jest --runInBand --no-cache --no-watchman"
   },
   "license": "Apache-2.0",
   "licenses": [
