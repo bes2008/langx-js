@@ -37,6 +37,6 @@ export function parseInt(str:string|String|number|Number, radix?:number):number{
     return Number.parseInt(str.toString(), radix);
 }
 
-export function hashcode(n:number) {
+export function hashCode(n:number) {
     return parseInt(n)
 }

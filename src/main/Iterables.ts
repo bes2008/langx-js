@@ -116,6 +116,8 @@ export interface Collection<E extends any> extends Iterable<E> {
     isEmpty(): boolean;
 
     toArray(array?: Array<E>): Array<E>;
+
+    hashCode():number;
 }
 
 export type LinearCollection = Collection<any> | Set<any> | Array<any>;
@@ -175,6 +177,10 @@ export abstract class AbstractCollection<E> implements Collection<E> {
 
     [Symbol.iterator](): Iterator<E> {
         return this.iterator();
+    }
+
+    hashCode(): number {
+        return hashCode(this)
     }
 }
 
@@ -663,6 +669,23 @@ export class HashSet<E> extends AbstractSet<E> {
 export interface MapEntry<K, V> {
     key: K;
     value?: V;
+    hashCode():number;
+}
+
+export class SimpleMapEntry<K,V> implements MapEntry<K, V>{
+    key: K;
+    value?: V;
+
+    constructor(key:K, value?:V) {
+        this.key = key;
+        this.value = value;
+    }
+
+    hashCode(): number {
+        return (this.key == null ? 0 :   Objects.hashCode(this.key)) ^
+            (this.value == null ? 0 : Objects.hashCode(this.value));
+    }
+
 }
 
 
@@ -692,6 +715,8 @@ export interface LikeJavaMap<K extends any, V extends any> extends Iterable<MapE
     size(): number;
 
     iterator(): Iterator<MapEntry<any, any>>;
+
+    hashCode():number;
 }
 
 export abstract class AbstractMap<K extends any, V extends any> implements LikeJavaMap<K, V> {
@@ -728,6 +753,9 @@ export abstract class AbstractMap<K extends any, V extends any> implements LikeJ
         return this.iterator();
     }
 
+    hashCode(): number {
+        return hashCode(this);
+    }
 }
 
 
@@ -766,7 +794,7 @@ export class HashMap<K extends any, V extends any> extends AbstractMap<K, V> {
     }
 
     private getKeySlot(key: K): number {
-        let keyHash: number = Numbers.parseInt(Objects.hashcode(key));
+        let keyHash: number = Numbers.parseInt(Objects.hashCode(key));
         return keyHash % this.MAX_SLOT;
     }
 
@@ -820,7 +848,7 @@ export class HashMap<K extends any, V extends any> extends AbstractMap<K, V> {
             }
         });
         if (oldEntry == null) {
-            list.add({key: key, value: value});
+            list.add(new SimpleMapEntry(key, value));
             this.length++;
             return undefined;
         } else {
@@ -984,4 +1012,12 @@ export class IteratorIterable<E extends any> extends AbstractLikeJavaIterator<E>
     [Symbol.iterator](): Iterator<E> {
         return this;
     }
+}
+
+export function hashCode(iterable:Iterable<any>) :number{
+        let hashCode:number=0;
+        for(let element of iterable){
+            hashCode+=Objects.hashCode(element);
+        }
+        return hashCode;
 }

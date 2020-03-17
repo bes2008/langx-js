@@ -1,6 +1,6 @@
 import {hasOwnEnumerableProperty, isEmpty} from "./Objects";
 
-export function hashcode(str: string | String): number {
+export function hashCode(str: string | String): number {
     if (isEmpty(str)) {
         return 0;
     }
@@ -12,6 +12,6 @@ export function hashcode(str: string | String): number {
     for (let i: number = 0; i < str.length; i++) {
         hash = 31 * hash + str.charCodeAt(i);
     }
-    str["hash"] = hashcode;
+    str["hash"] = hash;
     return hash;
 }
