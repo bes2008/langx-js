@@ -15,13 +15,20 @@ All java collection written in Iterables.ts module
 |logger      |Logger        |
 |Exceptions| some java.lang.RuntimeException (s)|
 
+
 ## Migrate [langx-java](https://github.com/fangjinuo/langx-java) Utilities
 |TypeScript Class or Module | langx-java Class    |
 |-----------------|---------------------|
 |Emptys           |Emptys               |
 |Objects          |Objects              |
+|Numbers| Numbers|
+|Booleans| Booleans|
+|Dates| Dates|
 |Preconditions    |Preconditions        |
 |Collects       |Collects |
+|Functions| Function,Consumer,Predicate,Supplier ... |
+|Pipeline|Pipeline [ Stream API ]|
+
 
 ## References
 + [JavaScript API](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript)
