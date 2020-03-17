@@ -931,7 +931,7 @@ export function asIterable(object: any): ArrayList<any> {
         return new ArrayList(object);
     } else {
         if (isIterator(object)) {
-            return new ArrayList(...new IteratorIterable(<Iterator<any>>object));
+            return new ArrayList(new IteratorIterable(<Iterator<any>>object));
         }
     }
     return new ArrayList([object]);
