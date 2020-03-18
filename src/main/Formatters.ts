@@ -1,3 +1,3 @@
-export interface Formatter<DATA extends any, PARAMS >{
-    format(data:DATA, params:PARAMS);
+export interface Formatter<DATA extends any, O extends any >{
+    format(data:DATA, params?:Array<any>):O;
 }
