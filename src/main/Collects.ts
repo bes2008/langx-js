@@ -16,6 +16,7 @@ import {
 } from "./Functions";
 import * as Iterables from "./Iterables";
 import {
+    AbstractList,
     ArrayList,
     Collection,
     HashMap,
@@ -619,4 +620,23 @@ export function removeIf(iterable: Iterable<any>, predicate: Predicate<any> | Pr
         map.putAll(<LikeJavaMap<any, any>>newCollection);
     }
     return iterable;
+}
+
+
+export function limit(iterable:Iterable<any>, limit:number):List<any> {
+    Preconditions.checkTrue(limit>=0);
+    let list = iterable instanceof AbstractList ? <List<any>>iterable: newList(iterable);
+    if(list.size()<=limit){
+        return list;
+    }
+    return list.subList(0,limit);
+}
+
+export function skip(iterable:Iterable<any>, skip:number) {
+    Preconditions.checkTrue(skip>=0);
+    let list = iterable instanceof AbstractList ? <List<any>>iterable: newList(iterable);
+    if(list.size()<=skip){
+        return emptyArrayList();
+    }
+    return list.subList(skip, list.size());
 }
