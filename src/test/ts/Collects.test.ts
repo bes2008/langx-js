@@ -1,14 +1,12 @@
 import * as Collects from "../../main/Collects";
 import * as logger from "../../main/logger";
-import {ArrayList, List} from "../../main/Iterables";
+import {List} from "../../main/Iterables";
 /**
  * HelloWorld.test.ts
  */
 describe("Collects Tests", ()=>{
 
-    test("ArrayList Test", ()=>{
-        debugger;
-        let list:ArrayList<string> = Collects.emptyArrayList();
+    function testList(list:List<any>){
         list.addAll(Collects.newList(["a","b","c","d","e"]));
         Collects.forEach(list, (element)=>{
             logger.info(element);
@@ -36,7 +34,13 @@ describe("Collects Tests", ()=>{
         expect(list.isEmpty()).toBe(false);
         list.retainAll(Collects.newList(["c","d","m"]));
         expect(list.containsAll(Collects.newList(["c","d"]))).toBe(true);
+    }
+
+    test("ArrayList Test", ()=>{
+        testList(Collects.emptyArrayList());
     });
 
-
+    test("LinkedList Test", ()=>{
+        testList(Collects.emptyLinkedList());
+    });
 });
