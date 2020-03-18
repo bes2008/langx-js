@@ -1,6 +1,6 @@
 import * as Collects from "../../main/Collects";
 import * as logger from "../../main/logger";
-import {ArrayList} from "../../main/Iterables";
+import {ArrayList, List} from "../../main/Iterables";
 /**
  * HelloWorld.test.ts
  */
@@ -21,6 +21,21 @@ describe("Collects Tests", ()=>{
         expect(list.size()).toBe(5);
         list.remove("f");
         expect(list.size()).toBe(5);
+        if(list.contains("a")){
+            logger.info("has 'a'");
+        }
+        if(list.containsAll(Collects.newList(["a","b"]))){
+            logger.info("contains ['a', 'b']");
+        }
+        let alist:List<any> =  Collects.newList(["a","b","k"]);
+        if(!list.containsAll(alist)){
+            logger.info("not contains ['a', 'b','k']");
+        }
+        list.removeAll(alist);
+        expect(list.size()).toBe(3);
+        expect(list.isEmpty()).toBe(false);
+        list.retainAll(Collects.newList(["c","d","m"]));
+        expect(list.containsAll(Collects.newList(["c","d"]))).toBe(true);
     });
 
 

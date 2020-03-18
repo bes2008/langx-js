@@ -155,7 +155,7 @@ export abstract class AbstractCollection<E> implements Collection<E> {
    abstract [Symbol.iterator](): Iterator<E> ;
 
     hashCode(): number {
-        return hashCode(this)
+        return hashCode(this);
     }
 }
 
