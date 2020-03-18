@@ -34,6 +34,8 @@ describe("List Tests", ()=>{
         expect(list.isEmpty()).toBe(false);
         list.retainAll(Collects.newList(["c","d","m"]));
         expect(list.containsAll(Collects.newList(["c","d"]))).toBe(true);
+        expect(list.get(1)).toBe('d');
+        expect(list.get(0)).toBe('c');
     }
 
     test("ArrayList Test", ()=>{
