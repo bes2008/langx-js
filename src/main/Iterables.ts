@@ -6,66 +6,48 @@ import * as Collects from "./Collects";
 import * as Booleans from "./Booleans";
 import * as Pipeline from "./Pipeline";
 
-export interface LikeJavaIterator<E extends any> extends Iterator<E> {
-    hasNext(): boolean;
-}
+export abstract class AbstractIterator<E extends any> implements Iterator<E> {
+    abstract next(...args: [] | [undefined]):IteratorResult<any>;
 
-export abstract class AbstractLikeJavaIterator<E extends any> implements LikeJavaIterator<E> {
-    abstract hasNext(): boolean;
-
-    abstract next(...args): IteratorYieldResult<E> | IteratorReturnResult<any> ;
-
-    return(value?: any): IteratorYieldResult<any> | IteratorReturnResult<any> {
+    return(value?: any): IteratorResult<any> {
         return {
             value: value,
             done: true
         };
     }
 
-    throw(e?: any): IteratorYieldResult<any> | IteratorReturnResult<any> {
+    throw(e?: any): IteratorResult<any> {
         if (Types.isError(e)) {
             throw e;
         }
         return {
             value: null,
-            done: this.hasNext()
+            done: true
         }
     }
 }
 
-export class ObjectPropertiesIterator extends AbstractLikeJavaIterator<any> implements LikeJavaIterator<any>, IterableIterator<any> {
+export class ObjectPropertiesIterator extends AbstractIterator<any> implements IterableIterator<any> {
     private readonly obj: Object;
-    private keys: Array<string>;
-    private index: number = -1;
+    private keysIter: Iterator<any>;
 
     constructor(object: Object) {
         super();
         this.obj = object;
-        this.keys = Object.keys(object);
+        this.keysIter = new ArrayList(Object.keys(object))[Symbol.iterator]();
     }
 
     [Symbol.iterator](): IterableIterator<any> {
         return this;
     }
 
-    hasNext(): boolean {
-        return this.index < this.keys.length - 1;
+    next(...args: [] | [undefined]): IteratorResult<any>  {
+       let keyResult:IteratorResult<any> = this.keysIter.next();
+       return {
+           value: this.obj[keyResult.value],
+           done:keyResult.done
+       };
     }
-
-    next(...args: [] | [undefined]): IteratorYieldResult<any> | IteratorReturnResult<any> {
-        if (this.hasNext()) {
-            this.index++;
-            return {
-                value: this.obj[this.keys[this.index]],
-                done: this.hasNext()
-            }
-        }
-        return {
-            value: Objects.unknownNull(),
-            done: false
-        };
-    }
-
 
 }
 
@@ -75,16 +57,12 @@ export class NullIterable implements Iterable<any> {
     }
 }
 
-export class NullIterator extends AbstractLikeJavaIterator<any> {
-    next(...args: [] | [undefined]): IteratorYieldResult<any> | IteratorReturnResult<any> {
+export class NullIterator extends AbstractIterator<any> {
+    next(...args: [] | [undefined]): IteratorResult<any> {
         return {
             done: true,
             value: undefined
         };
-    }
-
-    hasNext(): boolean {
-        return false;
     }
 }
 
@@ -103,7 +81,7 @@ export interface Collection<E extends any> extends Iterable<E> {
 
     containsAll(c: Collection<E>): boolean;
 
-    iterator(): LikeJavaIterator<E>;
+    [Symbol.iterator]():Iterator<E>;
 
     remove(e: E): E;
 
@@ -161,7 +139,6 @@ export abstract class AbstractCollection<E> implements Collection<E> {
 
     abstract retainAll(c: Collection<E>): boolean;
 
-    abstract iterator(): LikeJavaIterator<E>;
 
     abstract remove(e: E): E;
 
@@ -175,9 +152,7 @@ export abstract class AbstractCollection<E> implements Collection<E> {
         return 0;
     }
 
-    [Symbol.iterator](): Iterator<E> {
-        return this.iterator();
-    }
+   abstract [Symbol.iterator](): Iterator<E> ;
 
     hashCode(): number {
         return hashCode(this)
@@ -240,7 +215,7 @@ export class ArrayList<E> extends AbstractList<E> {
     }
 
     get(index: number): E {
-        Preconditions.checkIndex(index < 0 || index >= this.length);
+        Preconditions.checkIndex(index >=0 && index < this.length);
         return this.array[index];
     }
 
@@ -308,10 +283,6 @@ export class ArrayList<E> extends AbstractList<E> {
         return e;
     }
 
-    iterator(): LikeJavaIterator<E> {
-        return new ArrayListIterator(this);
-    }
-
     retainAll(c: Collection<E>): boolean {
         let newArray: Array<E> = [];
         let containAll: boolean = true;
@@ -334,32 +305,31 @@ export class ArrayList<E> extends AbstractList<E> {
         array.concat(this.array);
         return array;
     }
+
+    [Symbol.iterator]():Iterator<E>{
+        return new ArrayListIterator(this);
+    }
 }
 
-export class ArrayListIterator<E> extends AbstractLikeJavaIterator<E> {
-    private index: number = -1;
+export class ArrayListIterator<E extends any> extends AbstractIterator<E> {
+    private index: number = 0;
     private array: ArrayList<E>;
 
-    constructor(array: AbstractList<E> | Array<E>) {
+    constructor(array: ArrayList<E>) {
         super();
-        this.array = new ArrayList(array);
+        this.array = array;
     }
 
-    hasNext(): boolean {
-        return this.index < this.array.size() - 1;
-    }
-
-    next(...args: [] | [undefined]): IteratorYieldResult<E> | IteratorReturnResult<E> {
-        if (this.hasNext()) {
-            this.index++;
+    next(...args: [] | [undefined]): IteratorResult<E> {
+        if (this.index<this.array.size()) {
             return {
-                done: !this.hasNext(),
-                value: this.array.get(this.index)
-            }
+                value: this.array.get(this.index++),
+                done: false
+            };
         } else {
             return {
                 done: true,
-                value: <E>Objects.unknownNull()
+                value: null
             };
         }
     }
@@ -423,7 +393,7 @@ export class LinkedList<E> extends AbstractList<E> {
         return -1;
     }
 
-    iterator(): LikeJavaIterator<E> {
+    [Symbol.iterator](): Iterator<E> {
         return new LinkedListIterator(this);
     }
 
@@ -548,50 +518,31 @@ export class LinkedList<E> extends AbstractList<E> {
 
     toArray(array?: Array<E>): Array<E> {
         let arr = array == null ? [] : array;
-        let iter: LikeJavaIterator<E> = this.iterator();
-        while (iter.hasNext()) {
-            arr.push(iter.next().value)
+        for(let element of this){
+            arr.push(element);
         }
         return arr
     }
 
 }
 
-export class LinkedListIterator<E extends any> extends AbstractLikeJavaIterator<any> {
+export class LinkedListIterator<E extends any> extends AbstractIterator<any> {
     private node: LinkedListNode<E>;
-    private list: LinkedList<E>;
 
     constructor(list: LinkedList<E>) {
         super();
-        this.list = list;
-        this.node = <LinkedListNode<E>>Objects.unknownNull();
+        this.node = list.first;
     }
 
-    hasNext(): boolean {
-        if (this.list.isEmpty()) {
-            return false;
-        }
 
-        if (this.node == null) {
-            return true;
-        }
-
-        if (this.node != this.list.last) {
-            return true;
-        }
-
-        return false;
-    }
-
-    next(...args: [] | [undefined]): IteratorYieldResult<E> | IteratorReturnResult<any> {
-        if (this.hasNext()) {
-            if (this.node == null) {
-                this.node = this.list.first;
+    next(...args: [] | [undefined]): IteratorResult<E> {
+        if (this.node!=null) {
+            let n = this.node;
+            this.node = n.next;
                 return {
-                    done: !this.hasNext(),
-                    value: this.node.e
+                    value: n.e,
+                    done: false
                 }
-            }
         }
         return {
             done: true,
@@ -643,8 +594,8 @@ export class HashSet<E> extends AbstractSet<E> {
         return false;
     }
 
-    iterator(): LikeJavaIterator<E> {
-        return this.map.keySet().iterator();
+    [Symbol.iterator]():Iterator<E>{
+        return this.map.keySet()[Symbol.iterator]();
     }
 
     remove(e: E): E {
@@ -714,7 +665,7 @@ export interface LikeJavaMap<K extends any, V extends any> extends Iterable<MapE
 
     size(): number;
 
-    iterator(): Iterator<MapEntry<any, any>>;
+    [Symbol.iterator](): Iterator<MapEntry<any, any>>;
 
     hashCode():number;
 }
@@ -747,11 +698,8 @@ export abstract class AbstractMap<K extends any, V extends any> implements LikeJ
 
     abstract remove(key: K): V | undefined;
 
-    abstract iterator(): Iterator<MapEntry<any, any>>;
 
-    [Symbol.iterator](): Iterator<MapEntry<any, any>> {
-        return this.iterator();
-    }
+    abstract [Symbol.iterator](): Iterator<MapEntry<any, any>>;
 
     hashCode(): number {
         return hashCode(this);
@@ -859,9 +807,7 @@ export class HashMap<K extends any, V extends any> extends AbstractMap<K, V> {
 
     putAll(map: LikeJavaMap<K, V>): void {
         if (map != null) {
-            let iter = map.entrySet().iterator();
-            while (iter.hasNext()) {
-                let entry: MapEntry<K, V> = iter.next().value
+            for(let entry of map.entrySet()){
                 this.put(entry.key, entry.value);
             }
         }
@@ -905,8 +851,8 @@ export class HashMap<K extends any, V extends any> extends AbstractMap<K, V> {
     }
 
 
-    iterator(): Iterator<MapEntry<any, any>> {
-        return this.entrySet().iterator();
+    [Symbol.iterator](): Iterator<MapEntry<any, any>> {
+        return this.entrySet()[Symbol.iterator]();
     }
 }
 
@@ -934,7 +880,7 @@ export function isIterable(obj: any): boolean {
     if (obj == null) {
         return false;
     }
-    if (Types.isCollection(obj) || obj instanceof AbstractLikeJavaIterator || obj instanceof AbstractMap || Types.isFunction(obj[Symbol.iterator])) {
+    if (Types.isCollection(obj)  || obj instanceof AbstractMap || Types.isFunction(obj[Symbol.iterator])) {
         return true;
     }
     return false;
@@ -965,7 +911,7 @@ export function asIterable(object: any): ArrayList<any> {
     return new ArrayList([object]);
 }
 
-export class IteratorIterable<E extends any> extends AbstractLikeJavaIterator<E> implements Iterable<E> {
+export class IteratorIterable<E extends any> extends AbstractIterator<E> implements Iterable<E> {
     private iter: Iterator<E>;
     private iterResult: IteratorYieldResult<E> | IteratorReturnResult<E>;
     private index: number = -1; // the lastIndex had been read

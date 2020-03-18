@@ -11,8 +11,9 @@ describe("Collects Tests", ()=>{
         let list:ArrayList<string> = Collects.emptyArrayList();
         list.addAll(Collects.newList(["a","b","c","d","e"]));
         Collects.forEach(list, (element)=>{
-            logger.info(list);
+            logger.info(element);
         });
+        debugger;
         expect(list.size()).toBe(5);
         list.add("f");
         expect(list.size()).toBe(6);
