@@ -27,9 +27,9 @@ export function judgeFuncType(mapper?:Func<any,any>|Func2<any,any, any>|Function
             return FunctionType.FUNCTION;
         }
     }else{
-        if((<Function>mapper["apply"]).length==2){
+        if((<Function>mapper["apply"]).length==1){
             return FunctionType.FUNC;
-        }else if((<Function>mapper["apply"]).length>=3){
+        }else if((<Function>mapper["apply"]).length>=2){
             return FunctionType.FUNC2;
         }
     }

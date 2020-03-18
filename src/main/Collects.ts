@@ -270,7 +270,7 @@ export function filter(iterable: Iterable<any>, predicate: Predicate<any> | Pred
 
 export function firstN(iterable: Iterable<any>, predicate: Predicate<any> | Predicate2<any, any> | Function, count: number): any {
     Preconditions.checkNonNull(iterable);
-    Preconditions.checkTrue(count < 0 || !Numbers.isInteger(count));
+    Preconditions.checkTrue(count > 0 || Numbers.isInteger(count));
     let predicateType = Functions.judgePredicateType(predicate);
     Preconditions.checkTrue(predicateType != PredicateType.UNKNOWN, "illegal predicate");
     let isMap = Types.isMap(iterable);
@@ -338,7 +338,7 @@ export function firstN(iterable: Iterable<any>, predicate: Predicate<any> | Pred
 }
 
 export function first(iterable: Iterable<any>, predicate: Predicate<any> | Predicate2<any, any> | Function): any {
-    let list = firstN(iterable, predicate, 1).toList();
+    let list = toList(firstN(iterable, predicate, 1));
     if (list.isEmpty()) {
         return null;
     }
@@ -348,7 +348,9 @@ export function first(iterable: Iterable<any>, predicate: Predicate<any> | Predi
 export function flatMap(list: Array<LinearCollection> | Collection<LinearCollection> | Set<LinearCollection>, mapper?: Func<any, any> | Func2<any, any, any> | Function): List<any> {
     let array: Array<any> = [];
     for (let collection of list) {
-        array = array.concat([...collection]);
+        if (collection != null) {
+            array = array.concat([...collection]);
+        }
     }
     const list0: List<any> = newList(array);
     if (mapper != null) {
@@ -623,19 +625,19 @@ export function removeIf(iterable: Iterable<any>, predicate: Predicate<any> | Pr
 }
 
 
-export function limit(iterable:Iterable<any>, limit:number):List<any> {
-    Preconditions.checkTrue(limit>=0);
-    let list = iterable instanceof AbstractList ? <List<any>>iterable: newList(iterable);
-    if(list.size()<=limit){
+export function limit(iterable: Iterable<any>, limit: number): List<any> {
+    Preconditions.checkTrue(limit >= 0);
+    let list = iterable instanceof AbstractList ? <List<any>>iterable : newList(iterable);
+    if (list.size() <= limit) {
         return list;
     }
-    return list.subList(0,limit);
+    return list.subList(0, limit);
 }
 
-export function skip(iterable:Iterable<any>, skip:number) {
-    Preconditions.checkTrue(skip>=0);
-    let list = iterable instanceof AbstractList ? <List<any>>iterable: newList(iterable);
-    if(list.size()<=skip){
+export function skip(iterable: Iterable<any>, skip: number) {
+    Preconditions.checkTrue(skip >= 0);
+    let list = iterable instanceof AbstractList ? <List<any>>iterable : newList(iterable);
+    if (list.size() <= skip) {
         return emptyArrayList();
     }
     return list.subList(skip, list.size());

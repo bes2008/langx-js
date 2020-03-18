@@ -165,7 +165,7 @@ export function hasOwnEnumerableProperty(obj: any, property: string | number | s
  * @param property
  * @param descriptor
  */
-export function defineProperty(obj: object, property: string | number | symbol, descriptor: object | ObjectPropertyDescriptor | null | undefined) {
+export function defineProperty(obj: any, property: string | number | symbol, descriptor: object | ObjectPropertyDescriptor | null | undefined) {
     if (obj == null || property == null || descriptor == null) {
         return;
     }
@@ -174,7 +174,7 @@ export function defineProperty(obj: object, property: string | number | symbol, 
             o[prop] = desc["value"];
         }
     }
-    Object["defineProperty"].call(Object, obj, property, descriptor);
+    Object.defineProperty(obj, property, descriptor);
 }
 
 export function definePrototypeProperty(obj: object, property: string | number | symbol, desc: ObjectPropertyDescriptor): void {

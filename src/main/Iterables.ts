@@ -5,6 +5,7 @@ import * as Numbers from "./Numbers";
 import * as Collects from "./Collects";
 import * as Booleans from "./Booleans";
 import * as Pipeline from "./Pipeline";
+import {emptyArrayList} from "./Collects";
 
 export abstract class AbstractIterator<E extends any> implements Iterator<E> {
     abstract next(...args: [] | [undefined]): IteratorResult<any>;
@@ -593,7 +594,7 @@ export class HashSet<E> extends AbstractSet<E> {
     }
 
     [Symbol.iterator](): Iterator<E> {
-        return this.map.keySet()[Symbol.iterator]();
+        return new ArrayList<E>(this)[Symbol.iterator]();
     }
 
     remove(e: E): E {
@@ -776,6 +777,7 @@ export class HashMap<K extends any, V extends any> extends AbstractMap<K, V> {
 
 
     keySet(): LikeJavaSet<K> {
+        debugger;
         return Pipeline.of(this.array).flatMap({
             apply(entry: MapEntry<K, V>): K {
                 return entry.key;
@@ -851,7 +853,7 @@ export class HashMap<K extends any, V extends any> extends AbstractMap<K, V> {
 
 
     [Symbol.iterator](): Iterator<MapEntry<any, any>> {
-        return this.entrySet()[Symbol.iterator]();
+        return new ArrayList(this.entrySet())[Symbol.iterator]();
     }
 }
 
@@ -965,4 +967,52 @@ export function hashCode(iterable: Iterable<any>): number {
         hashCode += Objects.hashCode(element);
     }
     return hashCode;
+}
+
+export class CompositeIterator<E extends any> extends AbstractIterator<E>{
+    private readonly iterators:List<Iterator<E>> = emptyArrayList();
+    private iter:Iterator<Iterator<E>> = <Iterator<Iterator<E>>>Objects.unknownNull();
+    private currentIter:Iterator<E> = <Iterator<E>>Objects.unknownNull();
+    private running:boolean= false;
+    private finished:boolean = false;
+
+    constructor(iterators?: List<Iterator<E>>) {
+        super();
+        if(iterators!=null){
+            this.iterators .addAll(iterators);
+        }
+    }
+
+    addIterator(iterator:Iterator<E>):void{
+        if(!this.running && !this.finished){
+            this.iterators.add(iterator);
+        }
+    }
+
+
+    next(...args: [] | [undefined]): IteratorResult<E>  {
+        if(!this.running){
+            this.iter = this.iterators[Symbol.iterator]();
+            this.running = true;
+        }
+        if(this.currentIter==null && !this.finished){
+            let getSubIteratorResult:IteratorResult<Iterator<E>> = this.iter.next();
+            if(!getSubIteratorResult.done){
+                this.currentIter=getSubIteratorResult.value;
+            }else{
+                this.currentIter = <Iterator<E>>Objects.unknownNull();
+                this.finished = true;
+            }
+        }
+
+        if(this.currentIter!=null && !this.finished){
+            return this.currentIter.next();
+        }
+        return {
+            done:true,
+            value: null
+        };
+    }
+
+
 }
