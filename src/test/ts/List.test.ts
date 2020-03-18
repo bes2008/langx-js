@@ -4,7 +4,7 @@ import {List} from "../../main/Iterables";
 /**
  * HelloWorld.test.ts
  */
-describe("Collects Tests", ()=>{
+describe("List Tests", ()=>{
 
     function testList(list:List<any>){
         list.addAll(Collects.newList(["a","b","c","d","e"]));
