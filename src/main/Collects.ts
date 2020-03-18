@@ -94,7 +94,7 @@ export function toArray(list?: Collection<any> | Array<any> | Set<any> | Iterabl
     return new Array(...list);
 }
 
-export function foreach(iterable: Iterable<any>, consumer: Consumer<any> | Consumer2<number, any> | Function): void {
+export function forEach(iterable: Iterable<any>, consumer: Consumer<any> | Consumer2<number, any> | Function): void {
     Preconditions.checkNonNull(iterable);
     let consumerType: ConsumerType = Functions.judgeConsumerType(consumer);
     Preconditions.checkTrue(consumerType != ConsumerType.UNKNOWN, "illegal consumer");
@@ -176,7 +176,7 @@ export function map(iterable: Iterable<any>, mapper: Func<any, any> | Func2<any,
                 }
             }
         };
-        foreach(map, mapConsumer);
+        forEach(map, mapConsumer);
         return newMap;
     } else {
         let list = emptyArrayList();
@@ -195,7 +195,7 @@ export function map(iterable: Iterable<any>, mapper: Func<any, any> | Func2<any,
                 }
             }
         };
-        foreach(iterable, listConsumer);
+        forEach(iterable, listConsumer);
         return list;
     }
 }
@@ -236,7 +236,7 @@ export function filter(iterable: Iterable<any>, predicate: Predicate<any> | Pred
                 }
             }
         };
-        foreach(map, mapConsumer);
+        forEach(map, mapConsumer);
         return newMap;
     } else {
         const newList = emptyArrayList();
@@ -262,7 +262,7 @@ export function filter(iterable: Iterable<any>, predicate: Predicate<any> | Pred
                 }
             }
         };
-        foreach(iterable, listConsumer);
+        forEach(iterable, listConsumer);
         return newList;
     }
 }
@@ -599,7 +599,7 @@ export function removeIf(iterable: Iterable<any>, predicate: Predicate<any> | Pr
     } else if (Types.isJsSet(iterable)) {
         let set: Set<any> = <Set<any>>iterable;
         set.clear();
-        foreach(newCollection, {
+        forEach(newCollection, {
             accept(element: any) {
                 set.add(element);
             }

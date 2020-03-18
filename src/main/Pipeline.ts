@@ -16,8 +16,8 @@ export class Pipeline<E extends any> {
         this.collection = Collects.asIterable(list);
     }
 
-    foreach(consumer: Consumer<E> | Consumer2<number, E> | Function): void {
-        Collects.foreach(this.collection, consumer);
+    forEach(consumer: Consumer<E> | Consumer2<number, E> | Function): void {
+        Collects.forEach(this.collection, consumer);
     }
 
     map(mapper: Func<E, any> | Func2<number, E, any> | Function): Pipeline<E> {
