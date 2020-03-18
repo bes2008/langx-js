@@ -15,7 +15,7 @@
     "packageOnly": "webpack",
     "prepack": "npm run package",
     "test": "jest",
-    "debug": "node --inspect ./node_modules/jest/bin/jest --runInBand --no-cache --no-watchman"
+    "debug": "node --inspect ./node_modules/jest/bin/jest --runInBand --watch"
   },
   "license": "Apache-2.0",
   "licenses": [
