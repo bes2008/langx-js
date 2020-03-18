@@ -7,7 +7,7 @@ import * as Booleans from "./Booleans";
 import * as Pipeline from "./Pipeline";
 
 export abstract class AbstractIterator<E extends any> implements Iterator<E> {
-    abstract next(...args: [] | [undefined]):IteratorResult<any>;
+    abstract next(...args: [] | [undefined]): IteratorResult<any>;
 
     return(value?: any): IteratorResult<any> {
         return {
@@ -41,12 +41,12 @@ export class ObjectPropertiesIterator extends AbstractIterator<any> implements I
         return this;
     }
 
-    next(...args: [] | [undefined]): IteratorResult<any>  {
-       let keyResult:IteratorResult<any> = this.keysIter.next();
-       return {
-           value: this.obj[keyResult.value],
-           done:keyResult.done
-       };
+    next(...args: [] | [undefined]): IteratorResult<any> {
+        let keyResult: IteratorResult<any> = this.keysIter.next();
+        return {
+            value: this.obj[keyResult.value],
+            done: keyResult.done
+        };
     }
 
 }
@@ -81,7 +81,7 @@ export interface Collection<E extends any> extends Iterable<E> {
 
     containsAll(c: Collection<E>): boolean;
 
-    [Symbol.iterator]():Iterator<E>;
+    [Symbol.iterator](): Iterator<E>;
 
     remove(e: E): E;
 
@@ -95,7 +95,7 @@ export interface Collection<E extends any> extends Iterable<E> {
 
     toArray(array?: Array<E>): Array<E>;
 
-    hashCode():number;
+    hashCode(): number;
 }
 
 export type LinearCollection = Collection<any> | Set<any> | Array<any>;
@@ -152,7 +152,7 @@ export abstract class AbstractCollection<E> implements Collection<E> {
         return 0;
     }
 
-   abstract [Symbol.iterator](): Iterator<E> ;
+    abstract [Symbol.iterator](): Iterator<E> ;
 
     hashCode(): number {
         return hashCode(this);
@@ -215,7 +215,7 @@ export class ArrayList<E> extends AbstractList<E> {
     }
 
     get(index: number): E {
-        Preconditions.checkIndex(index >=0 && index < this.length);
+        Preconditions.checkIndex(index >= 0 && index < this.length);
         return this.array[index];
     }
 
@@ -306,7 +306,7 @@ export class ArrayList<E> extends AbstractList<E> {
         return array;
     }
 
-    [Symbol.iterator]():Iterator<E>{
+    [Symbol.iterator](): Iterator<E> {
         return new ArrayListIterator(this);
     }
 }
@@ -321,7 +321,7 @@ export class ArrayListIterator<E extends any> extends AbstractIterator<E> {
     }
 
     next(...args: [] | [undefined]): IteratorResult<E> {
-        if (this.index<this.array.size()) {
+        if (this.index < this.array.size()) {
             return {
                 value: this.array.get(this.index++),
                 done: false
@@ -370,25 +370,31 @@ export class LinkedList<E> extends AbstractList<E> {
     indexOf(e: E): number {
         let i: number = 0;
         let node: LinkedListNode<E> = this.first;
-        while (i < (this.length - 1) && node.e != e) {
-            node = node.next;
+        while (i < this.length) {
+            if (node != null) {
+                if (node.e != e) {
+                    node = node.next;
+                } else {
+                    return i;
+                }
+            }
             i++;
-        }
-        if (node.e == e) {
-            return i;
         }
         return -1;
     }
 
     lastIndexOf(e: E): number {
-        let i: number = 0;
+        let i: number = this.length - 1;
         let node: LinkedListNode<E> = this.last;
-        while (i > 0 && node.e != e) {
-            node = node.next;
-            i--;
-        }
-        if (node.e == e) {
-            return i;
+        while (i >= 0) {
+            if (node != null) {
+                if (node.e != e) {
+                    node = node.prev;
+                } else {
+                    return i;
+                }
+            }
+            i++;
         }
         return -1;
     }
@@ -399,52 +405,42 @@ export class LinkedList<E> extends AbstractList<E> {
 
     remove(e: E): E {
         let node: LinkedListNode<E> = this.first;
-        while (node.next != null) {
+        while (node != null) {
             if (node.e == e) {
-                let prev: LinkedListNode<E> = node.prev;
-                if (prev != null) {
-                    prev.next = node.next;
-                }
-                node.next.prev = prev;
-                this.length--;
-                node = node.next;
+                this.removeNode(node);
             }
-        }
-        if (node != null) {
-            if (node.e == e) {
-                let prev: LinkedListNode<E> = node.prev;
-                if (prev != null) {
-                    prev.next = node.next;
-                }
-                this.length--;
-            }
+            node = node.next;
         }
         return e;
     }
 
     retainAll(c: Collection<E>): boolean {
         let node: LinkedListNode<E> = this.first;
-        while (node.next != this.last) {
+        while (node != null) {
             if (!c.contains(node.e)) {
-                let prev: LinkedListNode<E> = node.prev;
-                if (prev != null) {
-                    prev.next = node.next;
-                }
-                node.next.prev = prev;
-                this.length--;
-                node = node.next;
+                this.removeNode(node);
             }
-        }
-        if (node != null) {
-            if (!c.contains(node.e)) {
-                let prev: LinkedListNode<E> = node.prev;
-                if (prev != null) {
-                    prev.next = node.next;
-                }
-                this.length--;
-            }
+            node = node.next;
         }
         return false;
+    }
+
+    private removeNode(node: LinkedListNode<E>): void {
+        Preconditions.checkNonNull(node);
+        let prev: LinkedListNode<E> = node.prev;
+        if (prev != null) {
+            prev.next = node.next;
+        }
+        if (node.next != null) {
+            node.next.prev = prev;
+        }
+        if (this.last == node) {
+            this.last = prev;
+        }
+        if (this.first == node) {
+            this.first = node.next
+        }
+        this.length--;
     }
 
     private getNode(index: number): LinkedListNode<E> {
@@ -507,10 +503,13 @@ export class LinkedList<E> extends AbstractList<E> {
             prev: this.last,
             next: <LinkedListNode<E>>Objects.unknownNull()
         };
-        if (this.last == null) {
-            this.first = this.last = newNode;
-        } else {
+
+        if (this.last != null) {
             this.last.next = newNode;
+        }
+        this.last = newNode;
+        if (this.first == null) {
+            this.first = this.last;
         }
         this.length++;
         return true;
@@ -518,7 +517,7 @@ export class LinkedList<E> extends AbstractList<E> {
 
     toArray(array?: Array<E>): Array<E> {
         let arr = array == null ? [] : array;
-        for(let element of this){
+        for (let element of this) {
             arr.push(element);
         }
         return arr
@@ -534,15 +533,14 @@ export class LinkedListIterator<E extends any> extends AbstractIterator<any> {
         this.node = list.first;
     }
 
-
     next(...args: [] | [undefined]): IteratorResult<E> {
-        if (this.node!=null) {
+        if (this.node != null) {
             let n = this.node;
             this.node = n.next;
-                return {
-                    value: n.e,
-                    done: false
-                }
+            return {
+                value: n.e,
+                done: false
+            }
         }
         return {
             done: true,
@@ -594,7 +592,7 @@ export class HashSet<E> extends AbstractSet<E> {
         return false;
     }
 
-    [Symbol.iterator]():Iterator<E>{
+    [Symbol.iterator](): Iterator<E> {
         return this.map.keySet()[Symbol.iterator]();
     }
 
@@ -620,20 +618,21 @@ export class HashSet<E> extends AbstractSet<E> {
 export interface MapEntry<K, V> {
     key: K;
     value?: V;
-    hashCode():number;
+
+    hashCode(): number;
 }
 
-export class SimpleMapEntry<K,V> implements MapEntry<K, V>{
+export class SimpleMapEntry<K, V> implements MapEntry<K, V> {
     key: K;
     value?: V;
 
-    constructor(key:K, value?:V) {
+    constructor(key: K, value?: V) {
         this.key = key;
         this.value = value;
     }
 
     hashCode(): number {
-        return (this.key == null ? 0 :   Objects.hashCode(this.key)) ^
+        return (this.key == null ? 0 : Objects.hashCode(this.key)) ^
             (this.value == null ? 0 : Objects.hashCode(this.value));
     }
 
@@ -667,7 +666,7 @@ export interface LikeJavaMap<K extends any, V extends any> extends Iterable<MapE
 
     [Symbol.iterator](): Iterator<MapEntry<any, any>>;
 
-    hashCode():number;
+    hashCode(): number;
 }
 
 export abstract class AbstractMap<K extends any, V extends any> implements LikeJavaMap<K, V> {
@@ -807,7 +806,7 @@ export class HashMap<K extends any, V extends any> extends AbstractMap<K, V> {
 
     putAll(map: LikeJavaMap<K, V>): void {
         if (map != null) {
-            for(let entry of map.entrySet()){
+            for (let entry of map.entrySet()) {
                 this.put(entry.key, entry.value);
             }
         }
@@ -880,7 +879,7 @@ export function isIterable(obj: any): boolean {
     if (obj == null) {
         return false;
     }
-    if (Types.isCollection(obj)  || obj instanceof AbstractMap || Types.isFunction(obj[Symbol.iterator])) {
+    if (Types.isCollection(obj) || obj instanceof AbstractMap || Types.isFunction(obj[Symbol.iterator])) {
         return true;
     }
     return false;
@@ -960,10 +959,10 @@ export class IteratorIterable<E extends any> extends AbstractIterator<E> impleme
     }
 }
 
-export function hashCode(iterable:Iterable<any>) :number{
-        let hashCode:number=0;
-        for(let element of iterable){
-            hashCode+=Objects.hashCode(element);
-        }
-        return hashCode;
+export function hashCode(iterable: Iterable<any>): number {
+    let hashCode: number = 0;
+    for (let element of iterable) {
+        hashCode += Objects.hashCode(element);
+    }
+    return hashCode;
 }
