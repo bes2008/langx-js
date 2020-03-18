@@ -36,6 +36,7 @@ export function getType (object: any) : any {
             type = Number;
             break;
         case "symbol":
+            type = Symbol;
         case "object":
             type = Object;
             break;
@@ -44,6 +45,10 @@ export function getType (object: any) : any {
     }
     if (type != undefined && type != Object) {
         return type;
+    }
+
+    if(type==Symbol){
+        return Symbol;
     }
 
     if(object instanceof Date){
@@ -184,5 +189,10 @@ export function isSimpleObject(object:any):boolean {
         && !isMap(object)
         && !isCollection(object)
         && !isError(object)
+        && !isSymbol(object)
         ;
+}
+
+export function isSymbol(object:any):boolean {
+    return getType(object)==Symbol;
 }
