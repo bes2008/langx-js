@@ -7,6 +7,7 @@ import * as Booleans from "./Booleans";
 import * as Pipeline from "./Pipeline";
 import {emptyArrayList} from "./Collects";
 import {UnsupportOperationException} from "./Exceptions";
+import Comparator from "./Comparators";
 
 export abstract class AbstractIterator<E extends any> implements Iterator<E> {
     abstract next(...args: [] | [undefined]): IteratorResult<any>;
@@ -685,7 +686,6 @@ export abstract class AbstractMap<K extends any, V extends any> implements LikeJ
     }
 
     abstract clear(): void;
-    abstract clear(): void;
 
     abstract containsKey(key: K): boolean;
 
@@ -701,16 +701,96 @@ export abstract class AbstractMap<K extends any, V extends any> implements LikeJ
 
     abstract put(key?: K, value?: V): V | undefined;
 
-    abstract putAll(map: LikeJavaMap<K, V>): void;
+    putAll(map: LikeJavaMap<K, V>): void{
+        if(map!=null){
+            for(let entry of map){
+                this.put(entry.key, entry.value);
+            }
+        }
+    }
 
     abstract remove(key: K): V | undefined;
-
 
     abstract [Symbol.iterator](): Iterator<MapEntry<any, any>>;
 
     hashCode(): number {
         return hashCode(this);
     }
+}
+
+export class TreeMap<K extends any,V extends any> extends AbstractMap<K, V>{
+    private readonly list:ArrayList<MapEntry<K, V>> = new ArrayList<MapEntry<K, V>>();
+    private readonly map:HashMap<K,V>= new HashMap<K, V>();
+    private comparator:Comparator<K>;
+
+
+    constructor(map: LikeJavaMap<K, V>| Map<K, V>, comparator?:Comparator<K>) {
+        super();
+        this.comparator = comparator;
+        if(map!=null){
+            if(map instanceof Map){
+                for(let entry of map.entries()){
+                    this.put(entry[0], entry[1]);
+                }
+            }else if(map instanceof AbstractMap){
+                this.putAll(map);
+            }
+        }
+    }
+
+    [Symbol.iterator](): Iterator<MapEntry<any, any>> {
+        return this.list[Symbol.iterator]();
+    }
+
+    clear(): void {
+        this.list.clear();
+        this.map.clear();
+    }
+
+    containsKey(key: K): boolean {
+        return this.map.containsKey(key);
+    }
+
+    containsValue(value: V): boolean {
+        return this.map.containsValue(value);
+    }
+
+    entrySet(): LikeJavaSet<MapEntry<K, V>> {
+        return <LikeJavaSet<MapEntry<K, V>>>new MapInnerEntrySet(this.map, this.list);
+    }
+
+    get(key: K): V {
+        return this.map.get(key);
+    }
+
+    keySet(): LikeJavaSet<K> {
+        return new MapInnerKeySet(this, Pipeline.of(this.list).map((item:MapEntry<K, V>)=>{
+            return item.key;
+        }).toList());
+    }
+
+    put(key: K, value?: V): V | undefined {
+        if(key==null){
+            return value;
+        }
+        // TODO insert a element
+        return this.map.put(key, value);
+    }
+
+    remove(key: K): V | undefined {
+        return undefined;
+    }
+
+    size(): number {
+        return 0;
+    }
+
+    values(): Collection<V> {
+        return Pipeline.of(this.list).map((entry:MapEntry<K, V>)=>{
+            return entry.value;
+        }).toList();
+    }
+    
 }
 
 
