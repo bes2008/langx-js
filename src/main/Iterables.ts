@@ -597,7 +597,7 @@ export class HashSet<E> extends AbstractSet<E> {
     }
 
     contains(e: E): boolean {
-        return false;
+        return this.map.containsKey(e);
     }
 
     [Symbol.iterator](): Iterator<E> {
@@ -836,8 +836,8 @@ export class HashMap<K extends any, V extends any> extends AbstractMap<K, V> {
         } else {
             let result = oldEntry.value;
             Collects.removeIf(list, {
-                test(k: K) {
-                    return k == key;
+                test(entry: MapEntry<K, V>) {
+                    return entry.key == key;
                 }
             });
             this.length--;
