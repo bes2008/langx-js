@@ -567,10 +567,10 @@ export class HashSet<E> extends AbstractSet<E> {
         super();
         this.map = new HashMap<E, null>();
         if (list != null) {
-            if(list instanceof AbstractCollection){
+            if (list instanceof AbstractCollection) {
                 this.addAll(list);
-            }else{
-                for (let element of list){
+            } else {
+                for (let element of list) {
                     this.add(element);
                 }
             }
@@ -610,9 +610,9 @@ export class HashSet<E> extends AbstractSet<E> {
     }
 
     retainAll(c: Collection<E>): boolean {
-        let removed:ArrayList<E> = new ArrayList<E>();
-        for (let element of this.toArray()){
-            if(element!=null && !c.contains(element)){
+        let removed: ArrayList<E> = new ArrayList<E>();
+        for (let element of this.toArray()) {
+            if (element != null && !c.contains(element)) {
                 removed.add(element);
             }
         }
@@ -741,7 +741,7 @@ export class HashMap<K extends any, V extends any> extends AbstractMap<K, V> {
 
     clear(): void {
         for (let list of this.array) {
-            if(list!=null){
+            if (list != null) {
                 list.clear();
             }
         }
@@ -779,7 +779,7 @@ export class HashMap<K extends any, V extends any> extends AbstractMap<K, V> {
     }
 
     entrySet(): LikeJavaSet<MapEntry<K, V>> {
-        return <LikeJavaSet<MapEntry<K, V>>>new MapInnerEntrySet(this,Pipeline.of(this.array).flatMap().toList());
+        return <LikeJavaSet<MapEntry<K, V>>>new MapInnerEntrySet(this, Pipeline.of(this.array).flatMap().toList());
     }
 
     get(key: K): V {
@@ -793,7 +793,7 @@ export class HashMap<K extends any, V extends any> extends AbstractMap<K, V> {
 
 
     keySet(): LikeJavaSet<K> {
-        return new MapInnerKeySet(this,Pipeline.of(this.array).flatMap({
+        return new MapInnerKeySet(this, Pipeline.of(this.array).flatMap({
             apply(entry: MapEntry<K, V>): K {
                 return entry.key;
             }
@@ -872,9 +872,10 @@ export class HashMap<K extends any, V extends any> extends AbstractMap<K, V> {
     }
 }
 
-class MapInnerEntrySet<K,V extends any> extends AbstractSet<MapEntry<K,V>> {
-    private readonly map:LikeJavaMap<K,V> ;
-    private readonly entries:List<MapEntry<K, V>>;
+class MapInnerEntrySet<K, V extends any> extends AbstractSet<MapEntry<K, V>> {
+    private readonly map: LikeJavaMap<K, V>;
+    private readonly entries: List<MapEntry<K, V>>;
+
     constructor(map: LikeJavaMap<K, V>, entries: List<MapEntry<K, V>>) {
         super();
         this.map = map;
@@ -887,8 +888,8 @@ class MapInnerEntrySet<K,V extends any> extends AbstractSet<MapEntry<K,V>> {
 
     add(e: MapEntry<K, V>): boolean {
         let size0 = this.map.size();
-        this.map.put(e.key, e.value==null? <V>Objects.unknownNull():e.value);
-        if(this.map.size()-size0>0){
+        this.map.put(e.key, e.value == null ? <V>Objects.unknownNull() : e.value);
+        if (this.map.size() - size0 > 0) {
             this.entries.add(e);
             return true;
         }
@@ -924,9 +925,9 @@ class MapInnerEntrySet<K,V extends any> extends AbstractSet<MapEntry<K,V>> {
 
 }
 
-class MapInnerKeySet<E> extends AbstractSet<E>{
-    private readonly map:LikeJavaMap<E,any> ;
-    private readonly keys:List<E>;
+class MapInnerKeySet<E> extends AbstractSet<E> {
+    private readonly map: LikeJavaMap<E, any>;
+    private readonly keys: List<E>;
 
     constructor(map: LikeJavaMap<E, any>, keys: List<E>) {
         super();
@@ -953,17 +954,17 @@ class MapInnerKeySet<E> extends AbstractSet<E>{
 
     remove(e: E): E {
         this.map.remove(e);
-       return this.keys.remove(e);
+        return this.keys.remove(e);
     }
 
     retainAll(c: Collection<E>): boolean {
-        let removed:Array<E>=[];
-        for (let key of this.keys){
-            if(!c.contains(key)){
+        let removed: Array<E> = [];
+        for (let key of this.keys) {
+            if (!c.contains(key)) {
                 removed.push(key);
             }
         }
-        for(let key of removed){
+        for (let key of removed) {
             this.remove(key);
         }
         return true;
@@ -1088,47 +1089,47 @@ export function hashCode(iterable: Iterable<any>): number {
     return hashCode;
 }
 
-export class CompositeIterator<E extends any> extends AbstractIterator<E>{
-    private readonly iterators:List<Iterator<E>> = emptyArrayList();
-    private iter:Iterator<Iterator<E>> = <Iterator<Iterator<E>>>Objects.unknownNull();
-    private currentIter:Iterator<E> = <Iterator<E>>Objects.unknownNull();
-    private running:boolean= false;
-    private finished:boolean = false;
+export class CompositeIterator<E extends any> extends AbstractIterator<E> {
+    private readonly iterators: List<Iterator<E>> = emptyArrayList();
+    private iter: Iterator<Iterator<E>> = <Iterator<Iterator<E>>>Objects.unknownNull();
+    private currentIter: Iterator<E> = <Iterator<E>>Objects.unknownNull();
+    private running: boolean = false;
+    private finished: boolean = false;
 
     constructor(iterators?: List<Iterator<E>>) {
         super();
-        if(iterators!=null){
-            this.iterators .addAll(iterators);
+        if (iterators != null) {
+            this.iterators.addAll(iterators);
         }
     }
 
-    addIterator(iterator:Iterator<E>):void{
-        if(!this.running && !this.finished){
+    addIterator(iterator: Iterator<E>): void {
+        if (!this.running && !this.finished) {
             this.iterators.add(iterator);
         }
     }
 
 
-    next(...args: [] | [undefined]): IteratorResult<E>  {
-        if(!this.running){
+    next(...args: [] | [undefined]): IteratorResult<E> {
+        if (!this.running) {
             this.iter = this.iterators[Symbol.iterator]();
             this.running = true;
         }
-        if(this.currentIter==null && !this.finished){
-            let getSubIteratorResult:IteratorResult<Iterator<E>> = this.iter.next();
-            if(!getSubIteratorResult.done){
-                this.currentIter=getSubIteratorResult.value;
-            }else{
+        if (this.currentIter == null && !this.finished) {
+            let getSubIteratorResult: IteratorResult<Iterator<E>> = this.iter.next();
+            if (!getSubIteratorResult.done) {
+                this.currentIter = getSubIteratorResult.value;
+            } else {
                 this.currentIter = <Iterator<E>>Objects.unknownNull();
                 this.finished = true;
             }
         }
 
-        if(this.currentIter!=null && !this.finished){
+        if (this.currentIter != null && !this.finished) {
             return this.currentIter.next();
         }
         return {
-            done:true,
+            done: true,
             value: null
         };
     }

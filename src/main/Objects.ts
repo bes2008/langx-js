@@ -207,11 +207,11 @@ export function hashCode(object: any) {
     if (isEmpty(object)) {
         return 0;
     }
-    if(Types.isNumber(object)){
+    if (Types.isNumber(object)) {
         return Numbers.hashCode(object);
     }
 
-    if(Types.isBoolean(object)){
+    if (Types.isBoolean(object)) {
         return Booleans.hashCode(object);
     }
 
@@ -219,16 +219,16 @@ export function hashCode(object: any) {
         return Strings.hashCode(<string>object);
     }
 
-    if(Types.isDate(object)){
+    if (Types.isDate(object)) {
         return Dates.hashCode(object);
     }
 
-    if(Types.isArray(object)){
+    if (Types.isArray(object)) {
         return object.hashCode();
     }
     return 0;
 }
 
-Object.prototype["hashCode"]=function(){
+Object.prototype["hashCode"] = function () {
     return hashCode(this);
 };

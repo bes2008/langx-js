@@ -15,21 +15,21 @@ export enum FunctionType {
     FUNCTION
 }
 
-export function judgeFuncType(mapper?:Func<any,any>|Func2<any,any, any>|Function):FunctionType {
-    if(mapper==null){
+export function judgeFuncType(mapper?: Func<any, any> | Func2<any, any, any> | Function): FunctionType {
+    if (mapper == null) {
         return FunctionType.UNKNOWN;
     }
     let hasApplyMethod = Types.isFunction(mapper["apply"]);
 
-    if(!hasApplyMethod){
+    if (!hasApplyMethod) {
         let consumerIsFunction = Types.isFunction(mapper);
-        if(consumerIsFunction){
+        if (consumerIsFunction) {
             return FunctionType.FUNCTION;
         }
-    }else{
-        if((<Function>mapper["apply"]).length==1){
+    } else {
+        if ((<Function>mapper["apply"]).length == 1) {
             return FunctionType.FUNC;
-        }else if((<Function>mapper["apply"]).length>=2){
+        } else if ((<Function>mapper["apply"]).length >= 2) {
             return FunctionType.FUNC2;
         }
     }
@@ -52,21 +52,21 @@ export enum ConsumerType {
     FUNCTION
 }
 
-export function judgeConsumerType(consumer:Consumer<any>|Consumer2<any,any>|Function): ConsumerType {
-    if(consumer==null){
+export function judgeConsumerType(consumer: Consumer<any> | Consumer2<any, any> | Function): ConsumerType {
+    if (consumer == null) {
         return ConsumerType.UNKNOWN;
     }
     let hasAcceptMethod = Types.isFunction(consumer["accept"]);
 
-    if(!hasAcceptMethod){
+    if (!hasAcceptMethod) {
         let consumerIsFunction = Types.isFunction(consumer);
-        if(consumerIsFunction){
+        if (consumerIsFunction) {
             return ConsumerType.FUNCTION;
         }
-    }else{
-        if((<Function>consumer["accept"]).length==1){
+    } else {
+        if ((<Function>consumer["accept"]).length == 1) {
             return ConsumerType.CONSUMER;
-        }else{
+        } else {
             return ConsumerType.CONSUMER2;
         }
     }
@@ -101,21 +101,21 @@ export enum PredicateType {
     FUNCTION
 }
 
-export function judgePredicateType(predicate:Predicate<any>|Predicate2<any,any>|Function): PredicateType {
-    if(predicate==null){
+export function judgePredicateType(predicate: Predicate<any> | Predicate2<any, any> | Function): PredicateType {
+    if (predicate == null) {
         return PredicateType.UNKNOWN;
     }
     let hasTestMethod = Types.isFunction(predicate["test"]);
 
-    if(!hasTestMethod){
+    if (!hasTestMethod) {
         let predicateIsFunction = Types.isFunction(predicate);
-        if(predicateIsFunction){
+        if (predicateIsFunction) {
             return PredicateType.FUNCTION;
         }
-    }else{
-        if((<Function>predicate["test"]).length==1){
+    } else {
+        if ((<Function>predicate["test"]).length == 1) {
             return PredicateType.PREDICATE;
-        }else{
+        } else {
             return PredicateType.PREDICATE2;
         }
     }

@@ -1,3 +1,3 @@
-export function hashCode(date:Date):number {
+export function hashCode(date: Date): number {
     return date.getTime();
 }

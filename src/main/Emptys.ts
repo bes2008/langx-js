@@ -14,11 +14,11 @@ export function getLength(obj: any): number {
         return 0;
     }
 
-    if(Types.isString(obj)){
+    if (Types.isString(obj)) {
         return (<string>obj).length;
     }
 
-    if(Types.isNumber(obj)){
+    if (Types.isNumber(obj)) {
         return 1;
     }
 
@@ -62,38 +62,38 @@ export function getLength(obj: any): number {
 }
 
 export function isEmpty(obj: any): boolean {
-    if(isNull(obj)){
+    if (isNull(obj)) {
         return true;
     }
-    if(Types.isNumber(obj)){
-        return obj==0;
+    if (Types.isNumber(obj)) {
+        return obj == 0;
     }
 
-    if(Types.isString(obj)){
-        return (<string>obj).length==0;
+    if (Types.isString(obj)) {
+        return (<string>obj).length == 0;
     }
 
-    if(Types.isArray(obj)){
-        return (<Array<any>>obj).length==0
+    if (Types.isArray(obj)) {
+        return (<Array<any>>obj).length == 0
     }
 
-    if(Types.isJavaCollection(obj)){
+    if (Types.isJavaCollection(obj)) {
         return (<AbstractCollection<any>>obj).isEmpty();
     }
 
-    if(Types.isJsSet(obj)){
-        return (<Set<any>>obj).size==0;
+    if (Types.isJsSet(obj)) {
+        return (<Set<any>>obj).size == 0;
     }
 
-    if(Types.isJavaMap(obj)){
-        return (<AbstractMap<any, any>>obj).size()==0;
+    if (Types.isJavaMap(obj)) {
+        return (<AbstractMap<any, any>>obj).size() == 0;
     }
 
-    if(Types.isJsMap(obj)){
-        return (<Map<any,any>>obj).size==0;
+    if (Types.isJsMap(obj)) {
+        return (<Map<any, any>>obj).size == 0;
     }
 
-    if(Types.isSimpleObject(obj)){
+    if (Types.isSimpleObject(obj)) {
         return isEmpty(Object.keys(obj));
     }
 

@@ -51,7 +51,7 @@ export function emptyHashSet(): LikeJavaSet<any> {
 }
 
 export function emptyHashMap(): LikeJavaMap<any, any> {
-    return new HashMap<any,any>();
+    return new HashMap<any, any>();
 }
 
 export function newList(iterable?: Iterable<any>): List<any> {
