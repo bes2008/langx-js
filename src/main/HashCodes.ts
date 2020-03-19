@@ -5,7 +5,7 @@ import * as Objects from "./Objects";
 import * as Strings from "./Strings";
 import * as Iterables from "./Iterables";
 
-Object.prototype["hashCode"]=function(){
+Object.prototype["hashCode"] = function () {
     return Objects.hashCode(this);
 };
 
@@ -29,9 +29,9 @@ Array.prototype["hashCode"] = function () {
     return Iterables.hashCode(this);
 };
 
-Set.prototype["hashCode"]=function () {
+Set.prototype["hashCode"] = function () {
     return Iterables.hashCode(this);
 };
-Map.prototype["hashCode"]=function () {
+Map.prototype["hashCode"] = function () {
     return Iterables.hashCode(this);
 };

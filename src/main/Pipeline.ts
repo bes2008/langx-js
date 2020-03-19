@@ -68,12 +68,12 @@ export class Pipeline<E extends any> {
         return Collects.noneMatch(this.collection, predicate);
     }
 
-    limit(limit:number):Pipeline<E>{
-        return new Pipeline<E>(Collects.limit(this.collection, Math.max(0,limit)));
+    limit(limit: number): Pipeline<E> {
+        return new Pipeline<E>(Collects.limit(this.collection, Math.max(0, limit)));
     }
 
-    skip(skip:number):Pipeline<E>{
-        return new Pipeline<E>(Collects.skip(this.collection, Math.max(0,skip)));
+    skip(skip: number): Pipeline<E> {
+        return new Pipeline<E>(Collects.skip(this.collection, Math.max(0, skip)));
     }
 }
 

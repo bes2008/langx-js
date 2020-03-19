@@ -1,22 +1,23 @@
 import * as Types from './Types';
-export class RuntimeException extends Error{
-    constructor(message: string| String | Function) {
+
+export class RuntimeException extends Error {
+    constructor(message: string | String | Function) {
         super();
         this.message = Types.isFunction(message) ? (<Function>message)() : message;
     }
 }
 
-export class IndexOutboundException extends RuntimeException{
-    constructor (message?: string| String | Function|undefined|null){
-        if(message==null){
+export class IndexOutboundException extends RuntimeException {
+    constructor(message?: string | String | Function | undefined | null) {
+        if (message == null) {
             message = "Index outbound";
         }
         super(message);
     }
 }
 
-export class UnsupportOperationException extends RuntimeException{
-    constructor(message?:string) {
-        super(message?message:"Unsupport operation");
+export class UnsupportOperationException extends RuntimeException {
+    constructor(message?: string) {
+        super(message ? message : "Unsupport operation");
     }
 }
