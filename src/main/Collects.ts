@@ -46,16 +46,20 @@ export function emptyLinkedList(): LinkedList<any> {
     return new LinkedList<any>();
 }
 
-export function asIterable(obj: any): List<any> {
-    return Iterables.asIterable(obj);
-}
-
 export function emptyHashSet(): LikeJavaSet<any> {
     return new HashSet<any>();
 }
 
+export function emptyHashMap(): LikeJavaMap<any, any> {
+    return new HashMap<any,any>();
+}
+
 export function newList(iterable?: Iterable<any>): List<any> {
     return new ArrayList(iterable);
+}
+
+export function asIterable(obj: any): List<any> {
+    return Iterables.asIterable(obj);
 }
 
 export function cleanNulls(iterable: LinearCollection): Collection<any> | Array<any> {
