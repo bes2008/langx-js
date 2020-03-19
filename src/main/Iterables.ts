@@ -741,7 +741,9 @@ export class HashMap<K extends any, V extends any> extends AbstractMap<K, V> {
 
     clear(): void {
         for (let list of this.array) {
-            list.clear();
+            if(list!=null){
+                list.clear();
+            }
         }
         this.length = 0;
     }
