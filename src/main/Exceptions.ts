@@ -14,3 +14,9 @@ export class IndexOutboundException extends RuntimeException{
         super(message);
     }
 }
+
+export class UnsupportOperationException extends RuntimeException{
+    constructor(message?:string) {
+        super(message?message:"Unsupport operation");
+    }
+}

@@ -6,6 +6,7 @@ import * as Collects from "./Collects";
 import * as Booleans from "./Booleans";
 import * as Pipeline from "./Pipeline";
 import {emptyArrayList} from "./Collects";
+import {UnsupportOperationException} from "./Exceptions";
 
 export abstract class AbstractIterator<E extends any> implements Iterator<E> {
     abstract next(...args: [] | [undefined]): IteratorResult<any>;
@@ -566,7 +567,13 @@ export class HashSet<E> extends AbstractSet<E> {
         super();
         this.map = new HashMap<E, null>();
         if (list != null) {
-            this.addAll(new ArrayList(list));
+            if(list instanceof AbstractCollection){
+                this.addAll(list);
+            }else{
+                for (let element of list){
+                    this.add(element);
+                }
+            }
         }
     }
 
@@ -594,7 +601,7 @@ export class HashSet<E> extends AbstractSet<E> {
     }
 
     [Symbol.iterator](): Iterator<E> {
-        return new ArrayList<E>(this)[Symbol.iterator]();
+        return this.map.keySet()[Symbol.iterator]();
     }
 
     remove(e: E): E {
@@ -763,7 +770,7 @@ export class HashMap<K extends any, V extends any> extends AbstractMap<K, V> {
     }
 
     entrySet(): LikeJavaSet<MapEntry<K, V>> {
-        return Pipeline.of(this.array).flatMap().toSet();
+        return <LikeJavaSet<MapEntry<K, V>>>new MapInnerEntrySet(this,Pipeline.of(this.array).flatMap().toList());
     }
 
     get(key: K): V {
@@ -777,12 +784,11 @@ export class HashMap<K extends any, V extends any> extends AbstractMap<K, V> {
 
 
     keySet(): LikeJavaSet<K> {
-        debugger;
-        return Pipeline.of(this.array).flatMap({
+        return new MapInnerKeySet(this,Pipeline.of(this.array).flatMap({
             apply(entry: MapEntry<K, V>): K {
                 return entry.key;
             }
-        }).toSet();
+        }).toList());
     }
 
     put(key: K, value?: V): V | undefined {
@@ -855,6 +861,110 @@ export class HashMap<K extends any, V extends any> extends AbstractMap<K, V> {
     [Symbol.iterator](): Iterator<MapEntry<any, any>> {
         return new ArrayList(this.entrySet())[Symbol.iterator]();
     }
+}
+
+class MapInnerEntrySet<K,V extends any> extends AbstractSet<MapEntry<K,V>> {
+    private readonly map:LikeJavaMap<K,V> ;
+    private readonly entries:List<MapEntry<K, V>>;
+    constructor(map: LikeJavaMap<K, V>, entries: List<MapEntry<K, V>>) {
+        super();
+        this.map = map;
+        this.entries = entries;
+    }
+
+    [Symbol.iterator](): Iterator<MapEntry<K, V>> {
+        return this.entries[Symbol.iterator]();
+    }
+
+    add(e: MapEntry<K, V>): boolean {
+        let size0 = this.map.size();
+        this.map.put(e.key, e.value==null? <V>Objects.unknownNull():e.value);
+        if(this.map.size()-size0>0){
+            this.entries.add(e);
+            return true;
+        }
+        return false;
+    }
+
+    clear() {
+        this.map.clear();
+        this.entries.clear();
+    }
+
+    contains(e: MapEntry<K, V>): boolean {
+        return this.entries.contains(e);
+    }
+
+    remove(e: MapEntry<K, V>): MapEntry<K, V> {
+        this.entries.remove(e);
+        this.map.remove(e.key);
+        return e;
+    }
+
+    retainAll(c: Collection<MapEntry<K, V>>): boolean {
+        return false;
+    }
+
+    toArray(array?: Array<MapEntry<K, V>>): Array<MapEntry<K, V>> {
+        return this.entries.toArray(array);
+    }
+
+    size(): number {
+        return this.entries.size();
+    }
+
+}
+
+class MapInnerKeySet<E> extends AbstractSet<E>{
+    private readonly map:LikeJavaMap<E,any> ;
+    private readonly keys:List<E>;
+
+    constructor(map: LikeJavaMap<E, any>, keys: List<E>) {
+        super();
+        this.map = map;
+        this.keys = keys;
+    }
+
+    [Symbol.iterator](): Iterator<E> {
+        return this.keys[Symbol.iterator]();
+    }
+
+    add(e: E): boolean {
+        throw new UnsupportOperationException();
+    }
+
+    clear() {
+        this.keys.clear();
+        this.map.clear();
+    }
+
+    contains(e: E): boolean {
+        return this.map.containsKey(e);
+    }
+
+    remove(e: E): E {
+        this.map.remove(e);
+       return this.keys.remove(e);
+    }
+
+    retainAll(c: Collection<E>): boolean {
+        let removed:Array<E>=[];
+        for (let key of this.keys){
+            if(!c.contains(key)){
+                removed.push(key);
+            }
+        }
+        for(let key of removed){
+            this.remove(key);
+        }
+        return true;
+    }
+
+    toArray(array?: Array<E>): Array<E> {
+        return this.keys.toArray(array);
+    }
+
+
 }
 
 export function isIterator(obj: any): boolean {
