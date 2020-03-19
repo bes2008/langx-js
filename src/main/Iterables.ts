@@ -610,7 +610,14 @@ export class HashSet<E> extends AbstractSet<E> {
     }
 
     retainAll(c: Collection<E>): boolean {
-        return false;
+        let removed:ArrayList<E> = new ArrayList<E>();
+        for (let element of this.toArray()){
+            if(element!=null && !c.contains(element)){
+                removed.add(element);
+            }
+        }
+        this.removeAll(removed);
+        return true;
     }
 
     toArray(array?: Array<E>): Array<E> {
