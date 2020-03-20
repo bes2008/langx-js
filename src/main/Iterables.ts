@@ -169,7 +169,7 @@ export interface List<E> extends Collection<E> {
 
     set(index: number, e: E): E;
 
-    removeByIndex(index:number);
+    removeByIndex(index: number);
 
     indexOf(e: E): number;
 
@@ -203,7 +203,7 @@ export abstract class AbstractList<E> extends AbstractCollection<E> implements L
     abstract indexOf(e: E): number;
 
     removeByIndex(index: number) {
-        if(index<0|| index>=this.size()){
+        if (index < 0 || index >= this.size()) {
             return;
         }
     }
@@ -336,10 +336,10 @@ export class ArrayList<E> extends AbstractList<E> {
 
 
     removeByIndex(index: number) {
-        if(index<0|| index>=this.size()){
+        if (index < 0 || index >= this.size()) {
             return;
         }
-        this.array.splice(index,1);
+        this.array.splice(index, 1);
         this.length--;
     }
 }
@@ -449,7 +449,7 @@ export class LinkedList<E> extends AbstractList<E> {
 
 
     removeByIndex(index: number) {
-        if(index<0|| index>=this.size()){
+        if (index < 0 || index >= this.size()) {
             return;
         }
         let node: LinkedListNode<E> = this.getNode(index);
@@ -629,16 +629,23 @@ export interface LikeJavaSet<E extends any> extends Collection<E> {
 
 export abstract class AbstractSet<E extends any> extends AbstractCollection<E> implements LikeJavaSet<E> {
     abstract add(e?: E): boolean;
+
     abstract size(): number;
-    abstract clear():void;
-    abstract contains(e: E):boolean;
+
+    abstract clear(): void;
+
+    abstract contains(e: E): boolean;
+
     abstract [Symbol.iterator](): Iterator<E>;
+
     abstract remove(e: E): E;
+
     abstract retainAll(c: Collection<E>): boolean;
+
     abstract toArray(array?: Array<E>): Array<E>;
 }
 
-abstract class AbstractHashBasedSet<E extends any> extends AbstractSet<E>{
+abstract class AbstractHashBasedSet<E extends any> extends AbstractSet<E> {
     protected map: LikeJavaMap<E, null>;
 
     constructor() {
@@ -661,7 +668,7 @@ abstract class AbstractHashBasedSet<E extends any> extends AbstractSet<E>{
         return this.map.size();
     }
 
-    clear():void {
+    clear(): void {
         this.map.clear();
     }
 
@@ -716,7 +723,7 @@ export class HashSet<E> extends AbstractHashBasedSet<E> {
     }
 }
 
-export class LinkedHashSet<E extends any> extends AbstractHashBasedSet<E>{
+export class LinkedHashSet<E extends any> extends AbstractHashBasedSet<E> {
 
     constructor(list?: Collection<E> | Array<E> | Set<E> | Iterable<E> | IterableIterator<E>) {
         super();
@@ -733,9 +740,9 @@ export class LinkedHashSet<E extends any> extends AbstractHashBasedSet<E>{
     }
 }
 
-export class TreeSet<E extends any> extends AbstractHashBasedSet<E>{
+export class TreeSet<E extends any> extends AbstractHashBasedSet<E> {
 
-    constructor(list?: Collection<E> | Array<E> | Set<E> | Iterable<E> | IterableIterator<E>, comparator?:Comparator<E>) {
+    constructor(list?: Collection<E> | Array<E> | Set<E> | Iterable<E> | IterableIterator<E>, comparator?: Comparator<E>) {
         super();
         this.map = new TreeMap<E, null>(<TreeMap<E, null>>Objects.unknownNull(), comparator);
         if (list != null) {
@@ -951,8 +958,8 @@ export class TreeMap<K extends any, V extends any> extends AbstractMap<K, V> {
     remove(key: K): V | undefined {
         let newEntry: MapEntry<K, V> = new SimpleMapEntry(key, <V>Objects.unknownNull());
         let searchResult: SearchResult<MapEntry<K, V>> = binarySearch(this.list, newEntry, this.comparator, 0, this.list.size() - 1);
-        let value:V=<V>Objects.unknownNull();
-        if(searchResult.value!=null){
+        let value: V = <V>Objects.unknownNull();
+        if (searchResult.value != null) {
             value = <V>this.map.remove(key);
             this.list.removeByIndex(searchResult.index);
         }
@@ -1055,8 +1062,8 @@ export class HashMap<K extends any, V extends any> extends AbstractMap<K, V> {
         return this.putEntry(new SimpleMapEntry(key, value));
     }
 
-    protected putEntry( entry:MapEntry<K,V>): V | undefined {
-        if (entry == null|| entry.key==null) {
+    protected putEntry(entry: MapEntry<K, V>): V | undefined {
+        if (entry == null || entry.key == null) {
             return undefined;
         }
         let key = entry.key;
@@ -1129,8 +1136,8 @@ export class HashMap<K extends any, V extends any> extends AbstractMap<K, V> {
 }
 
 
-class LinkedHashMap<K, V extends any> extends HashMap<K, V>{
-    private readonly orders:List<MapEntry<K, V>> = new ArrayList<MapEntry<K, V>>();
+class LinkedHashMap<K, V extends any> extends HashMap<K, V> {
+    private readonly orders: List<MapEntry<K, V>> = new ArrayList<MapEntry<K, V>>();
 
     constructor(map?: LikeJavaMap<K, V> | Map<K, V>) {
         super(map);
@@ -1157,19 +1164,19 @@ class LinkedHashMap<K, V extends any> extends HashMap<K, V>{
         if (key == null) {
             return undefined;
         }
-        let entry:MapEntry<K, V> = new SimpleMapEntry(key,value);
+        let entry: MapEntry<K, V> = new SimpleMapEntry(key, value);
         let oldSize = this.size();
         let oldValue = this.putEntry(entry);
-        if(this.size()>oldSize){
-           this.orders.add(entry);
-        }else{
-            let entry:MapEntry<K, V>=Collects.first(this.orders, {
+        if (this.size() > oldSize) {
+            this.orders.add(entry);
+        } else {
+            let entry: MapEntry<K, V> = Collects.first(this.orders, {
                 test(index: number, entry: MapEntry<K, V>) {
-                    return entry!=null && entry.key==key;
+                    return entry != null && entry.key == key;
                 }
             });
-            if(entry!=null){
-                entry.value=value;
+            if (entry != null) {
+                entry.value = value;
             }
         }
         return oldValue;
@@ -1177,12 +1184,12 @@ class LinkedHashMap<K, V extends any> extends HashMap<K, V>{
 
 
     remove(key: K): V | undefined {
-        let oldSize= this.size();
+        let oldSize = this.size();
         let value = super.remove(key);
-        if(this.size()<oldSize){
+        if (this.size() < oldSize) {
             Collects.removeIf(this.orders, {
                 test(index: number, entry: MapEntry<K, V>) {
-                    return entry!=null && entry.key==key;
+                    return entry != null && entry.key == key;
                 }
             })
         }
@@ -1423,10 +1430,7 @@ export function hashCode(iterable: Iterable<any>): number {
 
 export class CompositeIterator<E extends any> extends AbstractIterator<E> {
     private readonly iterators: List<Iterator<E>> = emptyArrayList();
-    private iter: Iterator<Iterator<E>> = <Iterator<Iterator<E>>>Objects.unknownNull();
-    private currentIter: Iterator<E> = <Iterator<E>>Objects.unknownNull();
-    private running: boolean = false;
-    private finished: boolean = false;
+    private currentIteratorIndex = -1;
 
     constructor(iterators?: List<Iterator<E>>) {
         super();
@@ -1436,34 +1440,29 @@ export class CompositeIterator<E extends any> extends AbstractIterator<E> {
     }
 
     addIterator(iterator: Iterator<E>): void {
-        if (!this.running && !this.finished) {
+        if (this.currentIteratorIndex < 0) {
             this.iterators.add(iterator);
         }
     }
 
-
     next(...args: [] | [undefined]): IteratorResult<E> {
-        if (!this.running) {
-            this.iter = this.iterators[Symbol.iterator]();
-            this.running = true;
+        if (this.currentIteratorIndex >= this.iterators.size()) {
+            return {
+                done: true,
+                value: <E>Objects.unknownNull()
+            };
         }
-        if (this.currentIter == null && !this.finished) {
-            let getSubIteratorResult: IteratorResult<Iterator<E>> = this.iter.next();
-            if (!getSubIteratorResult.done) {
-                this.currentIter = getSubIteratorResult.value;
-            } else {
-                this.currentIter = <Iterator<E>>Objects.unknownNull();
-                this.finished = true;
-            }
+        if (this.currentIteratorIndex < 0) {
+            this.currentIteratorIndex = 0;
         }
-
-        if (this.currentIter != null && !this.finished) {
-            return this.currentIter.next();
+        let currentIterator: Iterator<E> = this.iterators.get(this.currentIteratorIndex);
+        let result: IteratorResult<E> = currentIterator.next();
+        if (!result.done) {
+            return result;
+        } else {
+            this.currentIteratorIndex++;
+            return this.next(...args);
         }
-        return {
-            done: true,
-            value: null
-        };
     }
 
 
