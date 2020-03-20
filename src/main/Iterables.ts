@@ -628,24 +628,22 @@ export interface LikeJavaSet<E extends any> extends Collection<E> {
 }
 
 export abstract class AbstractSet<E extends any> extends AbstractCollection<E> implements LikeJavaSet<E> {
-
+    abstract add(e?: E): boolean;
+    abstract size(): number;
+    abstract clear():void;
+    abstract contains(e: E):boolean;
+    abstract [Symbol.iterator](): Iterator<E>;
+    abstract remove(e: E): E;
+    abstract retainAll(c: Collection<E>): boolean;
+    abstract toArray(array?: Array<E>): Array<E>;
 }
 
-export class HashSet<E> extends AbstractSet<E> {
-    private map: HashMap<E, null>;
+export abstract class AbstractHashBasedSet<E extends any> extends AbstractSet<E>{
+    protected map: LikeJavaMap<E, null>;
 
-    constructor(list?: Collection<E> | Array<E> | Set<E> | Iterable<E> | IterableIterator<E>) {
+    constructor() {
         super();
-        this.map = new HashMap<E, null>();
-        if (list != null) {
-            if (list instanceof AbstractCollection) {
-                this.addAll(list);
-            } else {
-                for (let element of list) {
-                    this.add(element);
-                }
-            }
-        }
+        this.map = <LikeJavaMap<E, null>>Objects.unknownNull();
     }
 
     add(e?: E): boolean {
@@ -663,7 +661,7 @@ export class HashSet<E> extends AbstractSet<E> {
         return this.map.size();
     }
 
-    clear() {
+    clear():void {
         this.map.clear();
     }
 
@@ -701,8 +699,42 @@ export class HashSet<E> extends AbstractSet<E> {
 
 }
 
-export class TreeSet<E extends any> extends AbstractSet<E>{
-    private readonly map:TreeMap<E, null>;
+export class HashSet<E> extends AbstractHashBasedSet<E> {
+
+    constructor(list?: Collection<E> | Array<E> | Set<E> | Iterable<E> | IterableIterator<E>) {
+        super();
+        this.map = new HashMap<E, null>();
+        if (list != null) {
+            if (list instanceof AbstractCollection) {
+                this.addAll(list);
+            } else {
+                for (let element of list) {
+                    this.add(element);
+                }
+            }
+        }
+    }
+}
+
+export class LinkedHashSet<E extends any> extends AbstractHashBasedSet<E>{
+
+    constructor(list?: Collection<E> | Array<E> | Set<E> | Iterable<E> | IterableIterator<E>) {
+        super();
+        this.map = new LinkedHashMap<E, null>();
+        if (list != null) {
+            if (list instanceof AbstractCollection) {
+                this.addAll(list);
+            } else {
+                for (let element of list) {
+                    this.add(element);
+                }
+            }
+        }
+    }
+}
+
+export class TreeSet<E extends any> extends AbstractHashBasedSet<E>{
+
     constructor(list?: Collection<E> | Array<E> | Set<E> | Iterable<E> | IterableIterator<E>, comparator?:Comparator<E>) {
         super();
         this.map = new TreeMap<E, null>(<TreeMap<E, null>>Objects.unknownNull(), comparator);
@@ -715,52 +747,6 @@ export class TreeSet<E extends any> extends AbstractSet<E>{
                 }
             }
         }
-    }
-
-    [Symbol.iterator](): Iterator<E> {
-        return this.map.keySet()[Symbol.iterator]();
-    }
-
-    add(e: E): boolean {
-        if (e == null) {
-            return false;
-        }
-        if (this.map.containsKey(e)) {
-            return false;
-        }
-        this.map.put(e, null);
-        return true;
-    }
-
-    clear() {
-        this.map.clear();
-    }
-
-    contains(e: E): boolean {
-        return this.map.containsKey(e);
-    }
-
-    remove(e: E): E {
-        return <E>this.map.remove(e);
-    }
-
-    retainAll(c: Collection<E>): boolean {
-        let removed: ArrayList<E> = new ArrayList<E>();
-        for (let element of this.toArray()) {
-            if (element != null && !c.contains(element)) {
-                removed.add(element);
-            }
-        }
-        this.removeAll(removed);
-        return true;
-    }
-
-    toArray(array?: Array<E>): Array<E> {
-        if (array == null) {
-            return Collects.toArray(this.map.keySet());
-        }
-        array.push(...this.map.keySet());
-        return array;
     }
 
 }
@@ -806,7 +792,6 @@ export class SimpleMapEntry<K, V> implements MapEntry<K, V> {
         return (this.key == null ? 0 : Objects.hashCode(this.key)) ^
             (this.value == null ? 0 : Objects.hashCode(this.value));
     }
-
 }
 
 
@@ -1147,7 +1132,7 @@ export class HashMap<K extends any, V extends any> extends AbstractMap<K, V> {
 class LinkedHashMap<K, V extends any> extends HashMap<K, V>{
     private readonly orders:List<MapEntry<K, V>> = new ArrayList<MapEntry<K, V>>();
 
-    constructor(map: LikeJavaMap<K, V> | Map<K, V>) {
+    constructor(map?: LikeJavaMap<K, V> | Map<K, V>) {
         super(map);
     }
 
@@ -1319,7 +1304,9 @@ class MapInnerKeySet<E> extends AbstractSet<E> {
         return this.keys.toArray(array);
     }
 
-
+    size(): number {
+        return this.keys.size();
+    }
 }
 
 export function isIterator(obj: any): boolean {
