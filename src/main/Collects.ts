@@ -26,7 +26,7 @@ import {
     LikeJavaSet, LinearCollection,
     LinkedList,
     List,
-    MapEntry, TreeMap
+    MapEntry, TreeMap, TreeSet
 } from "./Iterables";
 import * as Preconditions from "./Preconditions";
 import {Comparator} from "./Comparators";
@@ -50,6 +50,10 @@ export function emptyLinkedList(): LinkedList<any> {
 
 export function emptyHashSet(): HashSet<any> {
     return new HashSet<any>();
+}
+
+export function emptyTreeSet(comparator?: Comparator<any>): TreeSet<any> {
+    return new TreeSet<any>(<Iterable<any>>Objects.unknownNull(),comparator);
 }
 
 export function emptyHashMap(): HashMap<any, any> {

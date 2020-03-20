@@ -40,4 +40,8 @@ describe("Set Tests", ()=>{
         testSet(Collects.emptyHashSet());
     });
 
+    test("Tree Test", ()=>{
+        testSet(Collects.emptyTreeSet());
+    });
+
 });

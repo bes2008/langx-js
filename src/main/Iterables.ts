@@ -701,6 +701,71 @@ export class HashSet<E> extends AbstractSet<E> {
 
 }
 
+export class TreeSet<E extends any> extends AbstractSet<E>{
+    private readonly map:TreeMap<E, null>;
+    constructor(list?: Collection<E> | Array<E> | Set<E> | Iterable<E> | IterableIterator<E>, comparator?:Comparator<E>) {
+        super();
+        this.map = new TreeMap<E, null>(<TreeMap<E, null>>Objects.unknownNull(), comparator);
+        if (list != null) {
+            if (list instanceof AbstractCollection) {
+                this.addAll(list);
+            } else {
+                for (let element of list) {
+                    this.add(element);
+                }
+            }
+        }
+    }
+
+    [Symbol.iterator](): Iterator<E> {
+        return this.map.keySet()[Symbol.iterator]();
+    }
+
+    add(e: E): boolean {
+        if (e == null) {
+            return false;
+        }
+        if (this.map.containsKey(e)) {
+            return false;
+        }
+        this.map.put(e, null);
+        return true;
+    }
+
+    clear() {
+        this.map.clear();
+    }
+
+    contains(e: E): boolean {
+        return this.map.containsKey(e);
+    }
+
+    remove(e: E): E {
+        return <E>this.map.remove(e);
+    }
+
+    retainAll(c: Collection<E>): boolean {
+        let removed: ArrayList<E> = new ArrayList<E>();
+        for (let element of this.toArray()) {
+            if (element != null && !c.contains(element)) {
+                removed.add(element);
+            }
+        }
+        this.removeAll(removed);
+        return true;
+    }
+
+    toArray(array?: Array<E>): Array<E> {
+        if (array == null) {
+            return Collects.toArray(this.map.keySet());
+        }
+        array.push(...this.map.keySet());
+        return array;
+    }
+
+}
+
+
 export interface MapEntry<K, V> {
     key: K;
     value?: V;
