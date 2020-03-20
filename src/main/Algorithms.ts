@@ -58,7 +58,7 @@ export function binarySearch(sortedArray: ArrayList<any>, e: any, comparator: Co
         return new SearchResult<any>(toIndex, null);
     }
     // compare the middle of current scope
-    let middleIndex = (fromIndex + toIndex) / 2;
+    let middleIndex = Math.floor(fromIndex + toIndex+1) / 2;
     let cMiddle = comparator.compare(e, sortedArray.get(middleIndex));
     if (cMiddle == 0) {
         return new SearchResult<any>(middleIndex, sortedArray.get(middleIndex));
