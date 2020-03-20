@@ -3,6 +3,7 @@ import * as Types from "./Types";
 import * as Numbers from "./Numbers";
 import * as Objects from "./Objects";
 import * as Functions from "./Functions";
+import * as Emptys from "./Emptys";
 import {
     Consumer,
     Consumer2,
@@ -28,6 +29,7 @@ import {
     MapEntry
 } from "./Iterables";
 import * as Preconditions from "./Preconditions";
+import {Comparator} from "./Comparators";
 
 
 export function emptyArray(): Array<any> {
