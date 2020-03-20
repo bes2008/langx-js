@@ -20,7 +20,11 @@ export function judgeFuncType(mapper?: Func<any, any> | Func2<any, any, any> | F
         return FunctionType.UNKNOWN;
     }
     let hasApplyMethod = Types.isFunction(mapper["apply"]);
-
+    if (hasApplyMethod) {
+        if (mapper["apply"] == Function.apply) {
+            hasApplyMethod = false;
+        }
+    }
     if (!hasApplyMethod) {
         let consumerIsFunction = Types.isFunction(mapper);
         if (consumerIsFunction) {

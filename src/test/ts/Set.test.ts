@@ -6,7 +6,7 @@ import {LikeJavaSet,  List} from "../../main/Iterables";
  */
 describe("Set Tests", ()=>{
 
-    function testList(list:LikeJavaSet<any>){
+    function testSet(list:LikeJavaSet<any>){
         debugger;
         list.addAll(Collects.newList(["a","b","c","d","e"]));
         Collects.forEach(list, (element)=>{
@@ -37,7 +37,7 @@ describe("Set Tests", ()=>{
     }
 
     test("HashSet Test", ()=>{
-        testList(Collects.emptyHashSet());
+        testSet(Collects.emptyHashSet());
     });
 
 });

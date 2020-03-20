@@ -340,6 +340,7 @@ export class ArrayList<E> extends AbstractList<E> {
             return;
         }
         this.array.splice(index,1);
+        this.length--;
     }
 }
 
@@ -820,7 +821,7 @@ export class TreeMap<K extends any, V extends any> extends AbstractMap<K, V> {
     private comparator: MapEntryKeyComparator<K, V> = <MapEntryKeyComparator<K, V>>Objects.unknownNull();
 
 
-    constructor(map: LikeJavaMap<K, V> | Map<K, V>, comparator?: Comparator<K>) {
+    constructor(map?: LikeJavaMap<K, V> | Map<K, V>, comparator?: Comparator<K>) {
         super();
         if (map != null) {
             if (map instanceof Map) {

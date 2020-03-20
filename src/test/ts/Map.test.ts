@@ -7,7 +7,7 @@ import {LikeJavaMap, List} from "../../main/Iterables";
  */
 describe("Map Tests", () => {
 
-    function testList(map: LikeJavaMap<string, any>) {
+    function testMap(map: LikeJavaMap<string, any>) {
         debugger;
 
         Collects.forEach(Collects.newList(["a", "b", "c", "d", "e"]), (element) => {
@@ -42,9 +42,12 @@ describe("Map Tests", () => {
         expect(map.size()).toBe(3);
         expect(map.isEmpty()).toBe(false);
     }
-
-    test("HashMap Test", () => {
-        testList(Collects.emptyHashMap());
+    test("TreeMap Test", () => {
+        testMap(Collects.emptyTreeMap());
     });
+    test("HashMap Test", () => {
+        testMap(Collects.emptyHashMap());
+    });
+
 
 });

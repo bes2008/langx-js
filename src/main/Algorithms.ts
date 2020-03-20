@@ -51,7 +51,7 @@ export function binarySearch(sortedArray: ArrayList<any>, e: any, comparator: Co
     // compare the last of current scope
     let cLast = comparator.compare(e, sortedArray.get(toIndex))
     if (cLast >= 0) {
-        return new SearchResult<any>(toIndex, cLast == 0 ? sortedArray.get(toIndex) : null);
+        return new SearchResult<any>(cLast == 0 ? toIndex : (toIndex+1), cLast == 0 ? sortedArray.get(toIndex) : null);
     }
     if (toIndex - fromIndex == 1) {
         // has no middle element

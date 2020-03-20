@@ -26,7 +26,7 @@ import {
     LikeJavaSet, LinearCollection,
     LinkedList,
     List,
-    MapEntry
+    MapEntry, TreeMap
 } from "./Iterables";
 import * as Preconditions from "./Preconditions";
 import {Comparator} from "./Comparators";
@@ -48,12 +48,16 @@ export function emptyLinkedList(): LinkedList<any> {
     return new LinkedList<any>();
 }
 
-export function emptyHashSet(): LikeJavaSet<any> {
+export function emptyHashSet(): HashSet<any> {
     return new HashSet<any>();
 }
 
-export function emptyHashMap(): LikeJavaMap<any, any> {
+export function emptyHashMap(): HashMap<any, any> {
     return new HashMap<any, any>();
+}
+
+export function emptyTreeMap(comparator?: Comparator<any>): TreeMap<any, any> {
+    return new TreeMap<any, any>(<Map<any, any>>Objects.unknownNull(), comparator);
 }
 
 export function newList(iterable?: Iterable<any>): List<any> {
@@ -108,9 +112,9 @@ export function forEach(iterable: Iterable<any>, consumer: Consumer<any> | Consu
     let isMap = Types.isMap(iterable);
     if (isMap) {
         let map;
-        if (Types.isJsMap(iterable)) {
+        if (Types.isJavaMap(iterable)) {
             map = <LikeJavaMap<any, any>>iterable;
-        } else {
+        } else if(Types.isJsMap(iterable)){
             map = new HashMap(<Map<any, any>>iterable);
         }
         for (let entry of map) {
