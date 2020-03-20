@@ -7,7 +7,7 @@ import * as Booleans from "./Booleans";
 import * as Pipeline from "./Pipeline";
 import {emptyArrayList} from "./Collects";
 import {UnsupportOperationException} from "./Exceptions";
-import Comparator from "./Comparators";
+import {Comparator} from "./Comparators";
 import * as Emptys from "./Emptys";
 
 export abstract class AbstractIterator<E extends any> implements Iterator<E> {
@@ -729,7 +729,7 @@ export abstract class AbstractMap<K extends any, V extends any> implements LikeJ
 export class TreeMap<K extends any,V extends any> extends AbstractMap<K, V>{
     private readonly list:ArrayList<MapEntry<K, V>> = new ArrayList<MapEntry<K, V>>();
     private readonly map:HashMap<K,V>= new HashMap<K, V>();
-    private comparator:Comparator<K>;
+    private comparator?:Comparator<K>;
 
 
     constructor(map: LikeJavaMap<K, V>| Map<K, V>, comparator?:Comparator<K>) {
@@ -741,9 +741,19 @@ export class TreeMap<K extends any,V extends any> extends AbstractMap<K, V>{
                     this.put(entry[0], entry[1]);
                 }
             }else if(map instanceof AbstractMap){
+                if(this.comparator==null){
+                    if(map instanceof TreeMap){
+                        this.comparator = (<TreeMap<K, V>>map).getComparator();
+                    }
+                }
+
                 this.putAll(map);
             }
         }
+    }
+
+    getComparator():Comparator<K>{
+        return <Comparator<K>>this.comparator;
     }
 
     [Symbol.iterator](): Iterator<MapEntry<any, any>> {

@@ -1,3 +1,4 @@
+import * as Objects from "./Objects";
 export interface Comparator<E> {
     compare(e1: E, e2: E): number;
 }
@@ -45,3 +46,8 @@ export class BooleanComparator implements Comparator<Boolean> {
     }
 }
 
+export class HashedComparator<E> implements Comparator<E>{
+    compare(e1: E, e2: E): number {
+        return Objects.hashCode(e1)- Objects.hashCode(e2);
+    }
+}

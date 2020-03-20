@@ -18,7 +18,7 @@
     "suppressImplicitAnyIndexErrors" : false,
     "strictNullChecks": true,
     "strictPropertyInitialization": true,
-    "noUnusedLocals": true,
+    "noUnusedLocals": false,
     "noUnusedParameters": false
   },
   "include": [

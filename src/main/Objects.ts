@@ -1,9 +1,7 @@
+import * as HashCodes from "./HashCodes";
 import * as Emptys from "./Emptys";
 import * as Types from "./Types";
-import * as Strings from "./Strings";
-import * as Booleans from "./Booleans";
-import * as Dates from "./Dates";
-import * as Numbers from "./Numbers";
+
 
 interface ObjectPropertyDescriptor {
     configurable?: boolean;
@@ -202,33 +200,6 @@ export function unknownNull(): unknown {
     return <unknown>null;
 }
 
-
-export function hashCode(object: any) {
-    if (isEmpty(object)) {
-        return 0;
-    }
-    if (Types.isNumber(object)) {
-        return Numbers.hashCode(object);
-    }
-
-    if (Types.isBoolean(object)) {
-        return Booleans.hashCode(object);
-    }
-
-    if (Types.isString(object)) {
-        return Strings.hashCode(<string>object);
-    }
-
-    if (Types.isDate(object)) {
-        return Dates.hashCode(object);
-    }
-
-    if (Types.isArray(object)) {
-        return object.hashCode();
-    }
-    return 0;
+export function hashCode(object:any):number {
+    return HashCodes.hashCode(object);
 }
-
-Object.prototype["hashCode"] = function () {
-    return hashCode(this);
-};
