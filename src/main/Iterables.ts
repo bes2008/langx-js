@@ -988,8 +988,8 @@ export class TreeMap<K extends any, V extends any> extends AbstractMap<K, V> {
 
 
 export class HashMap<K extends any, V extends any> extends AbstractMap<K, V> {
-    private length: number = 0;
-    private array: Array<List<MapEntry<K, V>>> = [];
+    protected length: number = 0;
+    protected array: Array<List<MapEntry<K, V>>> = [];
     private readonly MAX_SLOT: number = 48;
 
     constructor(map?: LikeJavaMap<K, V> | Map<K, V>) {
@@ -1067,10 +1067,15 @@ export class HashMap<K extends any, V extends any> extends AbstractMap<K, V> {
     }
 
     put(key: K, value?: V): V | undefined {
-        if (key == null) {
+        return this.putEntry(new SimpleMapEntry(key, value));
+    }
+
+    protected putEntry( entry:MapEntry<K,V>): V | undefined {
+        if (entry == null|| entry.key==null) {
             return undefined;
         }
-
+        let key = entry.key;
+        let value = entry.value;
         let list: List<MapEntry<K, V>> = this.getKeySlotList(key);
         let oldEntry: MapEntry<K, V> = Pipeline.of(list).first({
             test: function (entry: MapEntry<K, V>) {
@@ -1078,7 +1083,7 @@ export class HashMap<K extends any, V extends any> extends AbstractMap<K, V> {
             }
         });
         if (oldEntry == null) {
-            list.add(new SimpleMapEntry(key, value));
+            list.add(entry);
             this.length++;
             return undefined;
         } else {
@@ -1132,6 +1137,80 @@ export class HashMap<K extends any, V extends any> extends AbstractMap<K, V> {
         }).toList();
     }
 
+
+    [Symbol.iterator](): Iterator<MapEntry<any, any>> {
+        return new ArrayList(this.entrySet())[Symbol.iterator]();
+    }
+}
+
+
+class LinkedHashMap<K, V extends any> extends HashMap<K, V>{
+    private readonly orders:List<MapEntry<K, V>> = new ArrayList<MapEntry<K, V>>();
+
+    constructor(map: LikeJavaMap<K, V> | Map<K, V>) {
+        super(map);
+    }
+
+    clear(): void {
+        super.clear();
+        this.orders.clear();
+    }
+
+    entrySet(): LikeJavaSet<MapEntry<K, V>> {
+        return <LikeJavaSet<MapEntry<K, V>>>new MapInnerEntrySet(this, this.orders);
+    }
+
+    keySet(): LikeJavaSet<K> {
+        return new MapInnerKeySet(this, Pipeline.of(this.orders).flatMap({
+            apply(entry: MapEntry<K, V>): K {
+                return entry.key;
+            }
+        }).toList());
+    }
+
+    put(key: K, value?: V): V | undefined {
+        if (key == null) {
+            return undefined;
+        }
+        let entry:MapEntry<K, V> = new SimpleMapEntry(key,value);
+        let oldSize = this.size();
+        let oldValue = this.putEntry(entry);
+        if(this.size()>oldSize){
+           this.orders.add(entry);
+        }else{
+            let entry:MapEntry<K, V>=Collects.first(this.orders, {
+                test(index: number, entry: MapEntry<K, V>) {
+                    return entry!=null && entry.key==key;
+                }
+            });
+            if(entry!=null){
+                entry.value=value;
+            }
+        }
+        return oldValue;
+    }
+
+
+    remove(key: K): V | undefined {
+        let oldSize= this.size();
+        let value = super.remove(key);
+        if(this.size()<oldSize){
+            Collects.removeIf(this.orders, {
+                test(index: number, entry: MapEntry<K, V>) {
+                    return entry!=null && entry.key==key;
+                }
+            })
+        }
+        return value;
+    }
+
+    values(): Collection<V> {
+        return Pipeline.of(this.orders).map({
+            apply(entry: MapEntry<K, V>): V {
+                return entry.value == null ? <V>Objects.unknownNull() : entry.value;
+            }
+        }).toList();
+    }
 
     [Symbol.iterator](): Iterator<MapEntry<any, any>> {
         return new ArrayList(this.entrySet())[Symbol.iterator]();
