@@ -638,7 +638,7 @@ export abstract class AbstractSet<E extends any> extends AbstractCollection<E> i
     abstract toArray(array?: Array<E>): Array<E>;
 }
 
-export abstract class AbstractHashBasedSet<E extends any> extends AbstractSet<E>{
+abstract class AbstractHashBasedSet<E extends any> extends AbstractSet<E>{
     protected map: LikeJavaMap<E, null>;
 
     constructor() {
