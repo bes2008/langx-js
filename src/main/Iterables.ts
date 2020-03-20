@@ -169,6 +169,8 @@ export interface List<E> extends Collection<E> {
 
     set(index: number, e: E): E;
 
+    removeByIndex(index:number);
+
     indexOf(e: E): number;
 
     lastIndexOf(e: E): number;
@@ -199,6 +201,14 @@ export abstract class AbstractList<E> extends AbstractCollection<E> implements L
     abstract lastIndexOf(e: E): number ;
 
     abstract indexOf(e: E): number;
+
+    removeByIndex(index: number) {
+        if(index<0|| index>=this.size()){
+            return;
+        }
+    }
+
+
 }
 
 export class ArrayList<E> extends AbstractList<E> {
@@ -323,6 +333,14 @@ export class ArrayList<E> extends AbstractList<E> {
     [Symbol.iterator](): Iterator<E> {
         return new ArrayListIterator(this);
     }
+
+
+    removeByIndex(index: number) {
+        if(index<0|| index>=this.size()){
+            return;
+        }
+        this.array.splice(index,1);
+    }
 }
 
 export class ArrayListIterator<E extends any> extends AbstractIterator<E> {
@@ -428,6 +446,15 @@ export class LinkedList<E> extends AbstractList<E> {
         return e;
     }
 
+
+    removeByIndex(index: number) {
+        if(index<0|| index>=this.size()){
+            return;
+        }
+        let node: LinkedListNode<E> = this.getNode(index);
+        this.removeNode(node);
+    }
+
     retainAll(c: Collection<E>): boolean {
         let node: LinkedListNode<E> = this.first;
         while (node != null) {
@@ -511,20 +538,51 @@ export class LinkedList<E> extends AbstractList<E> {
         return new LinkedList(array);
     }
 
-    add(e: E): boolean {
-        let newNode: LinkedListNode<E> = {
-            e: e,
-            prev: this.last,
-            next: <LinkedListNode<E>>Objects.unknownNull()
-        };
+    add(e: E, index?: number): boolean {
+        if (index == null || index >= this.length) {
+            let newNode: LinkedListNode<E> = {
+                e: e,
+                prev: this.last,
+                next: <LinkedListNode<E>>Objects.unknownNull()
+            };
 
-        if (this.last != null) {
-            this.last.next = newNode;
+            if (this.last != null) {
+                this.last.next = newNode;
+            }
+            this.last = newNode;
+            if (this.first == null) {
+                this.first = this.last;
+            }
+        } else if (index <= 0) {
+            let newNode: LinkedListNode<E> = {
+                e: e,
+                prev: <LinkedListNode<E>>Objects.unknownNull(),
+                next: this.first
+            };
+            if (this.first != null) {
+                this.first.prev = newNode;
+            }
+            this.first = newNode;
+            if (this.last == null) {
+                this.last = this.first;
+            }
+        } else {
+            let next: LinkedListNode<E> = this.getNode(index);
+            let prev = next != null ? next.prev : <LinkedListNode<E>>Objects.unknownNull();
+
+            let newNode: LinkedListNode<E> = {
+                e: e,
+                prev: prev,
+                next: next
+            };
+            if (prev != null) {
+                prev.next = newNode;
+            }
+            if (next != null) {
+                next.prev = newNode;
+            }
         }
-        this.last = newNode;
-        if (this.first == null) {
-            this.first = this.last;
-        }
+
         this.length++;
         return true;
     }
@@ -824,7 +882,8 @@ export class TreeMap<K extends any, V extends any> extends AbstractMap<K, V> {
         if (key == null) {
             return value;
         }
-        let searchResult: SearchResult<MapEntry<K, V>> = binarySearch(this.list, new SimpleMapEntry(key, value), this.comparator, 0, this.list.size() - 1);
+        let newEntry: MapEntry<K, V> = new SimpleMapEntry(key, value);
+        let searchResult: SearchResult<MapEntry<K, V>> = binarySearch(this.list, newEntry, this.comparator, 0, this.list.size() - 1);
         let oldValue: V;
         if (searchResult.value != null) {
             let entry: MapEntry<K, V> = searchResult.value;
@@ -832,18 +891,25 @@ export class TreeMap<K extends any, V extends any> extends AbstractMap<K, V> {
             entry.value = value;
         } else {
             oldValue = <V>Objects.unknownNull();
-
+            this.list.add(newEntry, searchResult.index);
         }
         this.map.put(key, value);
         return oldValue;
     }
 
     remove(key: K): V | undefined {
-        return undefined;
+        let newEntry: MapEntry<K, V> = new SimpleMapEntry(key, <V>Objects.unknownNull());
+        let searchResult: SearchResult<MapEntry<K, V>> = binarySearch(this.list, newEntry, this.comparator, 0, this.list.size() - 1);
+        let value:V=<V>Objects.unknownNull();
+        if(searchResult.value!=null){
+            value = <V>this.map.remove(key);
+            this.list.removeByIndex(searchResult.index);
+        }
+        return value;
     }
 
     size(): number {
-        return 0;
+        return this.list.size();
     }
 
     values(): Collection<V> {
