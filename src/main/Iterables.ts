@@ -7,7 +7,7 @@ import * as Booleans from "./Booleans";
 import * as Pipeline from "./Pipeline";
 import {emptyArrayList} from "./Collects";
 import {UnsupportOperationException} from "./Exceptions";
-import {Comparator} from "./Comparators";
+import {Comparator, HashedComparator} from "./Comparators";
 import * as Emptys from "./Emptys";
 
 export abstract class AbstractIterator<E extends any> implements Iterator<E> {
@@ -709,9 +709,9 @@ export abstract class AbstractMap<K extends any, V extends any> implements LikeJ
 
     abstract put(key?: K, value?: V): V | undefined;
 
-    putAll(map: LikeJavaMap<K, V>): void{
-        if(map!=null){
-            for(let entry of map){
+    putAll(map: LikeJavaMap<K, V>): void {
+        if (map != null) {
+            for (let entry of map) {
                 this.put(entry.key, entry.value);
             }
         }
@@ -726,33 +726,38 @@ export abstract class AbstractMap<K extends any, V extends any> implements LikeJ
     }
 }
 
-export class TreeMap<K extends any,V extends any> extends AbstractMap<K, V>{
-    private readonly list:ArrayList<MapEntry<K, V>> = new ArrayList<MapEntry<K, V>>();
-    private readonly map:HashMap<K,V>= new HashMap<K, V>();
-    private comparator?:Comparator<K>;
+export class TreeMap<K extends any, V extends any> extends AbstractMap<K, V> {
+    private readonly list: ArrayList<MapEntry<K, V>> = new ArrayList<MapEntry<K, V>>();
+    private readonly map: HashMap<K, V> = new HashMap<K, V>();
+    private comparator?: Comparator<K>;
 
 
-    constructor(map: LikeJavaMap<K, V>| Map<K, V>, comparator?:Comparator<K>) {
+    constructor(map: LikeJavaMap<K, V> | Map<K, V>, comparator?: Comparator<K>) {
         super();
         this.comparator = comparator;
-        if(map!=null){
-            if(map instanceof Map){
-                for(let entry of map.entries()){
+        if (map != null) {
+            if (map instanceof Map) {
+                if (this.comparator == null) {
+                    this.comparator = new HashedComparator();
+                }
+                for (let entry of map.entries()) {
                     this.put(entry[0], entry[1]);
                 }
-            }else if(map instanceof AbstractMap){
-                if(this.comparator==null){
-                    if(map instanceof TreeMap){
+            } else if (map instanceof AbstractMap) {
+                if (this.comparator == null) {
+                    if (map instanceof TreeMap) {
                         this.comparator = (<TreeMap<K, V>>map).getComparator();
                     }
                 }
-
+                if (this.comparator == null) {
+                    this.comparator = new HashedComparator();
+                }
                 this.putAll(map);
             }
         }
     }
 
-    getComparator():Comparator<K>{
+    getComparator(): Comparator<K> {
         return <Comparator<K>>this.comparator;
     }
 
@@ -782,13 +787,13 @@ export class TreeMap<K extends any,V extends any> extends AbstractMap<K, V>{
     }
 
     keySet(): LikeJavaSet<K> {
-        return new MapInnerKeySet(this, Pipeline.of(this.list).map((item:MapEntry<K, V>)=>{
+        return new MapInnerKeySet(this, Pipeline.of(this.list).map((item: MapEntry<K, V>) => {
             return item.key;
         }).toList());
     }
 
     put(key: K, value?: V): V | undefined {
-        if(key==null){
+        if (key == null) {
             return value;
         }
         // TODO insert a element
@@ -804,11 +809,11 @@ export class TreeMap<K extends any,V extends any> extends AbstractMap<K, V>{
     }
 
     values(): Collection<V> {
-        return Pipeline.of(this.list).map((entry:MapEntry<K, V>)=>{
+        return Pipeline.of(this.list).map((entry: MapEntry<K, V>) => {
             return entry.value;
         }).toList();
     }
-    
+
 }
 
 
@@ -1233,12 +1238,13 @@ export class CompositeIterator<E extends any> extends AbstractIterator<E> {
  * if value== null: not found, the index is the suitable index
  * if value !=null: found, the index is the values's index
  */
-export class SearchResult<E extends any>{
-    value:E;
-    index:number
-    constructor(index:number, value:E) {
+export class SearchResult<E extends any> {
+    value: E;
+    index: number
+
+    constructor(index: number, value: E) {
         this.index = index;
-        this.value= value;
+        this.value = value;
     }
 }
 
@@ -1251,56 +1257,56 @@ export class SearchResult<E extends any>{
  * @param e
  * @param comparator
  */
-export function binarySearch(sortedArray:ArrayList<any>,e:any, comparator:Comparator<any>,fromIndex?:number, toIndex?:number):SearchResult<any>{
-    if(Emptys.isEmpty(sortedArray)){
-        return new SearchResult<any>(0,null);
+export function binarySearch(sortedArray: ArrayList<any>, e: any, comparator: Comparator<any>, fromIndex?: number, toIndex?: number): SearchResult<any> {
+    if (Emptys.isEmpty(sortedArray)) {
+        return new SearchResult<any>(0, null);
     }
-    if(fromIndex==null ||fromIndex<0){
-        fromIndex=0;
+    if (fromIndex == null || fromIndex < 0) {
+        fromIndex = 0;
     }
-    if(toIndex==null||toIndex>=sortedArray.size()){
-        toIndex=sortedArray.size()-1;
+    if (toIndex == null || toIndex >= sortedArray.size()) {
+        toIndex = sortedArray.size() - 1;
     }
 
 
     // compare the first of current scope
-    let cFirst = comparator.compare(e,sortedArray.get(fromIndex));
-    if(cFirst<=0){
-        return new SearchResult<any>(fromIndex, cFirst==0? sortedArray.get(fromIndex):null);
+    let cFirst = comparator.compare(e, sortedArray.get(fromIndex));
+    if (cFirst <= 0) {
+        return new SearchResult<any>(fromIndex, cFirst == 0 ? sortedArray.get(fromIndex) : null);
     }
 
-    if(fromIndex==toIndex){
-        return new SearchResult<any>(toIndex+1, null);
+    if (fromIndex == toIndex) {
+        return new SearchResult<any>(toIndex + 1, null);
     }
 
     // compare the last of current scope
-    let cLast =  comparator.compare(e,sortedArray.get(toIndex))
-    if(cLast>=0){
-        return new SearchResult<any>(toIndex, cLast==0? sortedArray.get(toIndex): null);
+    let cLast = comparator.compare(e, sortedArray.get(toIndex))
+    if (cLast >= 0) {
+        return new SearchResult<any>(toIndex, cLast == 0 ? sortedArray.get(toIndex) : null);
     }
-    if(toIndex-fromIndex==1){
+    if (toIndex - fromIndex == 1) {
         // has no middle element
         return new SearchResult<any>(toIndex, null);
     }
     // compare the middle of current scope
-    let middleIndex = (fromIndex+toIndex)/2;
+    let middleIndex = (fromIndex + toIndex) / 2;
     let cMiddle = comparator.compare(e, sortedArray.get(middleIndex));
-    if(cMiddle==0){
+    if (cMiddle == 0) {
         return new SearchResult<any>(middleIndex, sortedArray.get(middleIndex));
     }
-    if(cMiddle<0){
+    if (cMiddle < 0) {
         // go to the left
-        if(fromIndex+1>=middleIndex){
+        if (fromIndex + 1 >= middleIndex) {
             // end
-            return new SearchResult<any>(middleIndex,null);
+            return new SearchResult<any>(middleIndex, null);
         }
-        return binarySearch(sortedArray, e, comparator, fromIndex+1, middleIndex-1);
-    }else{
+        return binarySearch(sortedArray, e, comparator, fromIndex + 1, middleIndex - 1);
+    } else {
         // go to the right
-        if(toIndex-1<=middleIndex){
+        if (toIndex - 1 <= middleIndex) {
             // end
-            return new SearchResult<any>(middleIndex+1,null);
+            return new SearchResult<any>(middleIndex + 1, null);
         }
-        return binarySearch(sortedArray, e, comparator, middleIndex+1, toIndex-1);
+        return binarySearch(sortedArray, e, comparator, middleIndex + 1, toIndex - 1);
     }
 }
