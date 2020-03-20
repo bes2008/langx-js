@@ -645,7 +645,7 @@ export abstract class AbstractSet<E extends any> extends AbstractCollection<E> i
     abstract toArray(array?: Array<E>): Array<E>;
 }
 
-abstract class AbstractHashBasedSet<E extends any> extends AbstractSet<E> {
+abstract class AbstractMapBasedSet<E extends any> extends AbstractSet<E> {
     protected map: LikeJavaMap<E, null>;
 
     constructor() {
@@ -706,7 +706,7 @@ abstract class AbstractHashBasedSet<E extends any> extends AbstractSet<E> {
 
 }
 
-export class HashSet<E> extends AbstractHashBasedSet<E> {
+export class HashSet<E> extends AbstractMapBasedSet<E> {
 
     constructor(list?: Collection<E> | Array<E> | Set<E> | Iterable<E> | IterableIterator<E>) {
         super();
@@ -723,7 +723,7 @@ export class HashSet<E> extends AbstractHashBasedSet<E> {
     }
 }
 
-export class LinkedHashSet<E extends any> extends AbstractHashBasedSet<E> {
+export class LinkedHashSet<E extends any> extends AbstractMapBasedSet<E> {
 
     constructor(list?: Collection<E> | Array<E> | Set<E> | Iterable<E> | IterableIterator<E>) {
         super();
@@ -740,7 +740,7 @@ export class LinkedHashSet<E extends any> extends AbstractHashBasedSet<E> {
     }
 }
 
-export class TreeSet<E extends any> extends AbstractHashBasedSet<E> {
+export class TreeSet<E extends any> extends AbstractMapBasedSet<E> {
 
     constructor(list?: Collection<E> | Array<E> | Set<E> | Iterable<E> | IterableIterator<E>, comparator?: Comparator<E>) {
         super();
