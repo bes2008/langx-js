@@ -35,7 +35,7 @@ export function getPrototypeOf(obj: any): any {
         Object["getPrototypeOf"] = getPrototypeOf;
     } else {
         // call ES API
-        return Object["getPrototypeOf"](obj);
+        return Object.getPrototypeOf(obj);
     }
     return obj.prototype;
 }
@@ -93,7 +93,7 @@ export function getOwnPropertyDescriptor(obj: object, property: string | number 
             }
         })();
     }
-    return Object.getOwnPropertyDescriptor.call(Object, obj, property);
+    return Object.getOwnPropertyDescriptor(obj, property);
 }
 
 export function getPropertyDescriptor(obj: object, property: string | number | symbol): object | null | ObjectPropertyDescriptor {
@@ -125,7 +125,7 @@ export function hasOwnProperty(obj: object, property: string | number | symbol):
             }
         };
     }
-    return Object.prototype["hasOwnProperty"].call(obj, property);
+    return obj.hasOwnProperty(property);
 }
 
 /**
@@ -147,7 +147,7 @@ export function propertyIsEnumerable(obj: object, property: string | number | sy
             return false;
         }
     }
-    return Object.prototype["propertyIsEnumerable"].call(obj, property);
+    return obj.propertyIsEnumerable(property);
 }
 
 export function hasOwnEnumerableProperty(obj: any, property: string | number | symbol): boolean {
@@ -200,6 +200,6 @@ export function unknownNull(): unknown {
     return <unknown>null;
 }
 
-export function hashCode(object:any):number {
+export function hashCode(object: any): number {
     return HashCodes.hashCode(object);
 }

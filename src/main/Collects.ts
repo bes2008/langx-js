@@ -53,7 +53,7 @@ export function emptyHashSet(): HashSet<any> {
 }
 
 export function emptyTreeSet(comparator?: Comparator<any>): TreeSet<any> {
-    return new TreeSet<any>(<Iterable<any>>Objects.unknownNull(),comparator);
+    return new TreeSet<any>(<Iterable<any>>Objects.unknownNull(), comparator);
 }
 
 export function emptyHashMap(): HashMap<any, any> {
@@ -118,7 +118,7 @@ export function forEach(iterable: Iterable<any>, consumer: Consumer<any> | Consu
         let map;
         if (Types.isJavaMap(iterable)) {
             map = <LikeJavaMap<any, any>>iterable;
-        } else if(Types.isJsMap(iterable)){
+        } else if (Types.isJsMap(iterable)) {
             map = new HashMap(<Map<any, any>>iterable);
         }
         for (let entry of map) {
