@@ -30,9 +30,7 @@
     "url": "https://github.com/fangjinuo/langx-js.git"
   },
   "dependencies": {
-    "@babel/polyfill": "^7.8.7",
-    "jest": "^25.1.0",
-    "papaparse": "^4.6.3"
+    "@babel/polyfill": "^7.8.7"
   },
   "peerDependencies": {},
   "devDependencies": {
