@@ -2,6 +2,13 @@
   "name": "langx-js",
   "version": "1.0.1",
   "description": "JavaScript language extensions",
+  "keywords": [
+    "JavaScript", "TypeScript", "Java",
+    "Stream API", "Collection",
+    "ArrayList", "LinkedList",
+    "HashSet", "TreeSet", "LinkedHashSet",
+    "HashMap", "TreeMap", "LinkedHashMap"
+  ],
   "author": {
     "name": "jinuo.fang",
     "email": "fs1194361820@163.com",
