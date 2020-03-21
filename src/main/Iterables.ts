@@ -1136,7 +1136,7 @@ export class HashMap<K extends any, V extends any> extends AbstractMap<K, V> {
 }
 
 
-class LinkedHashMap<K, V extends any> extends HashMap<K, V> {
+export class LinkedHashMap<K, V extends any> extends HashMap<K, V> {
     private readonly orders: List<MapEntry<K, V>> = new ArrayList<MapEntry<K, V>>();
 
     constructor(map?: LikeJavaMap<K, V> | Map<K, V>) {

@@ -23,7 +23,7 @@ import {
     HashMap,
     HashSet,
     LikeJavaMap,
-    LikeJavaSet, LinearCollection,
+    LikeJavaSet, LinearCollection, LinkedHashMap, LinkedHashSet,
     LinkedList,
     List,
     MapEntry, TreeMap, TreeSet
@@ -64,8 +64,36 @@ export function emptyTreeMap(comparator?: Comparator<any>): TreeMap<any, any> {
     return new TreeMap<any, any>(<Map<any, any>>Objects.unknownNull(), comparator);
 }
 
-export function newList(iterable?: Iterable<any>): List<any> {
+export function newArrayList(iterable?: Iterable<any>): ArrayList<any> {
     return new ArrayList(iterable);
+}
+
+export function newLinkedList(iterable?:Iterable<any>):LinkedList<any> {
+    return new LinkedList<any>(iterable);
+}
+
+export function newHashSet(iterable?:Iterable<any>):HashSet<any> {
+    return new HashSet<any>(iterable);
+}
+
+export function newLinkedHashSet(iterable?:Iterable<any>):HashSet<any> {
+    return new LinkedHashSet<any>(iterable);
+}
+
+export function newTreeSet(iterable?:Iterable<any>, comparator?:Comparator<any>):HashSet<any> {
+    return new TreeSet<any>(iterable, comparator);
+}
+
+export function newHashMap(map?:Map<any,any>|LikeJavaMap<any, any>):HashMap<any, any> {
+return new HashMap<any, any>(map);
+}
+
+export function newLinkedHashMap(map?:Map<any,any>|LikeJavaMap<any, any>):LinkedHashMap<any,any> {
+    return new LinkedHashMap<any,any>(map);
+}
+
+export function newTreeMap(map?:Map<any,any>|LikeJavaMap<any, any>, keyComparator?:Comparator<any>):TreeMap<any, any> {
+    return new TreeMap<any, any>(map, keyComparator);
 }
 
 export function asIterable(obj: any): List<any> {
@@ -366,7 +394,7 @@ export function flatMap(list: Array<LinearCollection> | Collection<LinearCollect
             array = array.concat([...collection]);
         }
     }
-    const list0: List<any> = newList(array);
+    const list0: List<any> = newArrayList(array);
     if (mapper != null) {
         return <List<any>>map(list0, mapper);
     }
@@ -641,7 +669,7 @@ export function removeIf(iterable: Iterable<any>, predicate: Predicate<any> | Pr
 
 export function limit(iterable: Iterable<any>, limit: number): List<any> {
     Preconditions.checkTrue(limit >= 0);
-    let list = iterable instanceof AbstractList ? <List<any>>iterable : newList(iterable);
+    let list = iterable instanceof AbstractList ? <List<any>>iterable : newArrayList(iterable);
     if (list.size() <= limit) {
         return list;
     }
@@ -650,7 +678,7 @@ export function limit(iterable: Iterable<any>, limit: number): List<any> {
 
 export function skip(iterable: Iterable<any>, skip: number) {
     Preconditions.checkTrue(skip >= 0);
-    let list = iterable instanceof AbstractList ? <List<any>>iterable : newList(iterable);
+    let list = iterable instanceof AbstractList ? <List<any>>iterable : newArrayList(iterable);
     if (list.size() <= skip) {
         return emptyArrayList();
     }
