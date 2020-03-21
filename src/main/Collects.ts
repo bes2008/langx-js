@@ -56,8 +56,16 @@ export function emptyHashSet(): HashSet<any> {
     return new HashSet<any>();
 }
 
+export function emptyLinkedHashSet(): LinkedHashSet<any> {
+    return new LinkedHashSet<any>();
+}
+
 export function emptyTreeSet(comparator?: Comparator<any>): TreeSet<any> {
     return new TreeSet<any>(<Iterable<any>>Objects.unknownNull(), comparator);
+}
+
+export function emptyLinkedHashMap():LinkedHashMap<any, any> {
+    return new LinkedHashMap<any, any>();
 }
 
 export function emptyHashMap(): HashMap<any, any> {
@@ -80,7 +88,7 @@ export function newHashSet(iterable?: Iterable<any>): HashSet<any> {
     return new HashSet<any>(iterable);
 }
 
-export function newLinkedHashSet(iterable?: Iterable<any>): HashSet<any> {
+export function newLinkedHashSet(iterable?: Iterable<any>): LinkedHashSet<any> {
     return new LinkedHashSet<any>(iterable);
 }
 

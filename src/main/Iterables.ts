@@ -1153,7 +1153,7 @@ export class LinkedHashMap<K, V extends any> extends HashMap<K, V> {
     }
 
     keySet(): LikeJavaSet<K> {
-        return new MapInnerKeySet(this, Pipeline.of(this.orders).flatMap({
+        return new MapInnerKeySet(this, Pipeline.of(this.orders).map({
             apply(entry: MapEntry<K, V>): K {
                 return entry.key;
             }

@@ -10,7 +10,7 @@ describe("Map Tests", () => {
     function testMap(map: LikeJavaMap<string, any>) {
         debugger;
 
-        Collects.forEach(Collects.newList(["a", "b", "c", "d", "e"]), (element) => {
+        Collects.forEach(Collects.newArrayList(["a", "b", "c", "d", "e"]), (element) => {
             map.put(element, null);
         });
         Collects.forEach(map, (entry) => {
@@ -32,7 +32,7 @@ describe("Map Tests", () => {
         if (map.containsKey("a")) {
             logger.info("has 'a'");
         }
-        let alist: List<any> = Collects.newList(["a", "b", "k"]);
+        let alist: List<any> = Collects.newArrayList(["a", "b", "k"]);
         debugger
         Collects.removeIf(map, {
             test(key: string, value: any) {
@@ -42,9 +42,15 @@ describe("Map Tests", () => {
         expect(map.size()).toBe(3);
         expect(map.isEmpty()).toBe(false);
     }
+
+    test("LinkedHashMap Test", () => {
+        testMap(Collects.emptyLinkedHashMap());
+    });
+
     test("TreeMap Test", () => {
         testMap(Collects.emptyTreeMap());
     });
+
     test("HashMap Test", () => {
         testMap(Collects.emptyHashMap());
     });
