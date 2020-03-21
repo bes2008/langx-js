@@ -118,11 +118,11 @@ export function cleanNulls(iterable: LinearCollection): Collection<any> | Array<
     }
 }
 
-export function toSet(iterable: Iterable<any>): HashSet<any> {
+export function asSet(iterable: Iterable<any>): HashSet<any> {
     return new HashSet<any>([...iterable]);
 }
 
-export function toList(iterable: Iterable<any>): List<any> {
+export function asList(iterable: Iterable<any>): List<any> {
     return new ArrayList([...iterable]);
 }
 
@@ -380,7 +380,7 @@ export function firstN(iterable: Iterable<any>, predicate: Predicate<any> | Pred
 }
 
 export function first(iterable: Iterable<any>, predicate: Predicate<any> | Predicate2<any, any> | Function): any {
-    let list = toList(firstN(iterable, predicate, 1));
+    let list = asList(firstN(iterable, predicate, 1));
     if (list.isEmpty()) {
         return null;
     }

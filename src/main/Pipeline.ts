@@ -36,12 +36,12 @@ export class Pipeline<E extends any> {
         return Collects.first(this.collection, predicate);
     }
 
-    toSet(): HashSet<E> {
-        return Collects.toSet(this.collection);
+    asSet(): HashSet<E> {
+        return Collects.asSet(this.collection);
     }
 
-    toList(): List<E> {
-        return Collects.toList(this.collection);
+    asList(): List<E> {
+        return Collects.asList(this.collection);
     }
 
     toArray(array?: Array<E>): Array<E> {

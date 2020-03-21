@@ -933,7 +933,7 @@ export class TreeMap<K extends any, V extends any> extends AbstractMap<K, V> {
     keySet(): LikeJavaSet<K> {
         return new MapInnerKeySet(this, Pipeline.of(this.list).map((item: MapEntry<K, V>) => {
             return item.key;
-        }).toList());
+        }).asList());
     }
 
     put(key: K, value?: V): V | undefined {
@@ -973,7 +973,7 @@ export class TreeMap<K extends any, V extends any> extends AbstractMap<K, V> {
     values(): Collection<V> {
         return Pipeline.of(this.list).map((entry: MapEntry<K, V>) => {
             return entry.value;
-        }).toList();
+        }).asList();
     }
 
 }
@@ -1037,7 +1037,7 @@ export class HashMap<K extends any, V extends any> extends AbstractMap<K, V> {
     }
 
     entrySet(): LikeJavaSet<MapEntry<K, V>> {
-        return <LikeJavaSet<MapEntry<K, V>>>new MapInnerEntrySet(this, Pipeline.of(this.array).flatMap().toList());
+        return <LikeJavaSet<MapEntry<K, V>>>new MapInnerEntrySet(this, Pipeline.of(this.array).flatMap().asList());
     }
 
     get(key: K): V {
@@ -1055,7 +1055,7 @@ export class HashMap<K extends any, V extends any> extends AbstractMap<K, V> {
             apply(entry: MapEntry<K, V>): K {
                 return entry.key;
             }
-        }).toList());
+        }).asList());
     }
 
     put(key: K, value?: V): V | undefined {
@@ -1126,7 +1126,7 @@ export class HashMap<K extends any, V extends any> extends AbstractMap<K, V> {
             apply(entry: MapEntry<K, V>): V {
                 return entry.value == null ? <V>Objects.unknownNull() : entry.value;
             }
-        }).toList();
+        }).asList();
     }
 
 
@@ -1157,7 +1157,7 @@ export class LinkedHashMap<K, V extends any> extends HashMap<K, V> {
             apply(entry: MapEntry<K, V>): K {
                 return entry.key;
             }
-        }).toList());
+        }).asList());
     }
 
     put(key: K, value?: V): V | undefined {
@@ -1201,7 +1201,7 @@ export class LinkedHashMap<K, V extends any> extends HashMap<K, V> {
             apply(entry: MapEntry<K, V>): V {
                 return entry.value == null ? <V>Objects.unknownNull() : entry.value;
             }
-        }).toList();
+        }).asList();
     }
 
     [Symbol.iterator](): Iterator<MapEntry<any, any>> {
