@@ -1,8 +1,9 @@
 {
   "name": "langx-js",
   "version": "1.0.1",
-  "description": "JavaScript language extensions",
+  "description": "JavaScript language extensions, a replacement or a supplement of the lodash",
   "keywords": [
+    "lodash",
     "JavaScript", "TypeScript", "Java",
     "Stream API", "Collection",
     "ArrayList", "LinkedList",
