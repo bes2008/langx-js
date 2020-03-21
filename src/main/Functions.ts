@@ -105,7 +105,7 @@ export enum PredicateType {
     FUNCTION
 }
 
-export function judgePredicateType(predicate: Predicate<any> | Predicate2<any, any> | Function): PredicateType {
+export function judgePredicateType(predicate?: Predicate<any> | Predicate2<any, any> | Function): PredicateType {
     if (predicate == null) {
         return PredicateType.UNKNOWN;
     }

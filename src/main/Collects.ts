@@ -3,7 +3,6 @@ import * as Types from "./Types";
 import * as Numbers from "./Numbers";
 import * as Objects from "./Objects";
 import * as Functions from "./Functions";
-import * as Emptys from "./Emptys";
 import {
     Consumer,
     Consumer2,
@@ -23,10 +22,15 @@ import {
     HashMap,
     HashSet,
     LikeJavaMap,
-    LikeJavaSet, LinearCollection, LinkedHashMap, LinkedHashSet,
+    LikeJavaSet,
+    LinearCollection,
+    LinkedHashMap,
+    LinkedHashSet,
     LinkedList,
     List,
-    MapEntry, TreeMap, TreeSet
+    MapEntry,
+    TreeMap,
+    TreeSet
 } from "./Iterables";
 import * as Preconditions from "./Preconditions";
 import {Comparator} from "./Comparators";
@@ -68,31 +72,31 @@ export function newArrayList(iterable?: Iterable<any>): ArrayList<any> {
     return new ArrayList(iterable);
 }
 
-export function newLinkedList(iterable?:Iterable<any>):LinkedList<any> {
+export function newLinkedList(iterable?: Iterable<any>): LinkedList<any> {
     return new LinkedList<any>(iterable);
 }
 
-export function newHashSet(iterable?:Iterable<any>):HashSet<any> {
+export function newHashSet(iterable?: Iterable<any>): HashSet<any> {
     return new HashSet<any>(iterable);
 }
 
-export function newLinkedHashSet(iterable?:Iterable<any>):HashSet<any> {
+export function newLinkedHashSet(iterable?: Iterable<any>): HashSet<any> {
     return new LinkedHashSet<any>(iterable);
 }
 
-export function newTreeSet(iterable?:Iterable<any>, comparator?:Comparator<any>):HashSet<any> {
+export function newTreeSet(iterable?: Iterable<any>, comparator?: Comparator<any>): HashSet<any> {
     return new TreeSet<any>(iterable, comparator);
 }
 
-export function newHashMap(map?:Map<any,any>|LikeJavaMap<any, any>):HashMap<any, any> {
-return new HashMap<any, any>(map);
+export function newHashMap(map?: Map<any, any> | LikeJavaMap<any, any>): HashMap<any, any> {
+    return new HashMap<any, any>(map);
 }
 
-export function newLinkedHashMap(map?:Map<any,any>|LikeJavaMap<any, any>):LinkedHashMap<any,any> {
-    return new LinkedHashMap<any,any>(map);
+export function newLinkedHashMap(map?: Map<any, any> | LikeJavaMap<any, any>): LinkedHashMap<any, any> {
+    return new LinkedHashMap<any, any>(map);
 }
 
-export function newTreeMap(map?:Map<any,any>|LikeJavaMap<any, any>, keyComparator?:Comparator<any>):TreeMap<any, any> {
+export function newTreeMap(map?: Map<any, any> | LikeJavaMap<any, any>, keyComparator?: Comparator<any>): TreeMap<any, any> {
     return new TreeMap<any, any>(map, keyComparator);
 }
 
@@ -118,8 +122,8 @@ export function cleanNulls(iterable: LinearCollection): Collection<any> | Array<
     }
 }
 
-export function asSet(iterable: Iterable<any>, comparator?:Comparator<any>): LikeJavaSet<any> {
-    if(comparator==null){
+export function asSet(iterable: Iterable<any>, comparator?: Comparator<any>): LikeJavaSet<any> {
+    if (comparator == null) {
         return newLinkedHashSet(iterable);
     }
     return newTreeSet(iterable, comparator);
@@ -139,9 +143,102 @@ export function toArray(list?: Collection<any> | Array<any> | Set<any> | Iterabl
     return new Array(...list);
 }
 
-export function forEach(iterable: Iterable<any>, consumer: Consumer<any> | Consumer2<number, any> | Function): void {
+function _consumeMapEntry( entry: MapEntry<any, any>,consumerType: ConsumerType, consumer: Consumer<any> | Consumer2<number, any> | Function):void {
+    switch (consumerType) {
+        case ConsumerType.CONSUMER:
+            (<Consumer<MapEntry<any, any>>>consumer).accept(entry);
+            break;
+        case ConsumerType.CONSUMER2: {
+            (<Consumer2<any, any>>consumer).accept(entry.key, entry.value);
+            break;
+        }
+        case ConsumerType.FUNCTION:
+            (<Function>consumer).call({}, entry);
+            break;
+    }
+}
+
+function _judgePredicateConsumeMapEntry( entry: MapEntry<any, any>,consumePredicateType:PredicateType,  consumePredicate?: Predicate<any> | Predicate2<any, any> | Function):boolean {
+    let consumeable:boolean = true;
+    switch (consumePredicateType) {
+        case PredicateType.PREDICATE:
+            consumeable=(<Predicate<any>>consumePredicate).test(entry);
+            break;
+        case PredicateType.PREDICATE2:
+            consumeable=(<Predicate2<any,any>>consumePredicate).test(entry.key,entry.value);
+            break;
+        case PredicateType.FUNCTION:
+            consumeable=(<Function>consumePredicate).call({}, entry);
+    }
+    return consumeable;
+}
+
+function _judgeBreakConsumeMapEntry(entry: MapEntry<any, any>, breakPredicateType:PredicateType,  breakPredicate?: Predicate<any> | Predicate2<any, any> | Function ):boolean {
+    let breakable:boolean = false;
+    switch (breakPredicateType) {
+        case PredicateType.PREDICATE:
+            breakable=(<Predicate<any>>breakPredicate).test(entry);
+            break;
+        case PredicateType.PREDICATE2:
+            breakable=(<Predicate2<any,any>>breakPredicate).test(entry.key,entry.value);
+            break;
+        case PredicateType.FUNCTION:
+            breakable=(<Function>breakPredicate).call({}, entry);
+    }
+    return breakable;
+}
+
+
+function _consumeListItem( index:number,element: any,consumerType: ConsumerType, consumer: Consumer<any> | Consumer2<number, any> | Function):void {
+        switch (consumerType) {
+        case ConsumerType.CONSUMER:
+            (<Consumer<any>>consumer).accept(element);
+            break;
+        case ConsumerType.CONSUMER2:
+            (<Consumer2<number, any>>consumer).accept(index, element);
+            break;
+        case ConsumerType.FUNCTION:
+            (<Function>consumer).call({}, element, index);
+            break;
+        }
+}
+
+function _judgePredicateConsumeListItem(index:number,element: any,consumePredicateType:PredicateType,  consumePredicate?: Predicate<any> | Predicate2<any, any> | Function):boolean {
+    let consumeable:boolean = true;
+    switch (consumePredicateType) {
+        case PredicateType.PREDICATE:
+            consumeable=(<Predicate<any>>consumePredicate).test(element);
+            break;
+        case PredicateType.PREDICATE2:
+            consumeable=(<Predicate2<any,any>>consumePredicate).test(index,element);
+            break;
+        case PredicateType.FUNCTION:
+            consumeable=(<Function>consumePredicate).call({}, element,index);
+    }
+    return consumeable;
+}
+
+function _judgeBreakConsumeListItem(index:number,element: any, breakPredicateType:PredicateType,  breakPredicate?: Predicate<any> | Predicate2<any, any> | Function ):boolean {
+    let breakable:boolean = false;
+    switch (breakPredicateType) {
+        case PredicateType.PREDICATE:
+            breakable=(<Predicate<any>>breakPredicate).test(element);
+            break;
+        case PredicateType.PREDICATE2:
+            breakable=(<Predicate2<any,any>>breakPredicate).test(index,element);
+            break;
+        case PredicateType.FUNCTION:
+            breakable=(<Function>breakPredicate).call({}, element, index);
+    }
+    return breakable;
+}
+
+
+export function forEach(iterable: Iterable<any>, consumer: Consumer<any> | Consumer2<number, any> | Function, consumePredicate?: Predicate<any> | Predicate2<any, any> | Function, breakPredicate?: Predicate<any> | Predicate2<any, any> | Function): void {
     Preconditions.checkNonNull(iterable);
+    let consumePredicateType = Functions.judgePredicateType(consumePredicate);
     let consumerType: ConsumerType = Functions.judgeConsumerType(consumer);
+    let breakPredicateType = Functions.judgePredicateType(breakPredicate);
     Preconditions.checkTrue(consumerType != ConsumerType.UNKNOWN, "illegal consumer");
 
     let isMap = Types.isMap(iterable);
@@ -153,32 +250,21 @@ export function forEach(iterable: Iterable<any>, consumer: Consumer<any> | Consu
             map = new HashMap(<Map<any, any>>iterable);
         }
         for (let entry of map) {
-            switch (consumerType) {
-                case ConsumerType.CONSUMER:
-                    (<Consumer<MapEntry<any, any>>>consumer).accept(entry);
-                    break;
-                case ConsumerType.CONSUMER2: {
-                    (<Consumer2<any, any>>consumer).accept(entry.getKey(), entry.getValue());
+            if(_judgePredicateConsumeMapEntry(entry,consumePredicateType, consumePredicate )){
+                _consumeMapEntry(entry,consumerType, consumer);
+                if(_judgeBreakConsumeMapEntry(entry,breakPredicateType,breakPredicate)){
                     break;
                 }
-                case ConsumerType.FUNCTION:
-                    (<Function>consumer).call({}, entry);
-                    break;
             }
         }
     } else {
         let index = 0;
         for (let element of iterable) {
-            switch (consumerType) {
-                case ConsumerType.CONSUMER:
-                    (<Consumer<any>>consumer).accept(element);
+            if(_judgePredicateConsumeListItem(index,element,consumePredicateType,consumePredicate)){
+                _consumeListItem(index,element,consumerType,consumer);
+                if(_judgeBreakConsumeListItem(index,element,breakPredicateType,breakPredicate)){
                     break;
-                case ConsumerType.CONSUMER2:
-                    (<Consumer2<number, any>>consumer).accept(index, element);
-                    break;
-                case ConsumerType.FUNCTION:
-                    (<Function>consumer).call({}, element, index);
-                    break;
+                }
             }
             index++;
         }
