@@ -1,4 +1,4 @@
-import {Collection, HashSet, List} from "./Iterables";
+import {Collection, HashSet, LikeJavaSet, List} from "./Iterables";
 import * as Collects from "./Collects";
 import {Consumer, Consumer2, Func, Func2, Predicate, Predicate2} from "./Functions";
 
@@ -16,16 +16,16 @@ export class Pipeline<E extends any> {
         this.collection = Collects.asIterable(list);
     }
 
-    forEach(consumer: Consumer<E> | Consumer2<number, E> | Function): void {
-        Collects.forEach(this.collection, consumer);
+    forEach(consumer: Consumer<E> | Consumer2<number, E> | Function, consumePredicate?: Predicate<any> | Predicate2<any, any> | Function, breakPredicate?: Predicate<any> | Predicate2<any, any> | Function): void {
+        Collects.forEach(this.collection, consumer, consumePredicate, breakPredicate);
     }
 
     map(mapper: Func<E, any> | Func2<number, E, any> | Function): Pipeline<E> {
         return new Pipeline(Collects.map(this.collection, mapper));
     }
 
-    filter(predicate: Predicate<E> | Predicate2<number, E> | Function): Pipeline<E> {
-        return new Pipeline(Collects.filter(this.collection, predicate));
+    filter(predicate: Predicate<E> | Predicate2<number, E> | Function, breakPredicate?: Predicate<any> | Predicate2<any, any> | Function): Pipeline<E> {
+        return new Pipeline(Collects.filter(this.collection, predicate, breakPredicate));
     }
 
     firstN(predicate: Predicate<E> | Predicate2<number, E> | Function, count: number): Pipeline<E> {
@@ -36,7 +36,7 @@ export class Pipeline<E extends any> {
         return Collects.first(this.collection, predicate);
     }
 
-    asSet(): HashSet<E> {
+    asSet(): LikeJavaSet<E> {
         return Collects.asSet(this.collection);
     }
 
