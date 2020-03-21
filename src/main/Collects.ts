@@ -414,7 +414,7 @@ export function firstN(iterable: Iterable<any>, predicate: Predicate<any> | Pred
             test(index: number, element: any) {
                 return newList.size() >= count;
             }
-        })
+        });
         return newList;
     }
 }
@@ -534,7 +534,7 @@ export function noneMatch(iterable: Iterable<any>, predicate: Predicate<any> | P
         unmatched = false;
     }, predicate, () => {
         return !unmatched;
-    })
+    });
     return unmatched;
 }
 
