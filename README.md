@@ -1,4 +1,5 @@
-JavaScript language extensions, write JavaScript using Java API for a javaer
+JavaScript language extensions,  a replacement or a supplement of the lodash. Write JavaScript using Java API for a javaer, javascripter, typescripter.
+
 
 ## Versions
 [![npm](https://img.shields.io/badge/npm-v1.0.1-green.svg)](https://www.npmjs.com/package/langx-js/v/1.0.1)
