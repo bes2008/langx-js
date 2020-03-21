@@ -252,9 +252,9 @@ export function forEach(iterable: Iterable<any>, consumer: Consumer<any> | Consu
         for (let entry of map) {
             if (_judgePredicateConsumeMapEntry(entry, consumePredicateType, consumePredicate)) {
                 _consumeMapEntry(entry, consumerType, consumer);
-                if (_judgeBreakConsumeMapEntry(entry, breakPredicateType, breakPredicate)) {
-                    break;
-                }
+            }
+            if (_judgeBreakConsumeMapEntry(entry, breakPredicateType, breakPredicate)) {
+                break;
             }
         }
     } else {
@@ -262,9 +262,9 @@ export function forEach(iterable: Iterable<any>, consumer: Consumer<any> | Consu
         for (let element of iterable) {
             if (_judgePredicateConsumeListItem(index, element, consumePredicateType, consumePredicate)) {
                 _consumeListItem(index, element, consumerType, consumer);
-                if (_judgeBreakConsumeListItem(index, element, breakPredicateType, breakPredicate)) {
-                    break;
-                }
+            }
+            if (_judgeBreakConsumeListItem(index, element, breakPredicateType, breakPredicate)) {
+                break;
             }
             index++;
         }
@@ -278,16 +278,9 @@ export function map(iterable: Iterable<any>, mapper: Func<any, any> | Func2<any,
     let mapperType = Functions.judgeFuncType(mapper);
     Preconditions.checkTrue(mapperType != FunctionType.UNKNOWN, "illegal mapper");
 
-
     let isMap = Types.isMap(iterable);
     if (isMap) {
-        let map;
         const newMap: LikeJavaMap<any, any> = new HashMap<any, any>();
-        if (Types.isJsMap(iterable)) {
-            map = <LikeJavaMap<any, any>>iterable;
-        } else {
-            map = new HashMap(<Map<any, any>>iterable);
-        }
         const mapConsumer: Consumer<any> = {
             accept(entry: any) {
                 switch (mapperType) {
@@ -307,7 +300,7 @@ export function map(iterable: Iterable<any>, mapper: Func<any, any> | Func2<any,
                 }
             }
         };
-        forEach(map, mapConsumer);
+        forEach(iterable, mapConsumer);
         return newMap;
     } else {
         let list = emptyArrayList();
@@ -332,19 +325,13 @@ export function map(iterable: Iterable<any>, mapper: Func<any, any> | Func2<any,
 }
 
 
-export function filter(iterable: Iterable<any>, predicate: Predicate<any> | Predicate2<any, any> | Function): Iterable<any> {
+export function filter(iterable: Iterable<any>, predicate: Predicate<any> | Predicate2<any, any> | Function, breakPredicate?: Predicate<any> | Predicate2<any, any> | Function): Iterable<any> {
     Preconditions.checkNonNull(iterable);
     let predicateType = Functions.judgePredicateType(predicate);
     Preconditions.checkTrue(predicateType != PredicateType.UNKNOWN, "illegal predicate");
     let isMap = Types.isMap(iterable);
     if (isMap) {
-        let map;
         let newMap: LikeJavaMap<any, any> = new HashMap();
-        if (Types.isJsMap(iterable)) {
-            map = <LikeJavaMap<any, any>>iterable;
-        } else {
-            map = new HashMap(<Map<any, any>>iterable);
-        }
         const mapConsumer: Consumer<any> = {
             accept(entry: MapEntry<any, any>) {
                 switch (predicateType) {
@@ -367,7 +354,7 @@ export function filter(iterable: Iterable<any>, predicate: Predicate<any> | Pred
                 }
             }
         };
-        forEach(map, mapConsumer);
+        forEach(iterable, mapConsumer, <Predicate2<any, any>>Objects.unknownNull(), breakPredicate);
         return newMap;
     } else {
         const newList = emptyArrayList();
@@ -393,7 +380,7 @@ export function filter(iterable: Iterable<any>, predicate: Predicate<any> | Pred
                 }
             }
         };
-        forEach(iterable, listConsumer);
+        forEach(iterable, listConsumer, <Predicate2<any, any>>Objects.unknownNull(), breakPredicate);
         return newList;
     }
 }
@@ -406,64 +393,28 @@ export function firstN(iterable: Iterable<any>, predicate: Predicate<any> | Pred
     Preconditions.checkTrue(predicateType != PredicateType.UNKNOWN, "illegal predicate");
     let isMap = Types.isMap(iterable);
     if (isMap) {
-        let map;
         let newMap: LikeJavaMap<any, any> = new HashMap();
-        if (Types.isJsMap(iterable)) {
-            map = <LikeJavaMap<any, any>>iterable;
-        } else {
-            map = new HashMap(<Map<any, any>>iterable);
-        }
-        for (let entry of map) {
-            switch (predicateType) {
-                case PredicateType.PREDICATE:
-                    if ((<Predicate<any>>predicate).test(entry)) {
-                        newMap.put(entry.getKey(), entry.getValue());
-                    }
-                    break;
-                case PredicateType.PREDICATE2: {
-                    if ((<Predicate2<any, any>>predicate).test(entry.getKey(), entry.getValue())) {
-                        newMap.put(entry.getKey(), entry.getValue());
-                    }
-                    break;
-                }
-                case PredicateType.FUNCTION:
-                    if ((<Function>predicate).call({}, entry)) {
-                        newMap.put(entry.getKey(), entry.getValue());
-                    }
-                    break;
+        forEach(iterable, {
+            accept(entry: MapEntry<any, any>) {
+                newMap.put(entry.key, entry.value);
             }
-            if (newMap.size() == count) {
-                break;
+        }, predicate, {
+            test(entry: MapEntry<any, any>) {
+                return newMap.size() >= count;
             }
-        }
+        });
         return newMap;
     } else {
         const newList = emptyArrayList();
-        let index = 0;
-        for (let element of iterable) {
-            switch (predicateType) {
-                case PredicateType.PREDICATE:
-                    if ((<Predicate<any>>predicate).test(element)) {
-                        newList.add(element);
-                    }
-                    break;
-                case PredicateType.PREDICATE2: {
-                    if ((<Predicate2<any, any>>predicate).test(index, element)) {
-                        newList.add(element);
-                    }
-                    break;
-                }
-                case PredicateType.FUNCTION:
-                    if ((<Function>predicate).call({}, element)) {
-                        newList.add(element);
-                    }
-                    break;
+        forEach(iterable, {
+            accept(index: number, element: any) {
+                newList.add(element);
             }
-            index++;
-            if (index == count) {
-                break;
+        }, predicate, {
+            test(index: number, element: any) {
+                return newList.size() >= count;
             }
-        }
+        })
         return newList;
     }
 }
@@ -494,69 +445,13 @@ export function anyMatch(iterable: Iterable<any>, predicate: Predicate<any> | Pr
     Preconditions.checkNonNull(iterable);
     let predicateType = Functions.judgePredicateType(predicate);
     Preconditions.checkTrue(predicateType != PredicateType.UNKNOWN, "illegal predicate");
-    let isMap = Types.isMap(iterable);
-    if (isMap) {
-        let map;
-        if (Types.isJsMap(iterable)) {
-            map = <LikeJavaMap<any, any>>iterable;
-        } else {
-            map = new HashMap(<Map<any, any>>iterable);
-        }
-        let matched: boolean = false;
-        for (let entry of map) {
-            switch (predicateType) {
-                case PredicateType.PREDICATE:
-                    if ((<Predicate<any>>predicate).test(entry)) {
-                        matched = true;
-                    }
-                    break;
-                case PredicateType.PREDICATE2: {
-                    if ((<Predicate2<any, any>>predicate).test(entry.getKey(), entry.getValue())) {
-                        matched = true;
-                    }
-                    break;
-                }
-                case PredicateType.FUNCTION:
-                    if ((<Function>predicate).call({}, entry)) {
-                        matched = true;
-                    }
-                    break;
-            }
-            if (matched) {
-                break;
-            }
-        }
+    let matched: boolean = false;
+    forEach(iterable, () => {
+        matched = true;
+    }, predicate, () => {
         return matched;
-    } else {
-        let matched: boolean = false;
-        let index: number = 0;
-        for (let element of iterable) {
-            switch (predicateType) {
-                case PredicateType.PREDICATE:
-                    if ((<Predicate<any>>predicate).test(element)) {
-                        matched = true;
-                    }
-                    break;
-                case PredicateType.PREDICATE2: {
-                    if ((<Predicate2<any, any>>predicate).test(index, element)) {
-                        matched = true;
-                    }
-                    break;
-                }
-                case PredicateType.FUNCTION:
-                    if ((<Function>predicate).call({}, element)) {
-                        matched = true;
-                    }
-                    break;
-            }
-            if (matched) {
-                break;
-            }
-            index++;
-        }
-
-        return matched;
-    }
+    });
+    return matched;
 
 }
 
@@ -634,69 +529,13 @@ export function noneMatch(iterable: Iterable<any>, predicate: Predicate<any> | P
     Preconditions.checkNonNull(iterable);
     let predicateType = Functions.judgePredicateType(predicate);
     Preconditions.checkTrue(predicateType != PredicateType.UNKNOWN, "illegal predicate");
-    let isMap = Types.isMap(iterable);
-    if (isMap) {
-        let map;
-        if (Types.isJsMap(iterable)) {
-            map = <LikeJavaMap<any, any>>iterable;
-        } else {
-            map = new HashMap(<Map<any, any>>iterable);
-        }
-        let matched: boolean = true;
-        for (let entry of map) {
-            switch (predicateType) {
-                case PredicateType.PREDICATE:
-                    if ((<Predicate<any>>predicate).test(entry)) {
-                        matched = false;
-                    }
-                    break;
-                case PredicateType.PREDICATE2: {
-                    if ((<Predicate2<any, any>>predicate).test(entry.getKey(), entry.getValue())) {
-                        matched = false;
-                    }
-                    break;
-                }
-                case PredicateType.FUNCTION:
-                    if ((<Function>predicate).call({}, entry)) {
-                        matched = false;
-                    }
-                    break;
-            }
-            if (!matched) {
-                break;
-            }
-        }
-        return matched;
-    } else {
-        let matched: boolean = true;
-        let index: number = 0;
-        for (let element of iterable) {
-            switch (predicateType) {
-                case PredicateType.PREDICATE:
-                    if ((<Predicate<any>>predicate).test(element)) {
-                        matched = false;
-                    }
-                    break;
-                case PredicateType.PREDICATE2: {
-                    if ((<Predicate2<any, any>>predicate).test(index, element)) {
-                        matched = false;
-                    }
-                    break;
-                }
-                case PredicateType.FUNCTION:
-                    if ((<Function>predicate).call({}, element)) {
-                        matched = false;
-                    }
-                    break;
-            }
-            if (!matched) {
-                break;
-            }
-            index++;
-        }
-
-        return matched;
-    }
+    let unmatched: boolean = true;
+    forEach(iterable, () => {
+        unmatched = false;
+    }, predicate, () => {
+        return !unmatched;
+    })
+    return unmatched;
 }
 
 
