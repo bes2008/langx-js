@@ -1,5 +1,9 @@
 JavaScript language extensions, write JavaScript using Java API for a javaer
 
+## Versions
+[![npm](https://img.shields.io/badge/npm-v1.0.1-green.svg)](https://www.npmjs.com/package/langx-js/v/1.0.1)
+[![npm](https://img.shields.io/badge/npm-v1.0.0-green.svg)](https://www.npmjs.com/package/langx-js/v/1.0.0)
+
 ## Migrate [Java API](https://docs.oracle.com/javase/7/docs/api/)
 
 All java collection written in Iterables.ts module
@@ -12,6 +16,12 @@ All java collection written in Iterables.ts module
 |LinkedList       |java.util.LinkedList |
 |LikeJavaSet      |java.util.Set        |
 |LikeJavaMap      |java.util.Map        |
+|HashSet|java.util.HashSet|
+|LinkedHashSet|java.util.LinkedHashSet|
+|TreeSet|java.util.TreeSet|
+|HashMap|java.util.HashMap|
+|LinkedHashMap|java.util.LinkedHashMap|
+|TreeMap|java.util.TreeMap|
 |logger      |Logger        |
 |Exceptions| some java.lang.RuntimeException (s)|
 
@@ -27,7 +37,7 @@ All java collection written in Iterables.ts module
 |Preconditions    |Preconditions        |
 |Collects       |Collects |
 |Functions| Function,Consumer,Predicate,Supplier ... |
-|Pipeline|Pipeline [ Stream API ]|
+|Pipeline|Pipeline [Like Java8 Stream API ]|
 
 
 ## References
