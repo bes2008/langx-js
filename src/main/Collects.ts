@@ -118,12 +118,15 @@ export function cleanNulls(iterable: LinearCollection): Collection<any> | Array<
     }
 }
 
-export function asSet(iterable: Iterable<any>): HashSet<any> {
-    return new HashSet<any>([...iterable]);
+export function asSet(iterable: Iterable<any>, comparator?:Comparator<any>): LikeJavaSet<any> {
+    if(comparator==null){
+        return newLinkedHashSet(iterable);
+    }
+    return newTreeSet(iterable, comparator);
 }
 
 export function asList(iterable: Iterable<any>): List<any> {
-    return new ArrayList([...iterable]);
+    return new ArrayList(iterable);
 }
 
 export function toArray(list?: Collection<any> | Array<any> | Set<any> | Iterable<any> | IterableIterator<any>): Array<any> {
