@@ -143,7 +143,7 @@ export function toArray(list?: Collection<any> | Array<any> | Set<any> | Iterabl
     return new Array(...list);
 }
 
-function _consumeMapEntry( entry: MapEntry<any, any>,consumerType: ConsumerType, consumer: Consumer<any> | Consumer2<number, any> | Function):void {
+function _consumeMapEntry(entry: MapEntry<any, any>, consumerType: ConsumerType, consumer: Consumer<any> | Consumer2<number, any> | Function): void {
     switch (consumerType) {
         case ConsumerType.CONSUMER:
             (<Consumer<MapEntry<any, any>>>consumer).accept(entry);
@@ -158,39 +158,39 @@ function _consumeMapEntry( entry: MapEntry<any, any>,consumerType: ConsumerType,
     }
 }
 
-function _judgePredicateConsumeMapEntry( entry: MapEntry<any, any>,consumePredicateType:PredicateType,  consumePredicate?: Predicate<any> | Predicate2<any, any> | Function):boolean {
-    let consumeable:boolean = true;
+function _judgePredicateConsumeMapEntry(entry: MapEntry<any, any>, consumePredicateType: PredicateType, consumePredicate?: Predicate<any> | Predicate2<any, any> | Function): boolean {
+    let consumeable: boolean = true;
     switch (consumePredicateType) {
         case PredicateType.PREDICATE:
-            consumeable=(<Predicate<any>>consumePredicate).test(entry);
+            consumeable = (<Predicate<any>>consumePredicate).test(entry);
             break;
         case PredicateType.PREDICATE2:
-            consumeable=(<Predicate2<any,any>>consumePredicate).test(entry.key,entry.value);
+            consumeable = (<Predicate2<any, any>>consumePredicate).test(entry.key, entry.value);
             break;
         case PredicateType.FUNCTION:
-            consumeable=(<Function>consumePredicate).call({}, entry);
+            consumeable = (<Function>consumePredicate).call({}, entry);
     }
     return consumeable;
 }
 
-function _judgeBreakConsumeMapEntry(entry: MapEntry<any, any>, breakPredicateType:PredicateType,  breakPredicate?: Predicate<any> | Predicate2<any, any> | Function ):boolean {
-    let breakable:boolean = false;
+function _judgeBreakConsumeMapEntry(entry: MapEntry<any, any>, breakPredicateType: PredicateType, breakPredicate?: Predicate<any> | Predicate2<any, any> | Function): boolean {
+    let breakable: boolean = false;
     switch (breakPredicateType) {
         case PredicateType.PREDICATE:
-            breakable=(<Predicate<any>>breakPredicate).test(entry);
+            breakable = (<Predicate<any>>breakPredicate).test(entry);
             break;
         case PredicateType.PREDICATE2:
-            breakable=(<Predicate2<any,any>>breakPredicate).test(entry.key,entry.value);
+            breakable = (<Predicate2<any, any>>breakPredicate).test(entry.key, entry.value);
             break;
         case PredicateType.FUNCTION:
-            breakable=(<Function>breakPredicate).call({}, entry);
+            breakable = (<Function>breakPredicate).call({}, entry);
     }
     return breakable;
 }
 
 
-function _consumeListItem( index:number,element: any,consumerType: ConsumerType, consumer: Consumer<any> | Consumer2<number, any> | Function):void {
-        switch (consumerType) {
+function _consumeListItem(index: number, element: any, consumerType: ConsumerType, consumer: Consumer<any> | Consumer2<number, any> | Function): void {
+    switch (consumerType) {
         case ConsumerType.CONSUMER:
             (<Consumer<any>>consumer).accept(element);
             break;
@@ -200,35 +200,35 @@ function _consumeListItem( index:number,element: any,consumerType: ConsumerType,
         case ConsumerType.FUNCTION:
             (<Function>consumer).call({}, element, index);
             break;
-        }
+    }
 }
 
-function _judgePredicateConsumeListItem(index:number,element: any,consumePredicateType:PredicateType,  consumePredicate?: Predicate<any> | Predicate2<any, any> | Function):boolean {
-    let consumeable:boolean = true;
+function _judgePredicateConsumeListItem(index: number, element: any, consumePredicateType: PredicateType, consumePredicate?: Predicate<any> | Predicate2<any, any> | Function): boolean {
+    let consumeable: boolean = true;
     switch (consumePredicateType) {
         case PredicateType.PREDICATE:
-            consumeable=(<Predicate<any>>consumePredicate).test(element);
+            consumeable = (<Predicate<any>>consumePredicate).test(element);
             break;
         case PredicateType.PREDICATE2:
-            consumeable=(<Predicate2<any,any>>consumePredicate).test(index,element);
+            consumeable = (<Predicate2<any, any>>consumePredicate).test(index, element);
             break;
         case PredicateType.FUNCTION:
-            consumeable=(<Function>consumePredicate).call({}, element,index);
+            consumeable = (<Function>consumePredicate).call({}, element, index);
     }
     return consumeable;
 }
 
-function _judgeBreakConsumeListItem(index:number,element: any, breakPredicateType:PredicateType,  breakPredicate?: Predicate<any> | Predicate2<any, any> | Function ):boolean {
-    let breakable:boolean = false;
+function _judgeBreakConsumeListItem(index: number, element: any, breakPredicateType: PredicateType, breakPredicate?: Predicate<any> | Predicate2<any, any> | Function): boolean {
+    let breakable: boolean = false;
     switch (breakPredicateType) {
         case PredicateType.PREDICATE:
-            breakable=(<Predicate<any>>breakPredicate).test(element);
+            breakable = (<Predicate<any>>breakPredicate).test(element);
             break;
         case PredicateType.PREDICATE2:
-            breakable=(<Predicate2<any,any>>breakPredicate).test(index,element);
+            breakable = (<Predicate2<any, any>>breakPredicate).test(index, element);
             break;
         case PredicateType.FUNCTION:
-            breakable=(<Function>breakPredicate).call({}, element, index);
+            breakable = (<Function>breakPredicate).call({}, element, index);
     }
     return breakable;
 }
@@ -250,9 +250,9 @@ export function forEach(iterable: Iterable<any>, consumer: Consumer<any> | Consu
             map = new HashMap(<Map<any, any>>iterable);
         }
         for (let entry of map) {
-            if(_judgePredicateConsumeMapEntry(entry,consumePredicateType, consumePredicate )){
-                _consumeMapEntry(entry,consumerType, consumer);
-                if(_judgeBreakConsumeMapEntry(entry,breakPredicateType,breakPredicate)){
+            if (_judgePredicateConsumeMapEntry(entry, consumePredicateType, consumePredicate)) {
+                _consumeMapEntry(entry, consumerType, consumer);
+                if (_judgeBreakConsumeMapEntry(entry, breakPredicateType, breakPredicate)) {
                     break;
                 }
             }
@@ -260,9 +260,9 @@ export function forEach(iterable: Iterable<any>, consumer: Consumer<any> | Consu
     } else {
         let index = 0;
         for (let element of iterable) {
-            if(_judgePredicateConsumeListItem(index,element,consumePredicateType,consumePredicate)){
-                _consumeListItem(index,element,consumerType,consumer);
-                if(_judgeBreakConsumeListItem(index,element,breakPredicateType,breakPredicate)){
+            if (_judgePredicateConsumeListItem(index, element, consumePredicateType, consumePredicate)) {
+                _consumeListItem(index, element, consumerType, consumer);
+                if (_judgeBreakConsumeListItem(index, element, breakPredicateType, breakPredicate)) {
                     break;
                 }
             }
