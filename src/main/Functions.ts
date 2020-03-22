@@ -343,3 +343,27 @@ export function nonPredicateAny(predicate:Predicate<any>|Predicate2<any,any>|Fun
     }
     return p;
 }
+
+export class BooleanPredicate implements Predicate<any>{
+    private readonly value:boolean;
+    constructor(value:boolean) {
+        Preconditions.checkTrue(Types.isBoolean(value));
+        this.value = value;
+    }
+
+    test(i: any): boolean {
+        return this.value;
+    }
+}
+
+export function booleanPredicate(value:boolean) {
+    return new BooleanPredicate(value);
+}
+
+export function truePredicate() {
+    return booleanPredicate(true);
+}
+
+export function falsePredicate() {
+    return booleanPredicate(false);
+}

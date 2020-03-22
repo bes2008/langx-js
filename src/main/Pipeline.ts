@@ -1,6 +1,7 @@
 import {Collection, HashSet, LikeJavaSet, List} from "./Iterables";
 import * as Collects from "./Collects";
 import {Consumer, Consumer2, Func, Func2, Predicate, Predicate2} from "./Functions";
+import * as Objects from "./Objects";
 
 export class Pipeline<E extends any> {
     private readonly collection: Collection<E>;
@@ -32,7 +33,10 @@ export class Pipeline<E extends any> {
         return new Pipeline(Collects.firstN(this.collection, predicate, count));
     }
 
-    first(predicate: Predicate<E> | Predicate2<number, E> | Function): null | E {
+    first(predicate?: Predicate<E> | Predicate2<number, E> | Function): null | E {
+        if(predicate==null){
+            predicate=<Predicate<E>>Objects.unknownNull();
+        }
         return Collects.first(this.collection, predicate);
     }
 

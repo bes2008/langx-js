@@ -116,7 +116,7 @@ export function cleanNulls(iterable: LinearCollection): Collection<any> | Array<
     if (Types.isArray(iterable)) {
         return [...filter(iterable, {
             test: function (element: any) {
-                return !Objects.isEmpty(element);
+                return !Objects.isNull(element);
             }
         })];
     } else {
@@ -124,7 +124,7 @@ export function cleanNulls(iterable: LinearCollection): Collection<any> | Array<
         let collection = <Collection<any>>iterable;
         collection.clear();
         collection.addAll(<Collection<any>>filter(list, (element) => {
-            return !Objects.isEmpty(element);
+            return !Objects.isNull(element);
         }));
         return collection;
     }
@@ -394,9 +394,14 @@ export function filter(iterable: Iterable<any>, predicate: Predicate<any> | Pred
 }
 
 
-export function firstN(iterable: Iterable<any>, predicate: Predicate<any> | Predicate2<any, any> | Function, count: number): any {
-    Preconditions.checkNonNull(iterable);
+export function firstN(iterable: Iterable<any>, predicate: undefined | null | Predicate<any> | Predicate2<any, any> | Function, count: number): any {
     Preconditions.checkTrue(Numbers.isInteger(count) && count > 0);
+    if (iterable == null) {
+        return null;
+    }
+    if (predicate == null) {
+        predicate = Functions.truePredicate();
+    }
     let predicateType = Functions.judgePredicateType(predicate);
     Preconditions.checkTrue(predicateType != PredicateType.UNKNOWN, "illegal predicate");
     let isMap = Types.isMap(iterable);
@@ -427,7 +432,7 @@ export function firstN(iterable: Iterable<any>, predicate: Predicate<any> | Pred
     }
 }
 
-export function first(iterable: Iterable<any>, predicate: Predicate<any> | Predicate2<any, any> | Function): any {
+export function first(iterable: Iterable<any>, predicate: Predicate<any> | Predicate2<any, any> | Function | null | undefined): any {
     let list = asList(firstN(iterable, predicate, 1));
     if (list.isEmpty()) {
         return null;
@@ -467,9 +472,9 @@ export function allMatch(iterable: Iterable<any>, predicate: Predicate<any> | Pr
     Preconditions.checkNonNull(iterable);
     let matched: boolean = true;
     let nonPredicate = Functions.nonPredicateAny(predicate);
-    forEach(iterable, ()=>{
+    forEach(iterable, () => {
         matched = false;
-    },nonPredicate,()=>{
+    }, nonPredicate, () => {
         return !matched;
     });
     return matched;
