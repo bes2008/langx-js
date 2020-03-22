@@ -701,3 +701,34 @@ export function containsNone(iterable: Iterable<any>, judgement: Iterable<any>, 
         return contains(iterable, element, deep);
     });
 }
+
+export function intersection(iterable1: Iterable<any>, iterable2: Iterable<any>) {
+    let isMapOfIterable1 = Types.isMap(iterable1);
+    let isMapOfIterable2 = Types.isMap(iterable2);
+    Preconditions.checkTrue(isMapOfIterable1 == isMapOfIterable2);
+    if (isMapOfIterable1) {
+        let result: LinkedHashMap<any, any> = emptyLinkedHashMap();
+        let map1: LinkedHashMap<any, any> = (iterable1 instanceof Map) ? newLinkedHashMap(<Map<any, any>>iterable1) : newLinkedHashMap(<AbstractMap<any, any>>iterable1);
+        let map2: LinkedHashMap<any, any> = (iterable2 instanceof Map) ? newLinkedHashMap(<Map<any, any>>iterable2) : newLinkedHashMap(<AbstractMap<any, any>>iterable2);
+        let union: LinkedHashMap<any, any> = newLinkedHashMap(map1);
+        union.putAll(map2);
+        forEach(union, (key, value) => {
+            result.put(key, value);
+        }, (entry) => {
+            return contains(map1, entry, true) && contains(map2, entry, true);
+        });
+        return result;
+    } else {
+        let result: LinkedHashSet<any> = emptyLinkedHashSet();
+        let set1: LinkedHashSet<any> = newLinkedHashSet(iterable1);
+        let set2: LinkedHashSet<any> = newLinkedHashSet(iterable2);
+        let union: LinkedHashSet<any> = newLinkedHashSet(set1);
+        union.addAll(set2);
+        forEach(union, (element) => {
+            result.add(element)
+        }, (element) => {
+            return set1.contains(element) && set2.contains(element);
+        });
+        return result;
+    }
+}
