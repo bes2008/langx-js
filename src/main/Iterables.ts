@@ -756,6 +756,14 @@ export class TreeSet<E extends any> extends AbstractMapBasedSet<E> {
         }
     }
 
+    getComparator():Comparator<E>{
+        return (<TreeMap<E, null>>this.map).getComparator();
+    }
+
+    setComparator(comparator:Comparator<E>):void{
+        (<TreeMap<E, null>>this.map).setComparator(comparator);
+    }
+
 }
 
 
@@ -878,7 +886,7 @@ export class TreeMap<K extends any, V extends any> extends AbstractMap<K, V> {
     private comparator: MapEntryKeyComparator<K, V> = <MapEntryKeyComparator<K, V>>Objects.unknownNull();
 
 
-    constructor(map?: LikeJavaMap<K, V> | Map<K, V>, comparator?: Comparator<K>) {
+    constructor(map?: LikeJavaMap<K, V> | Map<K, V>|undefined|null, comparator?: Comparator<K>) {
         super();
         if (map != null) {
             if (map instanceof Map) {
@@ -903,6 +911,10 @@ export class TreeMap<K extends any, V extends any> extends AbstractMap<K, V> {
 
     getComparator(): Comparator<K> {
         return this.comparator.getDelegate();
+    }
+
+    setComparator(comparator:Comparator<K>):void{
+        this.comparator.setDelegate(comparator);
     }
 
     [Symbol.iterator](): Iterator<MapEntry<any, any>> {

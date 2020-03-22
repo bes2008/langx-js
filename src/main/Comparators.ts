@@ -51,3 +51,14 @@ export class HashedComparator<E> implements Comparator<E>{
         return Objects.hashCode(e1)- Objects.hashCode(e2);
     }
 }
+
+export class ReverseComparator<E> implements Comparator<E>{
+    private readonly comparator:Comparator<E>;
+    constructor(comparator:Comparator<E>) {
+        this.comparator = comparator;
+    }
+
+    compare(e1: E, e2: E): number {
+        return this.comparator.compare(e2,e1);
+    }
+}

@@ -16,7 +16,7 @@ import {
 } from "./Functions";
 import * as Iterables from "./Iterables";
 import {
-    AbstractList,
+    AbstractList, AbstractMap, AbstractSet,
     ArrayList,
     Collection,
     HashMap,
@@ -33,7 +33,7 @@ import {
     TreeSet
 } from "./Iterables";
 import * as Preconditions from "./Preconditions";
-import {Comparator} from "./Comparators";
+import {Comparator, ReverseComparator} from "./Comparators";
 import exp = require("constants");
 
 
@@ -291,14 +291,14 @@ export function map(iterable: Iterable<any>, mapper: Func<any, any> | Func2<any,
     if (isMap) {
         const newMap: LikeJavaMap<any, any> = new HashMap<any, any>();
         const mapConsumer: Consumer<any> = {
-            accept(entry: any) {
+            accept(entry: MapEntry<any, any>) {
                 switch (mapperType) {
                     case FunctionType.FUNC:
                         let newEntry: MapEntry<any, any> = (<Func<MapEntry<any, any>, MapEntry<any, any>>>mapper).apply(entry);
                         newMap.put(newEntry.key, newEntry.value);
                         break;
                     case FunctionType.FUNC2: {
-                        let newEntry2: MapEntry<any, any> = (<Func2<any, any, MapEntry<any, any>>>mapper).apply(entry.getKey(), entry.getValue());
+                        let newEntry2: MapEntry<any, any> = (<Func2<any, any, MapEntry<any, any>>>mapper).apply(entry.key, entry.value);
                         newMap.put(newEntry2.key, newEntry2.value);
                         break;
                     }
@@ -341,11 +341,15 @@ export function filter(iterable: Iterable<any>, predicate: Predicate<any> | Pred
     let isMap = Types.isMap(iterable);
     if (isMap) {
         let newMap: LikeJavaMap<any, any> = new HashMap();
-        forEach(iterable, (entry:MapEntry<any, any>)=>{newMap.put(entry.key,entry.value);}, <Predicate2<any, any>>Objects.unknownNull(), breakPredicate);
+        forEach(iterable, (entry: MapEntry<any, any>) => {
+            newMap.put(entry.key, entry.value);
+        }, <Predicate2<any, any>>Objects.unknownNull(), breakPredicate);
         return newMap;
     } else {
         const newList = emptyArrayList();
-        forEach(iterable, (element)=>{newList.add(element);}, predicate, breakPredicate);
+        forEach(iterable, (element) => {
+            newList.add(element);
+        }, predicate, breakPredicate);
         return newList;
     }
 }
@@ -509,6 +513,94 @@ export function skip(iterable: Iterable<any>, skip: number) {
     return list.subList(skip, list.size());
 }
 
-export function distinct(iterable, comparator?:Comparator<any>):LikeJavaSet<any> {
+export function distinct(iterable: Iterable<any>, comparator?: Comparator<any>): LikeJavaSet<any> {
     return newTreeSet(iterable, comparator);
+}
+
+export function reverse(iterable: Iterable<any>, newOne: boolean) {
+    if (Types.isArray(iterable)) {
+        return newOne ? [...iterable].reverse() : (<Array<any>>iterable).reverse();
+    }
+    if(iterable instanceof AbstractList){
+        let list:AbstractList<any> = <AbstractList<any>>iterable;
+        let array:Array<any>=[...list].reverse();
+        if(newOne){
+            return new ArrayList(array);
+        }
+        list.clear();
+        for(let element of array){
+            list.add(element);
+        }
+        return list;
+    }
+    if (iterable instanceof Set) {
+        let set: Set<any> = <Set<any>>iterable;
+        let array = [...iterable].reverse();
+        if (newOne) {
+            return new Set<any>(array);
+        }
+
+        set.clear();
+        for (let element of array) {
+            set.add(element);
+        }
+        return set;
+    }
+    if(iterable instanceof AbstractSet){
+        let set:AbstractSet<any> = <AbstractSet<any>>iterable;
+        let array:Array<any>=[...set].reverse();
+        if(newOne){
+            if(iterable instanceof TreeSet){
+                return new TreeSet(array,new ReverseComparator((<TreeSet<any>>iterable).getComparator()));
+            }
+            return new LinkedHashSet(array);
+        }
+        set.clear();
+        if(set instanceof TreeSet){
+            let treeSet = <TreeSet<any>>set;
+            treeSet.setComparator(new ReverseComparator(treeSet.getComparator()));
+        }
+        for(let element of array){
+            set.add(element);
+        }
+        return set;
+    }
+    if (iterable instanceof Map) {
+        let map: Map<any, any> = <Map<any, any>>iterable;
+        let entryArray:Array<[any,any]> = Array.from(map.entries()).reverse();
+        if (newOne) {
+            return new Map<any, any>(entryArray);
+        }
+        map.clear();
+        for (let [key, value] of entryArray) {
+            map.set(key, value);
+        }
+        return map;
+    }
+    if(iterable instanceof AbstractMap){
+        let map:AbstractMap<any, any> =<AbstractMap<any, any>>iterable;
+        let entryArray:Array<MapEntry<any, any>> = [...map].reverse();
+        if(newOne){
+            let newMap:AbstractMap<any, any>;
+            if(iterable instanceof TreeMap){
+                newMap =new TreeMap(null, new ReverseComparator((<TreeMap<any,any>>iterable).getComparator()));
+            }else {
+                newMap = new LinkedHashMap();
+            }
+            for (let entry of entryArray){
+                newMap.put(entry.key,entry.value);
+            }
+            return newMap;
+        }
+        map.clear();
+        if(iterable instanceof TreeMap){
+            let treeMap:TreeMap<any, any> = <TreeMap<any,any>>iterable;
+            treeMap.setComparator(new ReverseComparator(treeMap.getComparator()));
+        }
+        for (let entry of entryArray){
+            map.put(entry.key,entry.value);
+        }
+        return map;
+    }
+    return iterable;
 }
