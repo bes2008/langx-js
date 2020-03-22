@@ -32,14 +32,25 @@ export abstract class AbstractIterator<E extends any> implements Iterator<E> {
     }
 }
 
+export enum ObjectPropertiesIterateType {
+    KEY,
+    VALUE,
+    KEY_VALUE
+}
+
 export class ObjectPropertiesIterator extends AbstractIterator<any> implements IterableIterator<any> {
     private readonly obj: Object;
     private keysIter: Iterator<any>;
+    private readonly iterateType:ObjectPropertiesIterateType;
 
-    constructor(object: Object) {
+    constructor(object: Object, iterateType?:ObjectPropertiesIterateType) {
         super();
         this.obj = object;
         this.keysIter = new ArrayList(Object.keys(object))[Symbol.iterator]();
+        if(iterateType==null){
+            iterateType = ObjectPropertiesIterateType.KEY_VALUE;
+        }
+        this.iterateType = iterateType;
     }
 
     [Symbol.iterator](): IterableIterator<any> {
@@ -48,8 +59,22 @@ export class ObjectPropertiesIterator extends AbstractIterator<any> implements I
 
     next(...args: [] | [undefined]): IteratorResult<any> {
         let keyResult: IteratorResult<any> = this.keysIter.next();
+        let value:any;
+        switch (this.iterateType) {
+            case ObjectPropertiesIterateType.KEY:
+                value =keyResult.value;
+                break;
+            case ObjectPropertiesIterateType.VALUE:
+                value = this.obj[keyResult.value];
+                break;
+            default:
+                value={
+                    key: keyResult.value,
+                    value: this.obj[keyResult.value]
+                };
+        }
         return {
-            value: this.obj[keyResult.value],
+            value: value,
             done: keyResult.done
         };
     }
@@ -772,6 +797,20 @@ export interface MapEntry<K, V> {
     value?: V;
 
     hashCode(): number;
+}
+
+export function isLikeMapEntry(obj:object) {
+    if(Objects.isNull(obj)){
+        return false;
+    }
+    return Objects.hasProperty(obj,"key") && Objects.hasProperty(obj,"value");
+}
+
+export function toMapEntry(object):MapEntry<any, any>|null {
+    if(isLikeMapEntry(object)){
+        return null;
+    }
+    return new SimpleMapEntry(object["key"],object["value"]);
 }
 
 export class MapEntryKeyComparator<K, V> implements Comparator<MapEntry<K, V>>, Delegatable<Comparator<K>> {

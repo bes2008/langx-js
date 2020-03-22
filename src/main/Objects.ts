@@ -1,7 +1,10 @@
 import * as HashCodes from "./HashCodes";
 import * as Emptys from "./Emptys";
 import * as Types from "./Types";
-
+import * as Iterables from "./Iterables";
+import * as Dates from "./Dates";
+import {LinkedHashMap, MapEntry, ObjectPropertiesIterator} from "./Iterables";
+import * as Collects from "./Collects";
 
 interface ObjectPropertyDescriptor {
     configurable?: boolean;
@@ -202,4 +205,47 @@ export function unknownNull(): unknown {
 
 export function hashCode(object: any): number {
     return HashCodes.hashCode(object);
+}
+
+export function getLength(obj:any):number {
+    return Emptys.getLength(obj);
+}
+
+export function objectToMap(obj:object) {
+    let map:LinkedHashMap<any,any> = new LinkedHashMap();
+    if(isEmpty(obj)){
+        return map;
+    }
+    for(let entry of new ObjectPropertiesIterator(obj)){
+        map.put(entry.key, entry.value);
+    }
+    return map;
+}
+
+export function equals(obj1:any, obj2:any, deep?:boolean) {
+    if(Object.is(obj1,obj2) || obj1 == obj2){
+        return true;
+    }
+
+    if(!deep){
+        return false;
+    }
+
+    if(Types.isDate(obj1)){
+        return Dates.equals(obj1, obj2);
+    }
+
+    let obj1IsIterable = Iterables.isIterable(obj1);
+    let obj2IsIterable = Iterables.isIterable(obj2);
+    if(!obj1IsIterable && obj2IsIterable){
+        return false;
+    }
+    if(!obj1IsIterable && !obj2IsIterable){
+        obj1=objectToMap(obj1);
+        obj2=objectToMap(obj2);
+    }
+    if(obj1IsIterable && !obj2IsIterable){
+        obj2 = objectToMap(obj2);
+    }
+    return Collects.containsAll(obj1, obj2) && Collects.containsAll(obj2,obj1);
 }

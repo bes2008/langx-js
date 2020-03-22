@@ -614,6 +614,16 @@ export function count(iterable:Iterable<any>):number {
     return Emptys.getLength(iterable);
 }
 
+
+export function contains(iterable:Iterable<any>, element:any):boolean {
+    if(Emptys.isEmpty(iterable)){
+        return false;
+    }
+    return anyMatch(iterable,(e)=>{
+        return Objects.equals(e, element, false);
+    });
+}
+
 export function addAll(iterable:Iterable<any>, appendment:Iterable<any>):void {
     Preconditions.checkNonNull(iterable);
     Preconditions.checkNonNull(appendment);
@@ -657,4 +667,38 @@ export function addAll(iterable:Iterable<any>, appendment:Iterable<any>):void {
         }
         return;
     }
+}
+
+/**
+ * Judge every element in {judgement} will in the {iterable}
+ * @param iterable
+ * @param judgement
+ */
+export function containsAll(iterable:Iterable<any>, judgement:Iterable<any>):boolean{
+    if(Emptys.isEmpty(iterable)){
+        return false;
+    }
+    Preconditions.checkNonNull(judgement);
+    return allMatch(judgement,(element)=>{
+        return contains(iterable, element);
+    });
+}
+
+export function containsAny(iterable:Iterable<any>, judgement:Iterable<any>):boolean{
+    if(Emptys.isEmpty(iterable)){
+        return false;
+    }
+    Preconditions.checkNonNull(judgement);
+    return anyMatch(judgement,(element)=>{
+        return contains(iterable, element);
+    });
+}
+
+export function containsNone(iterable:Iterable<any>, judgement:Iterable<any>):boolean {
+    if(Emptys.isEmpty(iterable)){
+        return true;
+    }
+    return noneMatch(judgement,(element)=>{
+        return contains(iterable, element);
+    });
 }

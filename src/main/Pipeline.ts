@@ -93,6 +93,10 @@ export class Pipeline<E extends any> {
         return Collects.count(this.collection);
     }
 
+    addAll(appendment:Iterable<any>):Pipeline<any>{
+        Collects.addAll(this.collection, appendment);
+        return this;
+    }
 }
 
 
