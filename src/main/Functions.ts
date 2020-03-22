@@ -1,4 +1,5 @@
 import * as Types from "./Types";
+import * as Preconditions from "./Preconditions";
 
 export interface Func<I, O> {
     apply(input: I): O;
@@ -128,6 +129,7 @@ export function judgePredicateType(predicate?: Predicate<any> | Predicate2<any, 
 
 
 import * as Emptys from "./Emptys";
+import {ArrayList} from "./Iterables";
 
 export class IsNullPredicate implements Predicate<any> {
     test(i: any): boolean {
@@ -137,4 +139,187 @@ export class IsNullPredicate implements Predicate<any> {
 
 export function isNullPredicate(): Predicate<any> {
     return new IsNullPredicate();
+}
+
+export class AllPredicate implements Predicate<any>{
+    private readonly predicates:ArrayList<Predicate<any>> = new ArrayList<Predicate<any>>();
+    constructor(predicates:Iterable<Predicate<any>>) {
+        Preconditions.checkNonNull(predicates);
+        for (let predicate of predicates){
+            if(predicate!=null){
+                this.predicates.add(predicate);
+            }
+        }
+    }
+    test(i: any): boolean {
+        let matched: boolean= true;
+        for(let predicate of this.predicates){
+            matched = predicate.test(i);
+            if(!matched){
+                return  false;
+            }
+        }
+        return true;
+    }
+}
+
+export class AllPredicate2 implements Predicate2<any,any>{
+    private readonly predicates:ArrayList<Predicate2<any,any>> = new ArrayList<Predicate2<any,any>>();
+    constructor(predicates:Iterable<Predicate2<any,any>>) {
+        Preconditions.checkNonNull(predicates);
+        for (let predicate of predicates){
+            if(predicate!=null){
+                this.predicates.add(predicate);
+            }
+        }
+    }
+    test(i: any,i2:any): boolean {
+        let matched: boolean= true;
+        for(let predicate of this.predicates){
+            matched = predicate.test(i,i2);
+            if(!matched){
+                return  false;
+            }
+        }
+        return true;
+    }
+}
+
+export function allPredicate(predicates:Iterable<Predicate<any>>) {
+    return new AllPredicate(predicates);
+}
+
+export function allPredicate2(predicates:Iterable<Predicate2<any, any>>) {
+    return new AllPredicate2(predicates);
+}
+
+export class AnyPredicate implements Predicate<any>{
+    private readonly predicates:ArrayList<Predicate<any>> = new ArrayList<Predicate<any>>();
+    constructor(predicates:Iterable<Predicate<any>>) {
+        Preconditions.checkNonNull(predicates);
+        for (let predicate of predicates){
+            if(predicate!=null){
+                this.predicates.add(predicate);
+            }
+        }
+    }
+    test(i: any): boolean {
+        let matched: boolean= false;
+        for(let predicate of this.predicates){
+            matched = predicate.test(i);
+            if(matched){
+                return true;
+            }
+        }
+        return false;
+    }
+}
+export class AnyPredicate2 implements Predicate2<any,any>{
+    private readonly predicates:ArrayList<Predicate2<any,any>> = new ArrayList<Predicate2<any,any>>();
+    constructor(predicates:Iterable<Predicate2<any,any>>) {
+        Preconditions.checkNonNull(predicates);
+        for (let predicate of predicates){
+            if(predicate!=null){
+                this.predicates.add(predicate);
+            }
+        }
+    }
+    test(i: any,i2:any): boolean {
+        let matched: boolean= false;
+        for(let predicate of this.predicates){
+            matched = predicate.test(i,i2);
+            if(matched){
+                return true;
+            }
+        }
+        return false;
+    }
+}
+export function anyPredicate(predicates:Iterable<Predicate<any>>) {
+    return new AnyPredicate(predicates);
+}
+
+export function anyPredicate2(predicates:Iterable<Predicate2<any, any>>) {
+    return new AnyPredicate2(predicates);
+}
+export class NonePredicate implements Predicate<any>{
+    private readonly predicates:ArrayList<Predicate<any>> = new ArrayList<Predicate<any>>();
+    constructor(predicates:Iterable<Predicate<any>>) {
+        Preconditions.checkNonNull(predicates);
+        for (let predicate of predicates){
+            if(predicate!=null){
+                this.predicates.add(predicate);
+            }
+        }
+    }
+    test(i: any): boolean {
+        let matched: boolean= true;
+        for(let predicate of this.predicates){
+            matched = predicate.test(i);
+            if(matched){
+                return false;
+            }
+        }
+        return true;
+    }
+}
+
+export class NonePredicate2 implements Predicate2<any,any>{
+    private readonly predicates:ArrayList<Predicate2<any,any>> = new ArrayList<Predicate2<any,any>>();
+    constructor(predicates:Iterable<Predicate2<any,any>>) {
+        Preconditions.checkNonNull(predicates);
+        for (let predicate of predicates){
+            if(predicate!=null){
+                this.predicates.add(predicate);
+            }
+        }
+    }
+    test(i: any, i2:any): boolean {
+        let matched: boolean= true;
+        for(let predicate of this.predicates){
+            matched = predicate.test(i,i2);
+            if(matched){
+                return false;
+            }
+        }
+        return true;
+    }
+}
+
+export function nonePredicate(predicates:Iterable<Predicate<any>>) {
+    return new NonePredicate(predicates);
+}
+
+export function nonePredicate2(predicates:Iterable<Predicate2<any, any>>) {
+    return new NonePredicate2(predicates);
+}
+
+export class NonPredicate implements Predicate<any>{
+    private readonly predicate:Predicate<any>;
+    constructor(predicate:Predicate<any>) {
+        this.predicate = predicate;
+    }
+
+    test(i: any): boolean {
+        return !this.predicate.test(i);
+    }
+}
+
+export class NonPredicate2 implements Predicate2<any,any>{
+    private readonly predicate:Predicate2<any,any>;
+    constructor(predicate:Predicate2<any,any>) {
+        this.predicate = predicate;
+    }
+
+    test(i: any,i2:any): boolean {
+        return !this.predicate.test(i,i2);
+    }
+}
+
+export function nonPredicate(predicate:Predicate<any>){
+    return new NonPredicate(predicate);
+}
+
+export function nonPredicate2(predicate:Predicate2<any,any>){
+    return new NonPredicate2(predicate);
 }

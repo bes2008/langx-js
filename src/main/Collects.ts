@@ -396,7 +396,7 @@ export function filter(iterable: Iterable<any>, predicate: Predicate<any> | Pred
 
 export function firstN(iterable: Iterable<any>, predicate: Predicate<any> | Predicate2<any, any> | Function, count: number): any {
     Preconditions.checkNonNull(iterable);
-    Preconditions.checkTrue(count > 0 || Numbers.isInteger(count));
+    Preconditions.checkTrue(Numbers.isInteger(count) && count> 0 );
     let predicateType = Functions.judgePredicateType(predicate);
     Preconditions.checkTrue(predicateType != PredicateType.UNKNOWN, "illegal predicate");
     let isMap = Types.isMap(iterable);
