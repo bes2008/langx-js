@@ -7,13 +7,13 @@ import * as Emptys from "./Emptys";
 import {
     Consumer,
     Consumer2,
-    ConsumerType,
+    ConsumerType, falsePredicate,
     Func,
     Func2,
     FunctionType,
     Predicate,
     Predicate2,
-    PredicateType
+    PredicateType, Supplier0, truePredicate
 } from "./Functions";
 import * as Iterables from "./Iterables";
 import {
@@ -750,4 +750,21 @@ export function union(iterable1: Iterable<any>, iterable2: Iterable<any>) {
         union.addAll(set2);
         return union;
     }
+}
+
+export function collect(obj:object, containerFactory:Supplier0<Iterable<any>>, consumer:Consumer2<Iterable<any>, any>, consumePredicate?:Predicate<any>|Predicate2<any, any>|Function, breakPredicate?:Predicate<any>|Predicate2<any, any>|Function) {
+    return Functions.collect(asIterable(obj), {
+        accumulator(): Consumer2<Iterable<any>, any> {
+            return consumer;
+        },
+        supplier(): Supplier0<Iterable<any>> {
+            return containerFactory;
+        },
+        breakPredicator(): Predicate<any> | Predicate2<any, any> | Function {
+            return breakPredicate==null?falsePredicate():breakPredicate;
+        },
+        consumePredicator(): Predicate<any> | Predicate2<any, any> | Function {
+           return consumePredicate==null?truePredicate():consumePredicate;
+       }
+    });
 }

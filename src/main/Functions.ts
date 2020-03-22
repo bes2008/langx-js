@@ -1,5 +1,6 @@
 import * as Types from "./Types";
 import * as Preconditions from "./Preconditions";
+import * as Collects from "./Collects";
 
 export interface Func<I, O> {
     apply(input: I): O;
@@ -366,4 +367,24 @@ export function truePredicate() {
 
 export function falsePredicate() {
     return booleanPredicate(false);
+}
+
+/**
+ * @param C the container will be return, also te container will be fill
+ * @param E  the element in a will be iterate
+ */
+export interface Collector<E,C> {
+    supplier():Supplier0<C>;
+    accumulator():Consumer2<C, E>;
+    consumePredicator():Predicate<any>|Predicate2<any, any>|Function;
+    breakPredicator():Predicate<any>|Predicate2<any, any>|Function;
+}
+
+export function collect(iterable:Iterable<any>, collector:Collector<any, Iterable<any>>) {
+    let collection = collector.supplier().get();
+    let consumer = collector.accumulator();
+    Collects.forEach(iterable, (element)=>{
+        consumer.accept(collection, element);
+    }, collector.consumePredicator(), collector.breakPredicator());
+    return collection;
 }
