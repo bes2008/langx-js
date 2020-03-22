@@ -35,8 +35,8 @@ export class Pipeline<E extends any> {
     }
 
     findFirst(predicate?: Predicate<E> | Predicate2<number, E> | Function): null | E {
-        if(predicate==null){
-            predicate=<Predicate<E>>Objects.unknownNull();
+        if (predicate == null) {
+            predicate = <Predicate<E>>Objects.unknownNull();
         }
         return Collects.findFirst(this.collection, predicate);
     }
@@ -81,21 +81,37 @@ export class Pipeline<E extends any> {
         return new Pipeline<E>(Collects.skip(this.collection, Math.max(0, skip)));
     }
 
-    distinct(comparator?:Comparator<E>):Pipeline<E>{
+    distinct(comparator?: Comparator<E>): Pipeline<E> {
         return new Pipeline<E>(Collects.distinct(this.collection));
     }
 
-    reverse():Pipeline<E>{
+    reverse(): Pipeline<E> {
         return new Pipeline<E>(Collects.reverse(this.collection));
     }
 
-    count():number{
+    count(): number {
         return Collects.count(this.collection);
     }
 
-    addAll(appendment:Iterable<any>):Pipeline<any>{
+    addAll(appendment: Iterable<any>): Pipeline<any> {
         Collects.addAll(this.collection, appendment);
         return this;
+    }
+
+    contains(element: any, deep?: boolean): boolean {
+        return Collects.contains(this.collection, element, deep);
+    }
+
+    containsAll(iterable: Iterable<any>, deep?: boolean): boolean {
+        return Collects.contains(this.collection, iterable, deep);
+    }
+
+    containsAny(iterable: Iterable<any>, deep?: boolean): boolean {
+        return Collects.contains(this.collection, iterable, deep);
+    }
+
+    containsNone(iterable: Iterable<any>, deep?: boolean): boolean {
+        return Collects.contains(this.collection, iterable, deep);
     }
 }
 

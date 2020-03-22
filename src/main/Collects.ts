@@ -520,20 +520,20 @@ export function distinct(iterable: Iterable<any>, comparator?: Comparator<any>):
 }
 
 export function reverse(iterable: Iterable<any>, newOne?: boolean) {
-    if(newOne==null){
+    if (newOne == null) {
         newOne = true;
     }
     if (Types.isArray(iterable)) {
         return newOne ? [...iterable].reverse() : (<Array<any>>iterable).reverse();
     }
-    if(iterable instanceof AbstractList){
-        let list:AbstractList<any> = <AbstractList<any>>iterable;
-        let array:Array<any>=[...list].reverse();
-        if(newOne){
+    if (iterable instanceof AbstractList) {
+        let list: AbstractList<any> = <AbstractList<any>>iterable;
+        let array: Array<any> = [...list].reverse();
+        if (newOne) {
             return new ArrayList(array);
         }
         list.clear();
-        for(let element of array){
+        for (let element of array) {
             list.add(element);
         }
         return list;
@@ -551,28 +551,28 @@ export function reverse(iterable: Iterable<any>, newOne?: boolean) {
         }
         return set;
     }
-    if(iterable instanceof AbstractSet){
-        let set:AbstractSet<any> = <AbstractSet<any>>iterable;
-        let array:Array<any>=[...set].reverse();
-        if(newOne){
-            if(iterable instanceof TreeSet){
-                return new TreeSet(array,new ReverseComparator((<TreeSet<any>>iterable).getComparator()));
+    if (iterable instanceof AbstractSet) {
+        let set: AbstractSet<any> = <AbstractSet<any>>iterable;
+        let array: Array<any> = [...set].reverse();
+        if (newOne) {
+            if (iterable instanceof TreeSet) {
+                return new TreeSet(array, new ReverseComparator((<TreeSet<any>>iterable).getComparator()));
             }
             return new LinkedHashSet(array);
         }
         set.clear();
-        if(set instanceof TreeSet){
+        if (set instanceof TreeSet) {
             let treeSet = <TreeSet<any>>set;
             treeSet.setComparator(new ReverseComparator(treeSet.getComparator()));
         }
-        for(let element of array){
+        for (let element of array) {
             set.add(element);
         }
         return set;
     }
     if (iterable instanceof Map) {
         let map: Map<any, any> = <Map<any, any>>iterable;
-        let entryArray:Array<[any,any]> = Array.from(map.entries()).reverse();
+        let entryArray: Array<[any, any]> = Array.from(map.entries()).reverse();
         if (newOne) {
             return new Map<any, any>(entryArray);
         }
@@ -582,86 +582,76 @@ export function reverse(iterable: Iterable<any>, newOne?: boolean) {
         }
         return map;
     }
-    if(iterable instanceof AbstractMap){
-        let map:AbstractMap<any, any> =<AbstractMap<any, any>>iterable;
-        let entryArray:Array<MapEntry<any, any>> = [...map].reverse();
-        if(newOne){
-            let newMap:AbstractMap<any, any>;
-            if(iterable instanceof TreeMap){
-                newMap =new TreeMap(null, new ReverseComparator((<TreeMap<any,any>>iterable).getComparator()));
-            }else {
+    if (iterable instanceof AbstractMap) {
+        let map: AbstractMap<any, any> = <AbstractMap<any, any>>iterable;
+        let entryArray: Array<MapEntry<any, any>> = [...map].reverse();
+        if (newOne) {
+            let newMap: AbstractMap<any, any>;
+            if (iterable instanceof TreeMap) {
+                newMap = new TreeMap(null, new ReverseComparator((<TreeMap<any, any>>iterable).getComparator()));
+            } else {
                 newMap = new LinkedHashMap();
             }
-            for (let entry of entryArray){
-                newMap.put(entry.key,entry.value);
+            for (let entry of entryArray) {
+                newMap.put(entry.key, entry.value);
             }
             return newMap;
         }
         map.clear();
-        if(iterable instanceof TreeMap){
-            let treeMap:TreeMap<any, any> = <TreeMap<any,any>>iterable;
+        if (iterable instanceof TreeMap) {
+            let treeMap: TreeMap<any, any> = <TreeMap<any, any>>iterable;
             treeMap.setComparator(new ReverseComparator(treeMap.getComparator()));
         }
-        for (let entry of entryArray){
-            map.put(entry.key,entry.value);
+        for (let entry of entryArray) {
+            map.put(entry.key, entry.value);
         }
         return map;
     }
     return iterable;
 }
 
-export function count(iterable:Iterable<any>):number {
+export function count(iterable: Iterable<any>): number {
     return Emptys.getLength(iterable);
 }
 
-
-export function contains(iterable:Iterable<any>, element:any):boolean {
-    if(Emptys.isEmpty(iterable)){
-        return false;
-    }
-    return anyMatch(iterable,(e)=>{
-        return Objects.equals(e, element, false);
-    });
-}
-
-export function addAll(iterable:Iterable<any>, appendment:Iterable<any>):void {
+export function addAll(iterable: Iterable<any>, appendment: Iterable<any>): void {
     Preconditions.checkNonNull(iterable);
     Preconditions.checkNonNull(appendment);
-    if(iterable instanceof Array){
-        let array:Array<any> =<Array<any>>iterable;
+    if (iterable instanceof Array) {
+        let array: Array<any> = <Array<any>>iterable;
         array.splice(array.length, 0, ...appendment);
         return;
     }
-    if(iterable instanceof Set){
-        let set:Set<any> = <Set<any>>iterable;
-        for(let element of appendment){
+    if (iterable instanceof Set) {
+        let set: Set<any> = <Set<any>>iterable;
+        for (let element of appendment) {
             set.add(element);
         }
         return;
     }
-    if(iterable instanceof AbstractCollection){
+    if (iterable instanceof AbstractCollection) {
         (<AbstractCollection<any>>iterable).addAll(appendment);
         return;
     }
-    if(iterable instanceof AbstractMap){
-        let map:AbstractMap<any, any> = <AbstractMap<any, any>>iterable;
-        for(let entry of appendment){
-            if(entry instanceof Array){
-                Preconditions.checkTrue((<Array<any>>entry).length>=2);
-                map.put(entry[0],entry[1])
-            }else if(entry instanceof SimpleMapEntry){
+    if (iterable instanceof AbstractMap) {
+        let map: AbstractMap<any, any> = <AbstractMap<any, any>>iterable;
+        for (let entry of appendment) {
+            if (entry instanceof Array) {
+                Preconditions.checkTrue((<Array<any>>entry).length >= 2);
+                map.put(entry[0], entry[1])
+            } else if (entry instanceof SimpleMapEntry) {
                 map.put(entry.key, entry.value);
             }
         }
         return;
     }
-    if(iterable instanceof Map){
-        let map:Map<any,any> = <Map<any,any>>iterable;
-        for(let entry of appendment){
-            if(entry instanceof Array){
-                Preconditions.checkTrue((<Array<any>>entry).length>=2);
-                map.set(entry[0],entry[1])
-            }else if(entry instanceof SimpleMapEntry){
+    if (iterable instanceof Map) {
+        let map: Map<any, any> = <Map<any, any>>iterable;
+        for (let entry of appendment) {
+            if (entry instanceof Array) {
+                Preconditions.checkTrue((<Array<any>>entry).length >= 2);
+                map.set(entry[0], entry[1])
+            } else if (entry instanceof SimpleMapEntry) {
                 map.set(entry.key, entry.value);
             }
         }
@@ -669,36 +659,45 @@ export function addAll(iterable:Iterable<any>, appendment:Iterable<any>):void {
     }
 }
 
+export function contains(iterable: Iterable<any>, element: any, deep?: boolean): boolean {
+    if (Emptys.isEmpty(iterable)) {
+        return false;
+    }
+    return anyMatch(iterable, (e) => {
+        return Objects.equals(e, element, deep);
+    });
+}
+
 /**
  * Judge every element in {judgement} will in the {iterable}
  * @param iterable
  * @param judgement
  */
-export function containsAll(iterable:Iterable<any>, judgement:Iterable<any>):boolean{
-    if(Emptys.isEmpty(iterable)){
+export function containsAll(iterable: Iterable<any>, judgement: Iterable<any>, deep?: boolean): boolean {
+    if (Emptys.isEmpty(iterable)) {
         return false;
     }
     Preconditions.checkNonNull(judgement);
-    return allMatch(judgement,(element)=>{
-        return contains(iterable, element);
+    return allMatch(judgement, (element) => {
+        return contains(iterable, element, deep);
     });
 }
 
-export function containsAny(iterable:Iterable<any>, judgement:Iterable<any>):boolean{
-    if(Emptys.isEmpty(iterable)){
+export function containsAny(iterable: Iterable<any>, judgement: Iterable<any>, deep?: boolean): boolean {
+    if (Emptys.isEmpty(iterable)) {
         return false;
     }
     Preconditions.checkNonNull(judgement);
-    return anyMatch(judgement,(element)=>{
-        return contains(iterable, element);
+    return anyMatch(judgement, (element) => {
+        return contains(iterable, element, deep);
     });
 }
 
-export function containsNone(iterable:Iterable<any>, judgement:Iterable<any>):boolean {
-    if(Emptys.isEmpty(iterable)){
+export function containsNone(iterable: Iterable<any>, judgement: Iterable<any>, deep?: boolean): boolean {
+    if (Emptys.isEmpty(iterable)) {
         return true;
     }
-    return noneMatch(judgement,(element)=>{
-        return contains(iterable, element);
+    return noneMatch(judgement, (element) => {
+        return contains(iterable, element, deep);
     });
 }
