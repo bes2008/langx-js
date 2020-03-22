@@ -64,7 +64,7 @@ export function emptyTreeSet(comparator?: Comparator<any>): TreeSet<any> {
     return new TreeSet<any>(<Iterable<any>>Objects.unknownNull(), comparator);
 }
 
-export function emptyLinkedHashMap():LinkedHashMap<any, any> {
+export function emptyLinkedHashMap(): LinkedHashMap<any, any> {
     return new LinkedHashMap<any, any>();
 }
 
@@ -396,7 +396,7 @@ export function filter(iterable: Iterable<any>, predicate: Predicate<any> | Pred
 
 export function firstN(iterable: Iterable<any>, predicate: Predicate<any> | Predicate2<any, any> | Function, count: number): any {
     Preconditions.checkNonNull(iterable);
-    Preconditions.checkTrue(Numbers.isInteger(count) && count> 0 );
+    Preconditions.checkTrue(Numbers.isInteger(count) && count > 0);
     let predicateType = Functions.judgePredicateType(predicate);
     Preconditions.checkTrue(predicateType != PredicateType.UNKNOWN, "illegal predicate");
     let isMap = Types.isMap(iterable);
@@ -465,71 +465,14 @@ export function anyMatch(iterable: Iterable<any>, predicate: Predicate<any> | Pr
 
 export function allMatch(iterable: Iterable<any>, predicate: Predicate<any> | Predicate2<any, any> | Function): boolean {
     Preconditions.checkNonNull(iterable);
-    let predicateType = Functions.judgePredicateType(predicate);
-    Preconditions.checkTrue(predicateType != PredicateType.UNKNOWN, "illegal predicate");
-    let isMap = Types.isMap(iterable);
-    if (isMap) {
-        let map;
-        if (Types.isJsMap(iterable)) {
-            map = <LikeJavaMap<any, any>>iterable;
-        } else {
-            map = new HashMap(<Map<any, any>>iterable);
-        }
-        let matched: boolean = true;
-        for (let entry of map) {
-            switch (predicateType) {
-                case PredicateType.PREDICATE:
-                    if (!(<Predicate<any>>predicate).test(entry)) {
-                        matched = false;
-                    }
-                    break;
-                case PredicateType.PREDICATE2: {
-                    if (!(<Predicate2<any, any>>predicate).test(entry.getKey(), entry.getValue())) {
-                        matched = false;
-                    }
-                    break;
-                }
-                case PredicateType.FUNCTION:
-                    if (!(<Function>predicate).call({}, entry)) {
-                        matched = false;
-                    }
-                    break;
-            }
-            if (!matched) {
-                break;
-            }
-        }
-        return matched;
-    } else {
-        let matched: boolean = true;
-        let index: number = 0;
-        for (let element of iterable) {
-            switch (predicateType) {
-                case PredicateType.PREDICATE:
-                    if (!(<Predicate<any>>predicate).test(element)) {
-                        matched = false;
-                    }
-                    break;
-                case PredicateType.PREDICATE2: {
-                    if (!(<Predicate2<any, any>>predicate).test(index, element)) {
-                        matched = false;
-                    }
-                    break;
-                }
-                case PredicateType.FUNCTION:
-                    if (!(<Function>predicate).call({}, element)) {
-                        matched = false;
-                    }
-                    break;
-            }
-            if (!matched) {
-                break;
-            }
-            index++;
-        }
-
-        return matched;
-    }
+    let matched: boolean = true;
+    let nonPredicate = Functions.nonPredicateAny(predicate);
+    forEach(iterable, ()=>{
+        matched = false;
+    },nonPredicate,()=>{
+        return !matched;
+    });
+    return matched;
 }
 
 
@@ -551,26 +494,9 @@ export function removeIf(iterable: Iterable<any>, predicate: Predicate<any> | Pr
     if (predicate == null) {
         return iterable;
     }
-    let predicateType = Functions.judgePredicateType(predicate);
-    let p: Predicate2<number, any> = {
-        test(index: number, element: any) {
-            let unremoved: boolean = false;
-            switch (predicateType) {
-                case PredicateType.PREDICATE:
-                    unremoved = !(<Predicate<any>>predicate).test(element);
-                    break;
-                case PredicateType.PREDICATE2: {
-                    unremoved = !(<Predicate2<any, any>>predicate).test(index, element);
-                    break;
-                }
-                case PredicateType.FUNCTION:
-                    unremoved = !(<Function>predicate).call({}, element);
-                    break;
-            }
-            return unremoved;
-        }
-    };
-    let newCollection = filter(iterable, p);
+    // step 1: find all will not removed
+    let newCollection = filter(iterable, Functions.nonPredicateAny(predicate));
+    // step 2: clear all and fill all will not removed
     if (Types.isArray(iterable)) {
         let array: Array<any> = <Array<any>>iterable;
         // clear all

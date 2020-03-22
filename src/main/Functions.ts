@@ -323,3 +323,23 @@ export function nonPredicate(predicate:Predicate<any>){
 export function nonPredicate2(predicate:Predicate2<any,any>){
     return new NonPredicate2(predicate);
 }
+
+export function nonPredicateAny(predicate:Predicate<any>|Predicate2<any,any>|Function) {
+    let predicateType = judgePredicateType(predicate);
+    Preconditions.checkTrue(predicateType != PredicateType.UNKNOWN, "illegal predicate");
+    let p:Predicate<any>|Predicate2<any,any>|Function|any;
+    switch (predicateType) {
+        case PredicateType.PREDICATE:
+            p = nonPredicate(<Predicate<any>>predicate);
+            break;
+        case PredicateType.PREDICATE2:
+            p = nonPredicate2(<Predicate2<any,any>>predicate);
+            break;
+        case PredicateType.FUNCTION:
+            p = (i1:any,i2:any)=>{
+                return !(<Function>predicate).call({},i1,i2);
+            };
+            break;
+    }
+    return p;
+}
