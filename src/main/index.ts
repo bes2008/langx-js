@@ -1,5 +1,6 @@
 import "./HashCodes";
 import "./Objects";
+import "./Strings";
 import "./Types";
 import "./Emptys";
 import "./Exceptions";
@@ -12,4 +13,3 @@ import "./Preconditions";
 import "./Iterables";
 import "./Collects";
 import "./Pipeline";
-import "./Strings";
