@@ -1042,7 +1042,7 @@ export class HashMap<K extends any, V extends any> extends AbstractMap<K, V> {
 
     get(key: K): V {
         const list: List<MapEntry<K, V>> = this.getKeySlotList(key);
-        return Pipeline.of(list).first({
+        return Pipeline.of(list).findFirst({
             test: function (entry: MapEntry<K, V>) {
                 return key == entry.key;
             }
@@ -1069,7 +1069,7 @@ export class HashMap<K extends any, V extends any> extends AbstractMap<K, V> {
         let key = entry.key;
         let value = entry.value;
         let list: List<MapEntry<K, V>> = this.getKeySlotList(key);
-        let oldEntry: MapEntry<K, V> = Pipeline.of(list).first({
+        let oldEntry: MapEntry<K, V> = Pipeline.of(list).findFirst({
             test: function (entry: MapEntry<K, V>) {
                 return key == entry.key;
             }
@@ -1098,7 +1098,7 @@ export class HashMap<K extends any, V extends any> extends AbstractMap<K, V> {
         }
 
         let list: List<MapEntry<K, V>> = this.getKeySlotList(key);
-        let oldEntry: MapEntry<K, V> = Pipeline.of(list).first({
+        let oldEntry: MapEntry<K, V> = Pipeline.of(list).findFirst({
             test: function (entry: MapEntry<K, V>) {
                 return key == entry.key;
             }
@@ -1170,7 +1170,7 @@ export class LinkedHashMap<K, V extends any> extends HashMap<K, V> {
         if (this.size() > oldSize) {
             this.orders.add(entry);
         } else {
-            let entry: MapEntry<K, V> = Collects.first(this.orders, {
+            let entry: MapEntry<K, V> = Collects.findFirst(this.orders, {
                 test(index: number, entry: MapEntry<K, V>) {
                     return entry != null && entry.key == key;
                 }

@@ -34,6 +34,7 @@ import {
 } from "./Iterables";
 import * as Preconditions from "./Preconditions";
 import {Comparator} from "./Comparators";
+import exp = require("constants");
 
 
 export function emptyArray(): Array<any> {
@@ -350,7 +351,7 @@ export function filter(iterable: Iterable<any>, predicate: Predicate<any> | Pred
 }
 
 
-export function firstN(iterable: Iterable<any>, predicate: undefined | null | Predicate<any> | Predicate2<any, any> | Function, count: number): any {
+export function findN(iterable: Iterable<any>, predicate: undefined | null | Predicate<any> | Predicate2<any, any> | Function, count: number): any {
     Preconditions.checkTrue(Numbers.isInteger(count) && count > 0);
     if (iterable == null) {
         return null;
@@ -388,8 +389,8 @@ export function firstN(iterable: Iterable<any>, predicate: undefined | null | Pr
     }
 }
 
-export function first(iterable: Iterable<any>, predicate: Predicate<any> | Predicate2<any, any> | Function | null | undefined): any {
-    let list = asList(firstN(iterable, predicate, 1));
+export function findFirst(iterable: Iterable<any>, predicate: Predicate<any> | Predicate2<any, any> | Function | null | undefined): any {
+    let list = asList(findN(iterable, predicate, 1));
     if (list.isEmpty()) {
         return null;
     }
@@ -506,4 +507,8 @@ export function skip(iterable: Iterable<any>, skip: number) {
         return emptyArrayList();
     }
     return list.subList(skip, list.size());
+}
+
+export function distinct(iterable, comparator?:Comparator<any>):LikeJavaSet<any> {
+    return newTreeSet(iterable, comparator);
 }

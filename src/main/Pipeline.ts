@@ -29,15 +29,15 @@ export class Pipeline<E extends any> {
         return new Pipeline(Collects.filter(this.collection, predicate, breakPredicate));
     }
 
-    firstN(predicate: Predicate<E> | Predicate2<number, E> | Function, count: number): Pipeline<E> {
-        return new Pipeline(Collects.firstN(this.collection, predicate, count));
+    findN(predicate: Predicate<E> | Predicate2<number, E> | Function, count: number): Pipeline<E> {
+        return new Pipeline(Collects.findN(this.collection, predicate, count));
     }
 
-    first(predicate?: Predicate<E> | Predicate2<number, E> | Function): null | E {
+    findFirst(predicate?: Predicate<E> | Predicate2<number, E> | Function): null | E {
         if(predicate==null){
             predicate=<Predicate<E>>Objects.unknownNull();
         }
-        return Collects.first(this.collection, predicate);
+        return Collects.findFirst(this.collection, predicate);
     }
 
     asSet(): LikeJavaSet<E> {
