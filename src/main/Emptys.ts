@@ -53,11 +53,6 @@ export function getLength(obj: any): number {
             return (<AbstractMap<any, any>>obj).size();
         }
     }
-
-    if (Types.isSimpleObject(obj)) {
-        return 1;
-    }
-
     return 1;
 }
 

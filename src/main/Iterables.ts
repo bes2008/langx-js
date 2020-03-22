@@ -78,7 +78,7 @@ export class NoopIterator extends NullIterator {
 export interface Collection<E extends any> extends Iterable<E> {
     add(e: E): boolean;
 
-    addAll(c: Collection<E>): boolean;
+    addAll(c: Iterable<E>): boolean;
 
     clear(): void;
 
@@ -109,7 +109,7 @@ export abstract class AbstractCollection<E> implements Collection<E> {
 
     abstract add(e: E): boolean ;
 
-    addAll(c: Collection<E>): boolean {
+    addAll(c: Iterable<E>): boolean {
         let result: boolean = true;
         for (let e of c) {
             if (!this.add(e)) {

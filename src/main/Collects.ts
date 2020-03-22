@@ -3,6 +3,7 @@ import * as Types from "./Types";
 import * as Numbers from "./Numbers";
 import * as Objects from "./Objects";
 import * as Functions from "./Functions";
+import * as Emptys from "./Emptys";
 import {
     Consumer,
     Consumer2,
@@ -16,6 +17,7 @@ import {
 } from "./Functions";
 import * as Iterables from "./Iterables";
 import {
+    AbstractCollection,
     AbstractList, AbstractMap, AbstractSet,
     ArrayList,
     Collection,
@@ -28,7 +30,7 @@ import {
     LinkedHashSet,
     LinkedList,
     List,
-    MapEntry,
+    MapEntry, SimpleMapEntry,
     TreeMap,
     TreeSet
 } from "./Iterables";
@@ -517,7 +519,10 @@ export function distinct(iterable: Iterable<any>, comparator?: Comparator<any>):
     return newTreeSet(iterable, comparator);
 }
 
-export function reverse(iterable: Iterable<any>, newOne: boolean) {
+export function reverse(iterable: Iterable<any>, newOne?: boolean) {
+    if(newOne==null){
+        newOne = true;
+    }
     if (Types.isArray(iterable)) {
         return newOne ? [...iterable].reverse() : (<Array<any>>iterable).reverse();
     }
@@ -603,4 +608,53 @@ export function reverse(iterable: Iterable<any>, newOne: boolean) {
         return map;
     }
     return iterable;
+}
+
+export function count(iterable:Iterable<any>):number {
+    return Emptys.getLength(iterable);
+}
+
+export function addAll(iterable:Iterable<any>, appendment:Iterable<any>):void {
+    Preconditions.checkNonNull(iterable);
+    Preconditions.checkNonNull(appendment);
+    if(iterable instanceof Array){
+        let array:Array<any> =<Array<any>>iterable;
+        array.splice(array.length, 0, ...appendment);
+        return;
+    }
+    if(iterable instanceof Set){
+        let set:Set<any> = <Set<any>>iterable;
+        for(let element of appendment){
+            set.add(element);
+        }
+        return;
+    }
+    if(iterable instanceof AbstractCollection){
+        (<AbstractCollection<any>>iterable).addAll(appendment);
+        return;
+    }
+    if(iterable instanceof AbstractMap){
+        let map:AbstractMap<any, any> = <AbstractMap<any, any>>iterable;
+        for(let entry of appendment){
+            if(entry instanceof Array){
+                Preconditions.checkTrue((<Array<any>>entry).length>=2);
+                map.put(entry[0],entry[1])
+            }else if(entry instanceof SimpleMapEntry){
+                map.put(entry.key, entry.value);
+            }
+        }
+        return;
+    }
+    if(iterable instanceof Map){
+        let map:Map<any,any> = <Map<any,any>>iterable;
+        for(let entry of appendment){
+            if(entry instanceof Array){
+                Preconditions.checkTrue((<Array<any>>entry).length>=2);
+                map.set(entry[0],entry[1])
+            }else if(entry instanceof SimpleMapEntry){
+                map.set(entry.key, entry.value);
+            }
+        }
+        return;
+    }
 }

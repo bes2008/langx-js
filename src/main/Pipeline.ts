@@ -2,6 +2,7 @@ import {Collection, HashSet, LikeJavaSet, List} from "./Iterables";
 import * as Collects from "./Collects";
 import {Consumer, Consumer2, Func, Func2, Predicate, Predicate2} from "./Functions";
 import * as Objects from "./Objects";
+import {Comparator} from "./Comparators";
 
 export class Pipeline<E extends any> {
     private readonly collection: Collection<E>;
@@ -79,6 +80,19 @@ export class Pipeline<E extends any> {
     skip(skip: number): Pipeline<E> {
         return new Pipeline<E>(Collects.skip(this.collection, Math.max(0, skip)));
     }
+
+    distinct(comparator?:Comparator<E>):Pipeline<E>{
+        return new Pipeline<E>(Collects.distinct(this.collection));
+    }
+
+    reverse():Pipeline<E>{
+        return new Pipeline<E>(Collects.reverse(this.collection));
+    }
+
+    count():number{
+        return Collects.count(this.collection);
+    }
+
 }
 
 
