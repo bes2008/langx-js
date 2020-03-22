@@ -340,55 +340,11 @@ export function filter(iterable: Iterable<any>, predicate: Predicate<any> | Pred
     let isMap = Types.isMap(iterable);
     if (isMap) {
         let newMap: LikeJavaMap<any, any> = new HashMap();
-        const mapConsumer: Consumer<any> = {
-            accept(entry: MapEntry<any, any>) {
-                switch (predicateType) {
-                    case PredicateType.PREDICATE:
-                        if ((<Predicate<any>>predicate).test(entry)) {
-                            newMap.put(entry.key, entry.value);
-                        }
-                        break;
-                    case PredicateType.PREDICATE2: {
-                        if ((<Predicate2<any, any>>predicate).test(entry.key, entry.value)) {
-                            newMap.put(entry.key, entry.value);
-                        }
-                        break;
-                    }
-                    case PredicateType.FUNCTION:
-                        if ((<Function>predicate).call({}, entry)) {
-                            newMap.put(entry.key, entry.value);
-                        }
-                        break;
-                }
-            }
-        };
-        forEach(iterable, mapConsumer, <Predicate2<any, any>>Objects.unknownNull(), breakPredicate);
+        forEach(iterable, (entry:MapEntry<any, any>)=>{newMap.put(entry.key,entry.value);}, <Predicate2<any, any>>Objects.unknownNull(), breakPredicate);
         return newMap;
     } else {
         const newList = emptyArrayList();
-        const listConsumer: Consumer2<number, any> = {
-            accept(index: number, element: any) {
-                switch (predicateType) {
-                    case PredicateType.PREDICATE:
-                        if ((<Predicate<any>>predicate).test(element)) {
-                            newList.add(element);
-                        }
-                        break;
-                    case PredicateType.PREDICATE2: {
-                        if ((<Predicate2<any, any>>predicate).test(index, element)) {
-                            newList.add(element);
-                        }
-                        break;
-                    }
-                    case PredicateType.FUNCTION:
-                        if ((<Function>predicate).call({}, element)) {
-                            newList.add(element);
-                        }
-                        break;
-                }
-            }
-        };
-        forEach(iterable, listConsumer, <Predicate2<any, any>>Objects.unknownNull(), breakPredicate);
+        forEach(iterable, (element)=>{newList.add(element);}, predicate, breakPredicate);
         return newList;
     }
 }
