@@ -247,6 +247,7 @@ function _judgeBreakConsumeListItem(index: number, element: any, breakPredicateT
 
 export function forEach(iterable: Iterable<any>, consumer: Consumer<any> | Consumer2<number, any> | Function, consumePredicate?: Predicate<any> | Predicate2<any, any> | Function, breakPredicate?: Predicate<any> | Predicate2<any, any> | Function): void {
     Preconditions.checkNonNull(iterable);
+    Preconditions.checkTrue(Iterables.isIterable(iterable));
     let consumePredicateType = Functions.judgePredicateType(consumePredicate);
     let consumerType: ConsumerType = Functions.judgeConsumerType(consumer);
     let breakPredicateType = Functions.judgePredicateType(breakPredicate);
