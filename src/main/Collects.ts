@@ -5,6 +5,8 @@ import * as Objects from "./Objects";
 import * as Functions from "./Functions";
 import * as Emptys from "./Emptys";
 import {
+    AbstractCollector,
+    Collector,
     Consumer,
     Consumer2,
     ConsumerType, falsePredicate,
@@ -245,7 +247,7 @@ function _judgeBreakConsumeListItem(index: number, element: any, breakPredicateT
 }
 
 
-export function forEach(iterable: Iterable<any>, consumer: Consumer<any> | Consumer2<number, any> | Function, consumePredicate?: Predicate<any> | Predicate2<any, any> | Function, breakPredicate?: Predicate<any> | Predicate2<any, any> | Function): void {
+export function forEach(iterable: Iterable<any>, consumer: Consumer<any> | Consumer2<number, any> | Function, consumePredicate?: Predicate<any> | Predicate2<any, any> | Function|undefined|null, breakPredicate?: Predicate<any> | Predicate2<any, any> | Function|undefined|null): void {
     Preconditions.checkNonNull(iterable);
     Preconditions.checkTrue(Iterables.isIterable(iterable));
     let consumePredicateType = Functions.judgePredicateType(consumePredicate);
@@ -761,11 +763,40 @@ export function collect(obj:object, containerFactory:Supplier0<Iterable<any>>, c
         supplier(): Supplier0<Iterable<any>> {
             return containerFactory;
         },
-        breakPredicator(): Predicate<any> | Predicate2<any, any> | Function {
+        breakPredicate(): Predicate<any> | Predicate2<any, any> | Function {
             return breakPredicate==null?falsePredicate():breakPredicate;
         },
-        consumePredicator(): Predicate<any> | Predicate2<any, any> | Function {
+        consumePredicate(): Predicate<any> | Predicate2<any, any> | Function {
            return consumePredicate==null?truePredicate():consumePredicate;
        }
     });
+}
+
+export function toArrayList():Collector<any,ArrayList<any>> {
+    return {
+      accumulator(): Consumer2<ArrayList<any>, any> {
+          return {
+              accept(container: List<any>, element: any) {
+                  container.add(element);
+              }
+          }
+      },
+        consumePredicate(): Predicate<any> | Predicate2<any, any> | Function {
+          return truePredicate();
+        },
+        breakPredicate(): Predicate<any> | Predicate2<any, any> | Function {
+          return falsePredicate();
+        },
+        supplier(): Supplier0<ArrayList<any>> {
+          return {
+              get(): ArrayList<any> {
+                  return newArrayList();
+              }
+          }
+        }
+    };
+}
+
+export function toHashSet():Collector<any,HashSet<any>>  {
+
 }

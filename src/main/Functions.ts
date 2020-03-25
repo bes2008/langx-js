@@ -1,6 +1,7 @@
 import * as Types from "./Types";
 import * as Preconditions from "./Preconditions";
 import * as Collects from "./Collects";
+import * as Objects from "./Objects";
 
 export interface Func<I, O> {
     apply(input: I): O;
@@ -107,7 +108,7 @@ export enum PredicateType {
     FUNCTION
 }
 
-export function judgePredicateType(predicate?: Predicate<any> | Predicate2<any, any> | Function): PredicateType {
+export function judgePredicateType(predicate?: Predicate<any> | Predicate2<any, any> | Function|undefined|null): PredicateType {
     if (predicate == null) {
         return PredicateType.UNKNOWN;
     }
@@ -357,15 +358,15 @@ export class BooleanPredicate implements Predicate<any>{
     }
 }
 
-export function booleanPredicate(value:boolean) {
+export function booleanPredicate(value:boolean):BooleanPredicate {
     return new BooleanPredicate(value);
 }
 
-export function truePredicate() {
+export function truePredicate():BooleanPredicate  {
     return booleanPredicate(true);
 }
 
-export function falsePredicate() {
+export function falsePredicate():BooleanPredicate {
     return booleanPredicate(false);
 }
 
@@ -373,18 +374,45 @@ export function falsePredicate() {
  * @param C the container will be return, also te container will be fill
  * @param E  the element in a will be iterate
  */
-export interface Collector<E,C> {
+export interface Collector<E extends any,C extends Iterable<E>> {
     supplier():Supplier0<C>;
     accumulator():Consumer2<C, E>;
-    consumePredicator():Predicate<any>|Predicate2<any, any>|Function;
-    breakPredicator():Predicate<any>|Predicate2<any, any>|Function;
+    consumePredicate?():Predicate<any>|Predicate2<any, any>|Function;
+    breakPredicate?():Predicate<any>|Predicate2<any, any>|Function;
+}
+
+export abstract class AbstractCollector<E extends any, C extends Iterable<E>> implements Collector<E, C>{
+    consumePredicate(): Predicate<any> | Predicate2<any, any> | Function {
+        return truePredicate();
+    }
+
+    breakPredicate(): Predicate<any> | Predicate2<any, any> | Function {
+        return  falsePredicate();
+    }
+
+    abstract supplier(): Supplier0<C>;
+    abstract accumulator(): Consumer2<C, E>;
 }
 
 export function collect(iterable:Iterable<any>, collector:Collector<any, Iterable<any>>) {
     let collection = collector.supplier().get();
     let consumer = collector.accumulator();
+    let consumePredicate:Predicate<any>|Predicate2<any, any>|Function;
+    if(Types.isFunction(collector["consumePredicate"])){
+        consumePredicate = (<Function>collector["consumePredicate"])();
+    }else{
+        consumePredicate = truePredicate();
+    }
+
+    let breakPredicate:Predicate<any>|Predicate2<any, any>|Function;
+    if(Types.isFunction(collector["breakPredicate"])){
+        breakPredicate = (<Function>collector["breakPredicate"])();
+    }else{
+        breakPredicate = falsePredicate();
+    }
+
     Collects.forEach(iterable, (element)=>{
         consumer.accept(collection, element);
-    }, collector.consumePredicator(), collector.breakPredicator());
+    }, collector.consumePredicate(), collector.breakPredicate());
     return collection;
 }
