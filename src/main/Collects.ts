@@ -111,7 +111,7 @@ export function newTreeMap(map?: Map<any, any> | LikeJavaMap<any, any>, keyCompa
     return new TreeMap<any, any>(map, keyComparator);
 }
 
-export function asIterable(obj: any): List<any> {
+export function asIterable(obj: any): Iterable<any> {
     return Iterables.asIterable(obj);
 }
 

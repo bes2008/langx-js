@@ -1407,13 +1407,13 @@ export function propertiesAsIterable(object: any) {
 }
 
 
-export function asIterable(object: any): ArrayList<any> {
+export function asIterable(object: any): Iterable<any> {
     if (object == null) {
         return Collects.emptyArrayList();
     }
 
     if (isIterable(object)) {
-        return new ArrayList(object);
+        return object;
     } else {
         if (isIterator(object)) {
             return new ArrayList(new IteratorIterable(<Iterator<any>>object));
