@@ -3,6 +3,8 @@ import * as Collects from "./Collects";
 import {Consumer, Consumer2, Func, Func2, Predicate, Predicate2} from "./Functions";
 import * as Objects from "./Objects";
 import {Comparator} from "./Comparators";
+import * as Collectors from "./Collectors";
+import {Collector} from "./Collectors";
 
 export class Pipeline<E extends any> {
     private readonly collection: Collection<E>;
@@ -112,6 +114,10 @@ export class Pipeline<E extends any> {
 
     containsNone(iterable: Iterable<any>, deep?: boolean): boolean {
         return Collects.contains(this.collection, iterable, deep);
+    }
+
+    collect(collector:Collector<Iterable<any>, any>):Iterable<any>{
+        return Collectors.collect(this.collection, collector);
     }
 }
 
