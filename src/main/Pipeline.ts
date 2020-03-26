@@ -44,11 +44,11 @@ export class Pipeline<E extends any> {
     }
 
     asSet(): LikeJavaSet<E> {
-        return Collects.asSet(this.collection);
+        return <HashSet<any>>this.collect(Collectors.toHashSet());
     }
 
     asList(): List<E> {
-        return Collects.asList(this.collection);
+        return <List<E>>this.collect(Collectors.toArrayList());
     }
 
     toArray(array?: Array<E>): Array<E> {
