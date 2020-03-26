@@ -121,11 +121,11 @@ export class Pipeline<E extends any> {
     }
 
     groupBy(classifier: Func<any, any> | Func2<any, any, any> | Function, mapFactory: Supplier0<LikeJavaMap<any, List<any>>>): LikeJavaMap<any, List<any>> {
-        return <LikeJavaMap<any, List<any>>>this.collect(Collectors.groupingBy(classifier, mapFactory));
+        return Collects.groupBy(classifier, mapFactory);
     }
 
-    partitionBy(classifier: Func<any, any> | Func2<any, any, any> | Function): LikeJavaMap<any, List<any>> {
-        return <LikeJavaMap<any, List<any>>>this.collect(Collectors.partioningBy(classifier));
+    partitionBy(classifier: Func<any, any> | Func2<any, any, any> | Function):List<List<any>> {
+        return Collects.partitionBy(this.collection,classifier);
     }
 }
 

@@ -36,7 +36,9 @@ import {
 } from "./Iterables";
 import * as Preconditions from "./Preconditions";
 import {Comparator, ReverseComparator} from "./Comparators";
-import exp = require("constants");
+import * as Collectors from "./Collectors";
+import {partioningBy} from "./Collectors";
+import {Supplier0} from "./Functions";
 
 
 export function emptyArray(): Array<any> {
@@ -754,6 +756,21 @@ export function union(iterable1: Iterable<any>, iterable2: Iterable<any>) {
     }
 }
 
-export function f() {
+export function groupBy(classifier: Func<any, any> | Func2<any, any, any> | Function, mapFactory: Supplier0<LikeJavaMap<any, List<any>>>): LikeJavaMap<any, List<any>> {
+    return <LikeJavaMap<any, List<any>>>this.collect(Collectors.groupingBy(classifier, mapFactory));
+}
 
+export function partitionBy(iterable:Iterable<any>,classifier: Func<any, any> | Func2<any, any, any> | Function):List<List<any>> {
+    let map:LikeJavaMap<any, List<any>> =<LikeJavaMap<any, List<any>>>Collectors.collect(iterable, partioningBy(classifier));
+    return asList(map.values())
+}
+
+export function partitionBySize(iterable:Iterable<any>, size:number):List<List<any>> {
+    Preconditions.checkTrue(size>0);
+    return partitionBy(iterable, {
+        apply(index: number, element: any) {
+            // return Numbers.parseInt(index / element)+ (index % size ==0 ? 1 :0)
+            return index % size;
+        }
+    });
 }
