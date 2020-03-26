@@ -44,6 +44,23 @@ export function judgeFuncType(mapper?: Func<any, any> | Func2<any, any, any> | F
 }
 
 
+export function mapping(mapper: Func<any, any> | Func2<any, any, any> | Function, ...args) {
+    let mapperType = judgeFuncType(mapper);
+    let result;
+    switch (mapperType) {
+        case FunctionType.FUNC:
+            result=(<Func<any, any>>mapper).apply(args[0]);
+            break;
+        case FunctionType.FUNC2:
+            result = (<Func2<any, any, any>>mapper).apply(args[0], args[1]);
+            break;
+        case FunctionType.FUNCTION:
+            result=  (<Function>mapper).apply({}, args);
+            break;
+    }
+    return result;
+}
+
 export interface Consumer<I> {
     accept(i: I);
 }
@@ -368,51 +385,4 @@ export function truePredicate():BooleanPredicate  {
 
 export function falsePredicate():BooleanPredicate {
     return booleanPredicate(false);
-}
-
-/**
- * @param C the container will be return, also te container will be fill
- * @param E  the element in a will be iterate
- */
-export interface Collector<E extends any,C extends Iterable<E>> {
-    supplier():Supplier0<C>;
-    accumulator():Consumer2<C, E>;
-    consumePredicate?():Predicate<any>|Predicate2<any, any>|Function;
-    breakPredicate?():Predicate<any>|Predicate2<any, any>|Function;
-}
-
-export abstract class AbstractCollector<E extends any, C extends Iterable<E>> implements Collector<E, C>{
-    consumePredicate(): Predicate<any> | Predicate2<any, any> | Function {
-        return truePredicate();
-    }
-
-    breakPredicate(): Predicate<any> | Predicate2<any, any> | Function {
-        return  falsePredicate();
-    }
-
-    abstract supplier(): Supplier0<C>;
-    abstract accumulator(): Consumer2<C, E>;
-}
-
-export function collect(iterable:Iterable<any>, collector:Collector<any, Iterable<any>>) {
-    let collection = collector.supplier().get();
-    let consumer = collector.accumulator();
-    let consumePredicate:Predicate<any>|Predicate2<any, any>|Function;
-    if(Types.isFunction(collector["consumePredicate"])){
-        consumePredicate = (<Function>collector["consumePredicate"])();
-    }else{
-        consumePredicate = truePredicate();
-    }
-
-    let breakPredicate:Predicate<any>|Predicate2<any, any>|Function;
-    if(Types.isFunction(collector["breakPredicate"])){
-        breakPredicate = (<Function>collector["breakPredicate"])();
-    }else{
-        breakPredicate = falsePredicate();
-    }
-
-    Collects.forEach(iterable, (element)=>{
-        consumer.accept(collection, element);
-    }, collector.consumePredicate(), collector.breakPredicate());
-    return collection;
 }

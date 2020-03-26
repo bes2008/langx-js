@@ -15,7 +15,7 @@ export class Pipeline<E extends any> {
         if (list == null) {
             this.collection = Collects.emptyArrayList();
         }
-        this.collection = Collects.asIterable(list);
+        this.collection = Collects.asList(list);
     }
 
     forEach(consumer: Consumer<E> | Consumer2<number, E> | Function, consumePredicate?: Predicate<any> | Predicate2<any, any> | Function, breakPredicate?: Predicate<any> | Predicate2<any, any> | Function): void {

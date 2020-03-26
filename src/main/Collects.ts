@@ -5,8 +5,6 @@ import * as Objects from "./Objects";
 import * as Functions from "./Functions";
 import * as Emptys from "./Emptys";
 import {
-    AbstractCollector,
-    Collector,
     Consumer,
     Consumer2,
     ConsumerType, falsePredicate,
@@ -15,7 +13,7 @@ import {
     FunctionType,
     Predicate,
     Predicate2,
-    PredicateType, Supplier0, truePredicate
+    PredicateType, truePredicate
 } from "./Functions";
 import * as Iterables from "./Iterables";
 import {
@@ -81,35 +79,35 @@ export function emptyTreeMap(comparator?: Comparator<any>): TreeMap<any, any> {
     return new TreeMap<any, any>(<Map<any, any>>Objects.unknownNull(), comparator);
 }
 
-export function newArrayList(iterable?: Iterable<any>): ArrayList<any> {
+export function newArrayList(iterable?: Iterable<any> | undefined | null): ArrayList<any> {
     return new ArrayList(iterable);
 }
 
-export function newLinkedList(iterable?: Iterable<any>): LinkedList<any> {
+export function newLinkedList(iterable?: Iterable<any> | undefined | null): LinkedList<any> {
     return new LinkedList<any>(iterable);
 }
 
-export function newHashSet(iterable?: Iterable<any>): HashSet<any> {
+export function newHashSet(iterable?: Iterable<any> | undefined | null): HashSet<any> {
     return new HashSet<any>(iterable);
 }
 
-export function newLinkedHashSet(iterable?: Iterable<any>): LinkedHashSet<any> {
+export function newLinkedHashSet(iterable?: Iterable<any> | undefined | null): LinkedHashSet<any> {
     return new LinkedHashSet<any>(iterable);
 }
 
-export function newTreeSet(iterable?: Iterable<any>, comparator?: Comparator<any>): HashSet<any> {
+export function newTreeSet(iterable?: Iterable<any> | undefined | null, comparator?: Comparator<any>): TreeSet<any> {
     return new TreeSet<any>(iterable, comparator);
 }
 
-export function newHashMap(map?: Map<any, any> | LikeJavaMap<any, any>): HashMap<any, any> {
+export function newHashMap(map?: Map<any, any> | LikeJavaMap<any, any> | undefined | null): HashMap<any, any> {
     return new HashMap<any, any>(map);
 }
 
-export function newLinkedHashMap(map?: Map<any, any> | LikeJavaMap<any, any>): LinkedHashMap<any, any> {
+export function newLinkedHashMap(map?: Map<any, any> | LikeJavaMap<any, any> | undefined | null): LinkedHashMap<any, any> {
     return new LinkedHashMap<any, any>(map);
 }
 
-export function newTreeMap(map?: Map<any, any> | LikeJavaMap<any, any>, keyComparator?: Comparator<any>): TreeMap<any, any> {
+export function newTreeMap(map?: Map<any, any> | LikeJavaMap<any, any> | undefined | null, keyComparator?: Comparator<any>): TreeMap<any, any> {
     return new TreeMap<any, any>(map, keyComparator);
 }
 
@@ -247,11 +245,13 @@ function _judgeBreakConsumeListItem(index: number, element: any, breakPredicateT
 }
 
 
-export function forEach(iterable: Iterable<any>, consumer: Consumer<any> | Consumer2<number, any> | Function, consumePredicate?: Predicate<any> | Predicate2<any, any> | Function|undefined|null, breakPredicate?: Predicate<any> | Predicate2<any, any> | Function|undefined|null): void {
+export function forEach(iterable: Iterable<any>, consumer: Consumer<any> | Consumer2<number, any> | Function, consumePredicate?: Predicate<any> | Predicate2<any, any> | Function | undefined | null, breakPredicate?: Predicate<any> | Predicate2<any, any> | Function | undefined | null): void {
     Preconditions.checkNonNull(iterable);
     Preconditions.checkTrue(Iterables.isIterable(iterable));
+    consumePredicate = consumePredicate == null ? truePredicate() : consumePredicate;
     let consumePredicateType = Functions.judgePredicateType(consumePredicate);
     let consumerType: ConsumerType = Functions.judgeConsumerType(consumer);
+    breakPredicate = breakPredicate == null ? falsePredicate() : breakPredicate;
     let breakPredicateType = Functions.judgePredicateType(breakPredicate);
     Preconditions.checkTrue(consumerType != ConsumerType.UNKNOWN, "illegal consumer");
 
@@ -337,7 +337,6 @@ export function map(iterable: Iterable<any>, mapper: Func<any, any> | Func2<any,
         return list;
     }
 }
-
 
 export function filter(iterable: Iterable<any>, predicate: Predicate<any> | Predicate2<any, any> | Function, breakPredicate?: Predicate<any> | Predicate2<any, any> | Function): Iterable<any> {
     Preconditions.checkNonNull(iterable);
@@ -753,50 +752,4 @@ export function union(iterable1: Iterable<any>, iterable2: Iterable<any>) {
         union.addAll(set2);
         return union;
     }
-}
-
-export function collect(obj:object, containerFactory:Supplier0<Iterable<any>>, consumer:Consumer2<Iterable<any>, any>, consumePredicate?:Predicate<any>|Predicate2<any, any>|Function, breakPredicate?:Predicate<any>|Predicate2<any, any>|Function) {
-    return Functions.collect(asIterable(obj), {
-        accumulator(): Consumer2<Iterable<any>, any> {
-            return consumer;
-        },
-        supplier(): Supplier0<Iterable<any>> {
-            return containerFactory;
-        },
-        breakPredicate(): Predicate<any> | Predicate2<any, any> | Function {
-            return breakPredicate==null?falsePredicate():breakPredicate;
-        },
-        consumePredicate(): Predicate<any> | Predicate2<any, any> | Function {
-           return consumePredicate==null?truePredicate():consumePredicate;
-       }
-    });
-}
-
-export function toArrayList():Collector<any,ArrayList<any>> {
-    return {
-      accumulator(): Consumer2<ArrayList<any>, any> {
-          return {
-              accept(container: List<any>, element: any) {
-                  container.add(element);
-              }
-          }
-      },
-        consumePredicate(): Predicate<any> | Predicate2<any, any> | Function {
-          return truePredicate();
-        },
-        breakPredicate(): Predicate<any> | Predicate2<any, any> | Function {
-          return falsePredicate();
-        },
-        supplier(): Supplier0<ArrayList<any>> {
-          return {
-              get(): ArrayList<any> {
-                  return newArrayList();
-              }
-          }
-        }
-    };
-}
-
-export function toHashSet():Collector<any,HashSet<any>>  {
-
 }
