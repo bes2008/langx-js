@@ -1,6 +1,6 @@
-import {Collection, HashSet, LikeJavaSet, List} from "./Iterables";
+import {Collection, HashSet, LikeJavaMap, LikeJavaSet, List} from "./Iterables";
 import * as Collects from "./Collects";
-import {Consumer, Consumer2, Func, Func2, Predicate, Predicate2} from "./Functions";
+import {Consumer, Consumer2, Func, Func2, Predicate, Predicate2, Supplier0} from "./Functions";
 import * as Objects from "./Objects";
 import {Comparator} from "./Comparators";
 import * as Collectors from "./Collectors";
@@ -116,8 +116,16 @@ export class Pipeline<E extends any> {
         return Collects.contains(this.collection, iterable, deep);
     }
 
-    collect(collector:Collector<Iterable<any>, any>):Iterable<any>{
+    collect(collector: Collector<Iterable<any>, any>): Iterable<any> {
         return Collectors.collect(this.collection, collector);
+    }
+
+    groupBy(classifier: Func<any, any> | Func2<any, any, any> | Function, mapFactory: Supplier0<LikeJavaMap<any, List<any>>>): LikeJavaMap<any, List<any>> {
+        return <LikeJavaMap<any, List<any>>>this.collect(Collectors.groupingBy(classifier, mapFactory));
+    }
+
+    partitionBy(classifier: Func<any, any> | Func2<any, any, any> | Function): LikeJavaMap<any, List<any>> {
+        return <LikeJavaMap<any, List<any>>>this.collect(Collectors.partioningBy(classifier));
     }
 }
 

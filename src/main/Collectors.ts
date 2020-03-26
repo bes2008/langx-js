@@ -1,16 +1,27 @@
 import * as Functions from "./Functions";
+import * as Preconditions from "./Preconditions";
 import {
     Consumer2,
-    falsePredicate,
+    falsePredicate, IndexedConsumer2,
     Predicate,
     Predicate2,
     Supplier0,
     truePredicate
 } from "./Functions";
 
-import {ArrayList, HashMap, HashSet, LinkedHashMap, LinkedHashSet, LinkedList, TreeMap, TreeSet} from "./Iterables";
+import {
+    ArrayList,
+    HashMap,
+    HashSet,
+    LikeJavaMap,
+    LinkedHashMap,
+    LinkedHashSet,
+    LinkedList, List,
+    TreeMap,
+    TreeSet
+} from "./Iterables";
 import * as Collects from "./Collects";
-import {asIterable, newHashSet} from "./Collects";
+import {asIterable, newHashSet, newLinkedHashMap} from "./Collects";
 import {Comparator} from "./Comparators";
 import {Func} from "./Functions";
 import {Func2} from "./Functions";
@@ -21,28 +32,32 @@ import * as Types from "./Types";
  * @param C the container will be return, also te container will be fill
  * @param E  the element in a will be iterate
  */
-export interface Collector<C extends Iterable<E>,E extends any> {
-    supplier():Supplier0<C>;
-    accumulator():Consumer2<C, E>;
-    consumePredicate?():Predicate<any>|Predicate2<any, any>|Function;
-    breakPredicate?():Predicate<any>|Predicate2<any, any>|Function;
+export interface Collector<E extends any, C extends Iterable<E>> {
+    supplier(): Supplier0<C>;
+
+    accumulator(): Consumer2<C, E>;
+
+    consumePredicate?(): Predicate<any> | Predicate2<any, any> | Function;
+
+    breakPredicate?(): Predicate<any> | Predicate2<any, any> | Function;
 }
 
-export abstract class AbstractCollector<C extends Iterable<E>,E extends any> implements Collector<C,E>{
+export abstract class AbstractCollector<E extends any, C extends Iterable<E>> implements Collector<E, C> {
     consumePredicate(): Predicate<any> | Predicate2<any, any> | Function {
         return truePredicate();
     }
 
     breakPredicate(): Predicate<any> | Predicate2<any, any> | Function {
-        return  falsePredicate();
+        return falsePredicate();
     }
 
     abstract supplier(): Supplier0<C>;
+
     abstract accumulator(): Consumer2<C, E>;
 }
 
 
-export function collect1(obj: object, containerFactory: Supplier0<Iterable<any>>, consumer: Consumer2<Iterable<any>, any>, consumePredicate?: Predicate<any> | Predicate2<any, any> | Function, breakPredicate?: Predicate<any> | Predicate2<any, any> | Function):Iterable<any> {
+export function collect1(obj: object, containerFactory: Supplier0<Iterable<any>>, consumer: Consumer2<Iterable<any>, any>, consumePredicate?: Predicate<any> | Predicate2<any, any> | Function, breakPredicate?: Predicate<any> | Predicate2<any, any> | Function): Iterable<any> {
     return collect(asIterable(obj), {
         accumulator(): Consumer2<Iterable<any>, any> {
             return consumer;
@@ -59,24 +74,24 @@ export function collect1(obj: object, containerFactory: Supplier0<Iterable<any>>
     });
 }
 
-export function collect(iterable:Iterable<any>, collector:Collector<Iterable<any>,any>):Iterable<any> {
+export function collect(iterable: Iterable<any>, collector: Collector<any, Iterable<any>>): Iterable<any> {
     let collection = collector.supplier().get();
     let consumer = collector.accumulator();
-    let consumePredicate:Predicate<any>|Predicate2<any, any>|Function;
-    if(Types.isFunction(collector["consumePredicate"])){
+    let consumePredicate: Predicate<any> | Predicate2<any, any> | Function;
+    if (Types.isFunction(collector["consumePredicate"])) {
         consumePredicate = (<Function>collector["consumePredicate"])();
-    }else{
+    } else {
         consumePredicate = truePredicate();
     }
 
-    let breakPredicate:Predicate<any>|Predicate2<any, any>|Function;
-    if(Types.isFunction(collector["breakPredicate"])){
+    let breakPredicate: Predicate<any> | Predicate2<any, any> | Function;
+    if (Types.isFunction(collector["breakPredicate"])) {
         breakPredicate = (<Function>collector["breakPredicate"])();
-    }else{
+    } else {
         breakPredicate = falsePredicate();
     }
 
-    Collects.forEach(iterable, (element)=>{
+    Collects.forEach(iterable, (element) => {
         consumer.accept(collection, element);
     }, consumePredicate, breakPredicate);
     return collection;
@@ -87,13 +102,14 @@ export function toList(): Collector<any, ArrayList<any>> {
 }
 
 export function toArrayList(): Collector<any, ArrayList<any>> {
-    return new class extends AbstractCollector<ArrayList<any>, any> {
+    return new class extends AbstractCollector<any, ArrayList<any>> {
         accumulator(): Consumer2<any, any> {
             return {
                 accept(container: ArrayList<any>, element: any) {
                     container.add(element);
+                    this.index++;
                 }
-            };
+            }
         }
 
         supplier(): Supplier0<ArrayList<any>> {
@@ -108,7 +124,7 @@ export function toArrayList(): Collector<any, ArrayList<any>> {
 }
 
 export function toLinkedList(): Collector<any, LinkedList<any>> {
-    return new class extends AbstractCollector<LinkedList<any>, any> {
+    return new class extends AbstractCollector<any, LinkedList<any>> {
         accumulator(): Consumer2<any, any> {
             return {
                 accept(container: LinkedList<any>, element: any) {
@@ -132,8 +148,8 @@ export function toSet(): Collector<HashSet<any>, any> {
     return toHashSet();
 }
 
-export function toHashSet(): Collector<HashSet<any>, any> {
-    return new class extends AbstractCollector<HashSet<any>, any> {
+export function toHashSet(): Collector<any, HashSet<any>> {
+    return new class extends AbstractCollector<any, HashSet<any>> {
         accumulator(): Consumer2<HashSet<any>, any> {
             return {
                 accept(set: HashSet<any>, element: any) {
@@ -153,8 +169,8 @@ export function toHashSet(): Collector<HashSet<any>, any> {
 }
 
 
-export function toTreeSet(comparator?:Comparator<any>): Collector<TreeSet<any>, any> {
-    return new class extends AbstractCollector<TreeSet<any>, any> {
+export function toTreeSet(comparator?: Comparator<any>): Collector<any, TreeSet<any>> {
+    return new class extends AbstractCollector<any, TreeSet<any>> {
         accumulator(): Consumer2<TreeSet<any>, any> {
             return {
                 accept(set: TreeSet<any>, element: any) {
@@ -166,15 +182,15 @@ export function toTreeSet(comparator?:Comparator<any>): Collector<TreeSet<any>, 
         supplier(): Supplier0<TreeSet<any>> {
             return {
                 get(): TreeSet<any> {
-                    return Collects.newTreeSet(undefined,comparator);
+                    return Collects.newTreeSet(undefined, comparator);
                 }
             };
         }
     }
 }
 
-export function toLinkedHashSet(): Collector<LinkedHashSet<any>, any> {
-    return new class extends AbstractCollector<LinkedHashSet<any>, any> {
+export function toLinkedHashSet(): Collector<any, LinkedHashSet<any>> {
+    return new class extends AbstractCollector<any, LinkedHashSet<any>> {
         accumulator(): Consumer2<LinkedHashSet<any>, any> {
             return {
                 accept(set: LinkedHashSet<any>, element: any) {
@@ -193,23 +209,26 @@ export function toLinkedHashSet(): Collector<LinkedHashSet<any>, any> {
     }
 }
 
-export function toMap(keyMapper:Func<any, any> | Func2<any, any, any> | Function, valueMapper:Func<any, any> | Func2<any, any, any> | Function): Collector<HashMap<any,any>, any> {
+export function toMap(keyMapper: Func<any, any> | Func2<any, any, any> | Function, valueMapper: Func<any, any> | Func2<any, any, any> | Function): Collector<any, HashMap<any, any>> {
     return toHashMap(keyMapper, valueMapper);
 }
 
-export function toHashMap(keyMapper:Func<any, any> | Func2<any, any, any> | Function, valueMapper:Func<any, any> | Func2<any, any, any> | Function): Collector<HashMap<any,any>, any> {
-    return new class extends AbstractCollector<HashMap<any,any>, any> {
-        accumulator(): Consumer2<HashMap<any,any>, any> {
-            return {
-                accept(map: HashMap<any,any>, element: any) {
-                    map.put(Functions.mapping(keyMapper,[element], Functions.mapping(valueMapper,[element])));
+export function toHashMap(keyMapper: Func<any, any> | Func2<any, any, any> | Function, valueMapper: Func<any, any> | Func2<any, any, any> | Function): Collector<any, HashMap<any, any>> {
+    return new class extends AbstractCollector<any, HashMap<any, any>> {
+        accumulator(): Consumer2<HashMap<any, any>, any> {
+            return new class implements IndexedConsumer2<HashMap<any, any>, any> {
+                index: number = 0;
+
+                accept(map: HashMap<any, any>, element: any) {
+                    map.put(Functions.mappingCollectionElement(keyMapper, element, this.index), Functions.mappingCollectionElement(valueMapper, element, this.index));
+                    this.index++;
                 }
             };
         }
 
-        supplier(): Supplier0<HashMap<any,any>> {
+        supplier(): Supplier0<HashMap<any, any>> {
             return {
-                get(): HashMap<any,any> {
+                get(): HashMap<any, any> {
                     return Collects.newHashMap();
                 }
             };
@@ -217,19 +236,22 @@ export function toHashMap(keyMapper:Func<any, any> | Func2<any, any, any> | Func
     }
 }
 
-export function toLinkedHashMap(keyMapper:Func<any, any> | Func2<any, any, any> | Function, valueMapper:Func<any, any> | Func2<any, any, any> | Function): Collector<LinkedHashMap<any,any>, any> {
-    return new class extends AbstractCollector<LinkedHashMap<any,any>, any> {
-        accumulator(): Consumer2<LinkedHashMap<any,any>, any> {
-            return {
-                accept(map: LinkedHashMap<any,any>, element: any) {
-                    map.put(Functions.mapping(keyMapper,[element], Functions.mapping(valueMapper,[element])));
+export function toLinkedHashMap(keyMapper: Func<any, any> | Func2<any, any, any> | Function, valueMapper: Func<any, any> | Func2<any, any, any> | Function): Collector<any, LinkedHashMap<any, any>> {
+    return new class extends AbstractCollector<any, LinkedHashMap<any, any>> {
+        accumulator(): Consumer2<LinkedHashMap<any, any>, any> {
+            return new class implements IndexedConsumer2<LinkedHashMap<any, any>, any> {
+                index: number = 0;
+
+                accept(map: LinkedHashMap<any, any>, element: any) {
+                    map.put(Functions.mappingCollectionElement(keyMapper, element, this.index), Functions.mappingCollectionElement(valueMapper, element, this.index));
+                    this.index++;
                 }
             };
         }
 
-        supplier(): Supplier0<LinkedHashMap<any,any>> {
+        supplier(): Supplier0<LinkedHashMap<any, any>> {
             return {
-                get(): LinkedHashMap<any,any> {
+                get(): LinkedHashMap<any, any> {
                     return Collects.newLinkedHashMap();
                 }
             };
@@ -238,19 +260,22 @@ export function toLinkedHashMap(keyMapper:Func<any, any> | Func2<any, any, any> 
 }
 
 
-export function toTreeMap(keyMapper:Func<any, any> | Func2<any, any, any> | Function, valueMapper:Func<any, any> | Func2<any, any, any> | Function, comparator?:Comparator<any>): Collector<TreeMap<any,any>, any> {
-    return new class extends AbstractCollector<TreeMap<any,any>, any> {
-        accumulator(): Consumer2<TreeMap<any,any>, any> {
-            return {
-                accept(map: TreeMap<any,any>, element: any) {
-                    map.put(Functions.mapping(keyMapper,[element], Functions.mapping(valueMapper,[element])));
+export function toTreeMap(keyMapper: Func<any, any> | Func2<any, any, any> | Function, valueMapper: Func<any, any> | Func2<any, any, any> | Function, comparator?: Comparator<any>): Collector<any, TreeMap<any, any>> {
+    return new class extends AbstractCollector<any, TreeMap<any, any>> {
+        accumulator(): Consumer2<TreeMap<any, any>, any> {
+            return new class implements IndexedConsumer2<TreeMap<any, any>, any> {
+                index: number = 0;
+
+                accept(map: TreeMap<any, any>, element: any) {
+                    map.put(Functions.mappingCollectionElement(keyMapper, element, this.index), Functions.mappingCollectionElement(valueMapper, element, this.index));
+                    this.index++;
                 }
             };
         }
 
-        supplier(): Supplier0<TreeMap<any,any>> {
+        supplier(): Supplier0<TreeMap<any, any>> {
             return {
-                get(): TreeMap<any,any> {
+                get(): TreeMap<any, any> {
                     return Collects.newTreeMap(undefined, comparator);
                 }
             };
@@ -258,3 +283,39 @@ export function toTreeMap(keyMapper:Func<any, any> | Func2<any, any, any> | Func
     }
 }
 
+
+export function groupingBy(classifier: Func<any, any> | Func2<any, any, any> | Function, mapFactory: Supplier0<LikeJavaMap<any, List<any>>>): Collector<any, LikeJavaMap<any, List<any>>> {
+    Preconditions.checkNonNull(classifier);
+    Preconditions.checkNonNull(mapFactory);
+    return new class extends AbstractCollector<any, LikeJavaMap<any, List<any>>> {
+        accumulator(): Consumer2<LikeJavaMap<any, any>, any> {
+            return new class implements IndexedConsumer2<LikeJavaMap<any, List<any>>, any> {
+                index: number = 0;
+
+                accept(map: LikeJavaMap<any, List<any>>, element: any) {
+                    let group: any = Functions.mapping(classifier, [element]);
+                    let list: List<any> = map.get(group);
+                    if (list == null) {
+                        list = Collects.newArrayList();
+                        map.put(group, list);
+                    }
+                    list.add(element);
+                    this.index++;
+                }
+            }
+        }
+
+        supplier(): Supplier0<LikeJavaMap<any, List<any>>> {
+            return mapFactory;
+        }
+
+    }
+}
+
+export function partioningBy(classifier: Func<any, any> | Func2<any, any, any> | Function): Collector<any, LikeJavaMap<any, List<any>>> {
+    return groupingBy(classifier, {
+        get(): LikeJavaMap<any, List<any>> {
+            return newLinkedHashMap();
+        }
+    });
+}

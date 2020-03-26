@@ -753,3 +753,7 @@ export function union(iterable1: Iterable<any>, iterable2: Iterable<any>) {
         return union;
     }
 }
+
+export function f() {
+
+}

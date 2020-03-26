@@ -7,6 +7,15 @@ export class RuntimeException extends Error {
     }
 }
 
+export class IllegalArgumentException extends RuntimeException{
+    constructor(message: string | String | Function) {
+        if(message==null){
+            message="Illegal argument";
+        }
+        super(message);
+    }
+}
+
 export class IndexOutboundException extends RuntimeException {
     constructor(message?: string | String | Function | undefined | null) {
         if (message == null) {
