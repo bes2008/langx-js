@@ -251,7 +251,8 @@ export class ArrayList<E> extends AbstractList<E> {
             if (Types.isArray(arraylist)) {
                 this.array = <Array<E>>arraylist;
             } else {
-                this.array = new Array<E>(...arraylist);
+                this.array = new Array<E>();
+                this.addAll(arraylist);
             }
         }
         this.length = this.array.length;
