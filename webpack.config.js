@@ -8,7 +8,7 @@ module.exports = {
     entry: "./src/main/index.ts",
     output: {
         path: path.resolve(__dirname, './dist'),
-        filename: "bundle.js"
+        filename: "index.js"
     },
     resolve: {
         extensions: [".tsx", ".ts", ".js", ".json"]
