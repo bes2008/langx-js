@@ -10,7 +10,7 @@ module.exports= {
     "moduleFileExtensions": ["js", "jsx", "json", "ts", "tsx"],
     "notify": true,
     "clearMocks": true,
-    "roots":["<rootDir>/src/test"],
+    "roots":["<rootDir>/src/test/ts/"],
     "transform": {
         "^.+\\.tsx?$": "ts-jest"
     }

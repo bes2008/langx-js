@@ -1,6 +1,6 @@
 {
   "name": "langx-js",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "JavaScript language extensions, a replacement or a supplement of the lodash",
   "keywords": [
     "lodash",
@@ -23,7 +23,8 @@
       "name": "jinuo.fang",
       "email": "fs1194361820@163.com",
       "url": "https://github.com/fangjinuo"
-    },{
+    },
+    {
       "name": "chuankai.wei",
       "email": "fs1194361820@163.com",
       "url": "https://github.com/wckgo"
@@ -55,7 +56,10 @@
   "devDependencies": {
     "npm-run-all": "^4.1.5",
     "shx": "^0.3.2",
-    "typescript": "^3.8.3"
+    "typescript": "^3.8.3",
+    "jest": ">=25 <26",
+    "@types/jest": "^25.1.0",
+    "ts-jest": "^25.2.1"
   },
   "files": [
     "package.json",

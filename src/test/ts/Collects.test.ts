@@ -13,7 +13,7 @@ describe("Collects tests", () => {
         debugger;
         let arrayList = Collects.asIterable(['a', '1', null, "x", new Date(), null, new Date().getTime(), "abc"]);
         expect(Pipeline.of(arrayList).cleanNulls().asList().size()).toBe(6);
-        expect(Pipeline.of(arrayList).cleanNulls().first()).toBe("a");
+        expect(Pipeline.of(arrayList).cleanNulls().findFirst()).toBe("a");
         expect(Pipeline.of(arrayList).anyMatch((item) => {
             return Objects.isNull(item);
         })).toBe(true);
