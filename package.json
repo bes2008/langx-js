@@ -18,11 +18,17 @@
     "TreeMap",
     "LinkedHashMap"
   ],
-  "author": {
-    "name": "jinuo.fang",
-    "email": "fs1194361820@163.com",
-    "url": "https://github.com/fangjinuo"
-  },
+  "authors": [
+    {
+      "name": "jinuo.fang",
+      "email": "fs1194361820@163.com",
+      "url": "https://github.com/fangjinuo"
+    },{
+      "name": "chuankai.wei",
+      "email": "fs1194361820@163.com",
+      "url": "https://github.com/wckgo"
+    }
+  ],
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
   "types": "./dist/types/index.d.ts",
