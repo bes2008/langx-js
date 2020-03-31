@@ -1,19 +1,13 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
-    "target": "ES2015",
     "sourceMap": true,
     "charset": "utf8",
-
-    "outDir": "dist",
-
     "noImplicitAny": false,
     "strict": false,
     "removeComments": true,
     "pretty": true,
     "allowJs": true,
     "checkJs": true,
-    "declaration": true,
     "traceResolution":true,
     "suppressImplicitAnyIndexErrors" : false,
     "strictNullChecks": true,

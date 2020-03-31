@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.esm.json",
+  "compilerOptions": {
+    "module": "ES2015",
+    "target": "ESNEXT",
+    "removeComments": false,
+    "declaration": true,
+    "declarationMap": true,
+    "declarationDir": "./dist/types"
+  }
+}

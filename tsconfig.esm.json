@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "ESNEXT",
+    "importHelpers": true,
+    "target": "ES2015",
+    "outDir": "./dist/esm"
+  }
+}
