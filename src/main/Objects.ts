@@ -20,7 +20,7 @@ interface ObjectPropertyDescriptor {
 
 class SimpleObjectPropertyDescriptor implements ObjectPropertyDescriptor {
     configurable: boolean = true;
-    enumerable: boolean = true;
+    enumerable: boolean = false;
     value: any;
     writable: boolean = true;
 }
