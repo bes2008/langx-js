@@ -5,10 +5,16 @@ import * as Strings from "./Strings";
 import * as Iterables from "./Iterables";
 import * as Types from "./Types";
 import {isEmpty} from "./Emptys";
+import {Objects} from "./index";
 
-Object.prototype["hashCode"] = function () {
-    return hashCode(this);
-};
+Object.defineProperty(Object.prototype, "hashCode", {
+    configurable: true,
+    enumerable: false,
+    writable: true,
+    value: function () {
+        return hashCode(this);
+    }
+});
 
 Date.prototype["hashCode"] = function () {
     return Dates.hashCode(this);
@@ -53,14 +59,12 @@ export function hashCode(object: any) {
     if (Types.isString(object)) {
         return Strings.hashCode(<string>object);
     }
-
     if (Types.isDate(object)) {
         return Dates.hashCode(object);
     }
-
-    if (Types.isArray(object)) {
-        return object.hashCode();
+    if( object instanceof Array || object instanceof Set || object instanceof Map || Types.isCollection(object) || Types.isMap(object)){
+        return Iterables.hashCode(object);
     }
-    return 0;
+    return hashCode(Objects.keys(object));
 }
 

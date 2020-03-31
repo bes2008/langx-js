@@ -3,7 +3,7 @@ import * as Emptys from "./Emptys";
 import * as Types from "./Types";
 import * as Iterables from "./Iterables";
 import * as Dates from "./Dates";
-import {LinkedHashMap, MapEntry, ObjectPropertiesIterator} from "./Iterables";
+import {LinkedHashMap, ObjectPropertiesIterator} from "./Iterables";
 import * as Collects from "./Collects";
 
 interface ObjectPropertyDescriptor {
