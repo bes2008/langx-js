@@ -1,8 +1,10 @@
-import {Collection, HashSet, LikeJavaSet, List} from "./Iterables";
+import {Collection, HashSet, LikeJavaMap, LikeJavaSet, List} from "./Iterables";
 import * as Collects from "./Collects";
-import {Consumer, Consumer2, Func, Func2, Predicate, Predicate2} from "./Functions";
+import {Consumer, Consumer2, Func, Func2, Predicate, Predicate2, Supplier0} from "./Functions";
 import * as Objects from "./Objects";
 import {Comparator} from "./Comparators";
+import * as Collectors from "./Collectors";
+import {Collector} from "./Collectors";
 
 export class Pipeline<E extends any> {
     private readonly collection: Collection<E>;
@@ -15,7 +17,7 @@ export class Pipeline<E extends any> {
         if (list == null) {
             this.collection = Collects.emptyArrayList();
         }
-        this.collection = Collects.asIterable(list);
+        this.collection = Collects.asList(list);
     }
 
     forEach(consumer: Consumer<E> | Consumer2<number, E> | Function, consumePredicate?: Predicate<any> | Predicate2<any, any> | Function, breakPredicate?: Predicate<any> | Predicate2<any, any> | Function): void {
@@ -42,11 +44,11 @@ export class Pipeline<E extends any> {
     }
 
     asSet(): LikeJavaSet<E> {
-        return Collects.asSet(this.collection);
+        return <HashSet<any>>this.collect(Collectors.toHashSet());
     }
 
     asList(): List<E> {
-        return Collects.asList(this.collection);
+        return <List<E>>this.collect(Collectors.toArrayList());
     }
 
     toArray(array?: Array<E>): Array<E> {
@@ -112,6 +114,18 @@ export class Pipeline<E extends any> {
 
     containsNone(iterable: Iterable<any>, deep?: boolean): boolean {
         return Collects.contains(this.collection, iterable, deep);
+    }
+
+    collect(collector: Collector<Iterable<any>, any>): Iterable<any> {
+        return Collectors.collect(this.collection, collector);
+    }
+
+    groupBy(classifier: Func<any, any> | Func2<any, any, any> | Function, mapFactory: Supplier0<LikeJavaMap<any, List<any>>>): LikeJavaMap<any, List<any>> {
+        return Collects.groupBy(classifier, mapFactory);
+    }
+
+    partitionBy(classifier: Func<any, any> | Func2<any, any, any> | Function):List<List<any>> {
+        return Collects.partitionBy(this.collection,classifier);
     }
 }
 

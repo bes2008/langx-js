@@ -243,7 +243,7 @@ export class ArrayList<E> extends AbstractList<E> {
         return new ArrayList<E>();
     };
 
-    constructor(arraylist?: Collection<E> | Array<E> | Set<E> | Iterable<E> | IterableIterator<E>) {
+    constructor(arraylist?: Collection<E> | Array<E> | Set<E> | Iterable<E> | IterableIterator<E>|undefined|null) {
         super();
         if (arraylist == null) {
             this.array = [];
@@ -404,9 +404,9 @@ export class LinkedList<E> extends AbstractList<E> {
     first: LinkedListNode<E>;
     last: LinkedListNode<E>;
 
-    constructor(c?: Collection<E> | Array<E> | Set<E> | Iterable<E> | IterableIterator<E>) {
+    constructor(c?: Collection<E> | Array<E> | Set<E> | Iterable<E> | IterableIterator<E>|undefined|null) {
         super();
-        this.first = this.last = <LinkedListNode<E>>Objects.unknownNull()
+        this.first = this.last = <LinkedListNode<E>>Objects.unknownNull();
         if (c != null) {
             this.addAll(new ArrayList(c))
         }
@@ -733,7 +733,7 @@ abstract class AbstractMapBasedSet<E extends any> extends AbstractSet<E> {
 
 export class HashSet<E> extends AbstractMapBasedSet<E> {
 
-    constructor(list?: Collection<E> | Array<E> | Set<E> | Iterable<E> | IterableIterator<E>) {
+    constructor(list?: Collection<E> | Array<E> | Set<E> | Iterable<E> | IterableIterator<E>|undefined|null) {
         super();
         this.map = new HashMap<E, null>();
         if (list != null) {
@@ -750,7 +750,7 @@ export class HashSet<E> extends AbstractMapBasedSet<E> {
 
 export class LinkedHashSet<E extends any> extends AbstractMapBasedSet<E> {
 
-    constructor(list?: Collection<E> | Array<E> | Set<E> | Iterable<E> | IterableIterator<E>) {
+    constructor(list?: Collection<E> | Array<E> | Set<E> | Iterable<E> | IterableIterator<E>|undefined|null) {
         super();
         this.map = new LinkedHashMap<E, null>();
         if (list != null) {
@@ -767,7 +767,7 @@ export class LinkedHashSet<E extends any> extends AbstractMapBasedSet<E> {
 
 export class TreeSet<E extends any> extends AbstractMapBasedSet<E> {
 
-    constructor(list?: Collection<E> | Array<E> | Set<E> | Iterable<E> | IterableIterator<E>, comparator?: Comparator<E>) {
+    constructor(list?: Collection<E> | Array<E> | Set<E> | Iterable<E> | IterableIterator<E>|undefined|null, comparator?: Comparator<E>) {
         super();
         this.map = new TreeMap<E, null>(<TreeMap<E, null>>Objects.unknownNull(), comparator);
         if (list != null) {
@@ -1035,7 +1035,7 @@ export class HashMap<K extends any, V extends any> extends AbstractMap<K, V> {
     protected array: Array<List<MapEntry<K, V>>> = [];
     private readonly MAX_SLOT: number = 48;
 
-    constructor(map?: LikeJavaMap<K, V> | Map<K, V>) {
+    constructor(map?: LikeJavaMap<K, V> | Map<K, V>|undefined|null) {
         super();
         if (map != null) {
             if (this instanceof Map) {
@@ -1190,7 +1190,7 @@ export class HashMap<K extends any, V extends any> extends AbstractMap<K, V> {
 export class LinkedHashMap<K, V extends any> extends HashMap<K, V> {
     private readonly orders: List<MapEntry<K, V>> = new ArrayList<MapEntry<K, V>>();
 
-    constructor(map?: LikeJavaMap<K, V> | Map<K, V>) {
+    constructor(map?: LikeJavaMap<K, V> | Map<K, V>|undefined|null) {
         super(map);
     }
 
@@ -1407,13 +1407,13 @@ export function propertiesAsIterable(object: any) {
 }
 
 
-export function asIterable(object: any): ArrayList<any> {
+export function asIterable(object: any): Iterable<any> {
     if (object == null) {
         return Collects.emptyArrayList();
     }
 
     if (isIterable(object)) {
-        return new ArrayList(object);
+        return object;
     } else {
         if (isIterator(object)) {
             return new ArrayList(new IteratorIterable(<Iterator<any>>object));
