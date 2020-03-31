@@ -1,6 +1,6 @@
 {
   "name": "langx-js",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "JavaScript language extensions, a replacement or a supplement of the lodash",
   "keywords": [
     "lodash",
