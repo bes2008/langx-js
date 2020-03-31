@@ -2,8 +2,7 @@ JavaScript language extensions,  a replacement or a supplement of the lodash. Wr
 
 
 ## Versions
-[![npm](https://img.shields.io/badge/npm-v1.0.1-green.svg)](https://www.npmjs.com/package/langx-js/v/1.0.1)
-[![npm](https://img.shields.io/badge/npm-v1.0.0-green.svg)](https://www.npmjs.com/package/langx-js/v/1.0.0)
+[![npm](https://img.shields.io/badge/npm-v1.0.7-green.svg)](https://www.npmjs.com/package/langx-js/v/1.0.7)
 
 ## Migrate [Java API](https://docs.oracle.com/javase/7/docs/api/)
 
