@@ -146,14 +146,21 @@ export function asList(iterable: Iterable<any>): List<any> {
     return new ArrayList(iterable);
 }
 
-export function toArray(list?: Collection<any> | Array<any> | Set<any> | Iterable<any> | IterableIterator<any>): Array<any> {
+export function toArray(list?: Collection<any> | Array<any> | Set<any> | Iterable<any> | IterableIterator<any>, newArray?: Array<any>): Array<any> {
+    let useNewArray: boolean = newArray != null && Types.isArray(newArray);
     if (list == null) {
-        return [];
+        return useNewArray ? <Array<any>>newArray : [];
     }
-    if (Types.isArray(list)) {
-        return <Array<any>>list;
+    if (useNewArray || !Types.isArray(list)) {
+        if (newArray == null) {
+            newArray = [];
+        }
+        for (let element of list) {
+            newArray.push(element);
+        }
+        return newArray;
     }
-    return new Array(...list);
+    return <Array<any>>list;
 }
 
 function _consumeMapEntry(entry: MapEntry<any, any>, consumerType: ConsumerType, consumer: Consumer<any> | Consumer2<number, any> | Function): void {
@@ -421,8 +428,10 @@ export function flatMap(list: Array<LinearCollection> | Collection<LinearCollect
     return list0;
 }
 
-export function anyMatch(iterable: Iterable<any>, predicate: Predicate<any> | Predicate2<any, any> | Function): boolean {
-    Preconditions.checkNonNull(iterable);
+export function anyMatch(iterable: Iterable<any> | undefined, predicate: Predicate<any> | Predicate2<any, any> | Function): boolean {
+    if (iterable == null) {
+        return false;
+    }
     let predicateType = Functions.judgePredicateType(predicate);
     Preconditions.checkTrue(predicateType != PredicateType.UNKNOWN, "illegal predicate");
     let matched: boolean = false;
@@ -435,8 +444,10 @@ export function anyMatch(iterable: Iterable<any>, predicate: Predicate<any> | Pr
 
 }
 
-export function allMatch(iterable: Iterable<any>, predicate: Predicate<any> | Predicate2<any, any> | Function): boolean {
-    Preconditions.checkNonNull(iterable);
+export function allMatch(iterable: Iterable<any> | undefined, predicate: Predicate<any> | Predicate2<any, any> | Function): boolean {
+    if (iterable == null) {
+        return false;
+    }
     let matched: boolean = true;
     let nonPredicate = Functions.nonPredicateAny(predicate);
     forEach(iterable, () => {
@@ -448,8 +459,10 @@ export function allMatch(iterable: Iterable<any>, predicate: Predicate<any> | Pr
 }
 
 
-export function noneMatch(iterable: Iterable<any>, predicate: Predicate<any> | Predicate2<any, any> | Function): boolean {
-    Preconditions.checkNonNull(iterable);
+export function noneMatch(iterable: Iterable<any> | undefined, predicate: Predicate<any> | Predicate2<any, any> | Function): boolean {
+    if (iterable == null) {
+        return true;
+    }
     let predicateType = Functions.judgePredicateType(predicate);
     Preconditions.checkTrue(predicateType != PredicateType.UNKNOWN, "illegal predicate");
     let unmatched: boolean = true;
@@ -663,7 +676,7 @@ export function addAll(iterable: Iterable<any>, appendment: Iterable<any>): void
     }
 }
 
-export function contains(iterable: Iterable<any>, element: any, deep?: boolean): boolean {
+export function contains(iterable: Iterable<any> | undefined, element: any, deep?: boolean): boolean {
     if (Emptys.isEmpty(iterable)) {
         return false;
     }
@@ -760,17 +773,32 @@ export function groupBy(classifier: Func<any, any> | Func2<any, any, any> | Func
     return <LikeJavaMap<any, List<any>>>this.collect(Collectors.groupingBy(classifier, mapFactory));
 }
 
-export function partitionBy(iterable:Iterable<any>,classifier: Func<any, any> | Func2<any, any, any> | Function):List<List<any>> {
-    let map:LikeJavaMap<any, List<any>> =<LikeJavaMap<any, List<any>>>Collectors.collect(iterable, partioningBy(classifier));
+export function partitionBy(iterable: Iterable<any>, classifier: Func<any, any> | Func2<any, any, any> | Function): List<List<any>> {
+    let map: LikeJavaMap<any, List<any>> = <LikeJavaMap<any, List<any>>>Collectors.collect(iterable, partioningBy(classifier));
     return asList(map.values())
 }
 
-export function partitionBySize(iterable:Iterable<any>, size:number):List<List<any>> {
-    Preconditions.checkTrue(size>0);
+export function partitionBySize(iterable: Iterable<any>, size: number): List<List<any>> {
+    Preconditions.checkTrue(size > 0);
     return partitionBy(iterable, {
         apply(index: number, element: any) {
             // return Numbers.parseInt(index / element)+ (index % size ==0 ? 1 :0)
             return index % size;
         }
     });
+}
+
+/**
+ * append to collection
+ * @param collection
+ */
+export function concat(collection: Set<any> | Array<any> | Collection<any>, appentments: Set<any> | Array<any> | Collection<any>): Array<any>{
+    let newList: Array<any> = [];
+    if (collection != null) {
+        addAll(newList, collection);
+    }
+    if (appentments != null) {
+        addAll(newList, appentments);
+    }
+    return newList;
 }
