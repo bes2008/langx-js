@@ -627,8 +627,18 @@ export function reverse(iterable: Iterable<any>, newOne?: boolean) {
     return iterable;
 }
 
-export function count(iterable: Iterable<any>): number {
-    return Emptys.getLength(iterable);
+export function count(iterable: Iterable<any>, predicate?:Function|Predicate<any>|Predicate2<any, any>): number {
+    if(predicate==null){
+        return Emptys.getLength(iterable);
+    }
+    if(iterable==null){
+        return 0;
+    }
+    let count =0;
+    forEach(iterable, function () {
+        count++;
+    },predicate);
+    return count;
 }
 
 export function addAll(iterable: Iterable<any>, appendment: Iterable<any>): void {
