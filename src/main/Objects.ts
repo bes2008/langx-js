@@ -5,6 +5,7 @@ import * as Iterables from "./Iterables";
 import * as Dates from "./Dates";
 import {LinkedHashMap, ObjectPropertiesIterator} from "./Iterables";
 import * as Collects from "./Collects";
+import {type} from "os";
 
 interface ObjectPropertyDescriptor {
     configurable?: boolean;
@@ -248,4 +249,12 @@ export function equals(obj1: any, obj2: any, deep?: boolean) {
         obj2 = objectToMap(obj2);
     }
     return Collects.containsAll(obj1, obj2, deep) && Collects.containsAll(obj2, obj1, deep);
+}
+
+export function isObjectKeyType(type:any){
+    return type ==String;
+}
+
+export function isMapKeyType(type:any) {
+    return type==Symbol || type == String || type == Number;
 }

@@ -71,29 +71,6 @@ export function differenceWith(array: Array<any>, values: Array<any>, comparator
     }).toArray([]);
 }
 
-export function indexOf(array: Array<any>, value: any, fromIndex?: number): number {
-    fromIndex = (fromIndex == null || fromIndex < 0) ? 0 : Numbers.parseInt(fromIndex);
-    if (fromIndex >= array.length) {
-        return -1;
-    }
-    let index: number = Collects.newArrayList(array.slice(fromIndex)).indexOf(value);
-    return index == -1 ? -1 : (fromIndex + index);
-}
-
-export function initial(array: Array<any>) {
-    if (array.length >= 1) {
-        array.splice(array.length - 1, 1);
-    }
-    return array;
-}
-
-export function lastIndexOf(array: Array<any>, value: any, fromIndex?: number): number {
-    fromIndex = (fromIndex == null || fromIndex >= array.length) ? (array.length - 1) : fromIndex;
-    if (fromIndex < 0) {
-        return -1;
-    }
-    return Collects.newArrayList(array.slice(0, fromIndex + 1)).lastIndexOf(value);
-}
 
 export function drop(array: Array<any>, n: number): Array<any> {
     n = (n == null || n < 0) ? 1 : 0;
@@ -261,6 +238,42 @@ export function flattenDepth(array: Array<any> | any, depth?: number, currentDep
     return array;
 }
 
+export function fromPairs(pairs: Array<Array<any>>): object {
+    let obj = {};
+    Collects.forEach(pairs, {
+        accept(pair: Array<any>) {
+            obj[pair[0]] = pair[1];
+        }
+    }, (pair: Array<any>) => {
+        return Types.isArray(pair) && pair.length >= 2 && Objects.isObjectKeyType(Types.getType(pair[0]));
+    });
+    return obj;
+}
+
 export function head(array: Array<any>): any {
     return first(array);
+}
+
+export function indexOf(array: Array<any>, value: any, fromIndex?: number): number {
+    fromIndex = (fromIndex == null || fromIndex < 0) ? 0 : Numbers.parseInt(fromIndex);
+    if (fromIndex >= array.length) {
+        return -1;
+    }
+    let index: number = Collects.newArrayList(array.slice(fromIndex)).indexOf(value);
+    return index == -1 ? -1 : (fromIndex + index);
+}
+
+export function initial(array: Array<any>) {
+    if (array.length >= 1) {
+        array.splice(array.length - 1, 1);
+    }
+    return array;
+}
+
+export function lastIndexOf(array: Array<any>, value: any, fromIndex?: number): number {
+    fromIndex = (fromIndex == null || fromIndex >= array.length) ? (array.length - 1) : fromIndex;
+    if (fromIndex < 0) {
+        return -1;
+    }
+    return Collects.newArrayList(array.slice(0, fromIndex + 1)).lastIndexOf(value);
 }
