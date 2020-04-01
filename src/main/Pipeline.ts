@@ -52,7 +52,7 @@ export class Pipeline<E extends any> {
     }
 
     toArray(array?: Array<E>): Array<E> {
-        return Collects.toArray(this.collection);
+        return Collects.toArray(this.collection, array);
     }
 
     cleanNulls() {
