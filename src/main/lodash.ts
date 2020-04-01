@@ -1,11 +1,11 @@
 import * as Objects from "./Objects";
 import * as Numbers from "./Numbers";
 import * as Collects from "./Collects";
-import {List, MapEntry, ObjectPropertiesIterateType, ObjectPropertiesIterator, TreeSet} from "./Iterables";
+import {ObjectPropertiesIterateType, ObjectPropertiesIterator} from "./Iterables";
 import * as Pipeline from "./Pipeline";
 import * as Types from "./Types";
 import * as Preconditions from "./Preconditions";
-import {Comparator, FunctionComparator} from "./Comparators";
+import {Comparator} from "./Comparators";
 import * as Functions from "./Functions";
 import {Func2, Predicate, Predicate2, truePredicate} from "./Functions";
 
