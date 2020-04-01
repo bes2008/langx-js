@@ -59,16 +59,16 @@ export function callFunction(func: Func<any, any> | Func2<any, any, any> | Funct
  * @param index current index
  * @param element the element in a collection
  */
-export function buildMappingArgumentsForCollection(mapperType: FunctionType, element: any, index: number): Array<any> {
+export function buildArgumentsForCollection(mapperType: FunctionType|PredicateType|ConsumerType, element: any, index: number): Array<any> {
     let args: Array<any> = [];
     switch (mapperType) {
-        case FunctionType.FUNCTION:
+        case 3:
             args.push(element, index);
             break;
-        case FunctionType.FUNC2:
+        case 2:
             args.push(index, element);
             break;
-        case FunctionType.FUNC:
+        case 1:
             args.push(element);
             break;
         default:
@@ -78,16 +78,16 @@ export function buildMappingArgumentsForCollection(mapperType: FunctionType, ele
     return args;
 }
 
-export function buildMappingArgumentsForMap(mapperType: FunctionType, entry: MapEntry<any, any>): Array<any> {
+export function buildArgumentsForMap(mapperType: FunctionType|PredicateType|ConsumerType, entry: MapEntry<any, any>): Array<any> {
     let args: Array<any> = [];
     switch (mapperType) {
-        case FunctionType.FUNCTION:
+        case 3:
             args.push(entry);
             break;
-        case FunctionType.FUNC2:
+        case 2:
             args.push(entry.key, entry.value);
             break;
-        case FunctionType.FUNC:
+        case 1:
             args.push(entry);
             break;
         default:
@@ -116,13 +116,13 @@ export function mapping(mapper: Func<any, any> | Func2<any, any, any> | Function
 
 export function mappingCollectionElement(mapper: Func<any, any> | Func2<any, any, any> | Function, element: any, index: number): any {
     let mapperType = judgeFuncType(mapper);
-    let args: Array<any> = buildMappingArgumentsForCollection(mapperType, element, index);
+    let args: Array<any> = buildArgumentsForCollection(mapperType, element, index);
     return mapping(mapper, args);
 }
 
 export function mappingMapEntry(mapper: Func<any, any> | Func2<any, any, any> | Function, entry: MapEntry<any, any>): any {
     let mapperType = judgeFuncType(mapper);
-    let args: Array<any> = buildMappingArgumentsForMap(mapperType, entry);
+    let args: Array<any> = buildArgumentsForMap(mapperType, entry);
     return mapping(mapper, args);
 }
 
@@ -137,6 +137,43 @@ export interface Consumer2<I1, I2> {
 export interface IndexedConsumer2<I1, I2> extends Consumer2<I1, I2> {
     index: number;
 }
+
+
+export function consume(consumer: Consumer<any> | Consumer2<any, any> | Function, ...args): any {
+    let consumerType = judgeConsumerType(consumer);
+    let result;
+    switch (consumerType) {
+        case ConsumerType.CONSUMER:
+            result = (<Consumer<any>>consumer).accept(args[0]);
+            break;
+        case ConsumerType.CONSUMER2:
+            result = (<Consumer2<any, any>>consumer).accept(args[0], args[1]);
+            break;
+        case ConsumerType.FUNCTION:
+            result = (<Function>consumer).apply({}, args);
+            break;
+    }
+    return result;
+}
+
+export function consumeCollectionElement(consumer: Consumer<any> | Consumer2<any, any> | Function, element: any, index: number): void {
+    let consumerType:ConsumerType = judgeConsumerType(consumer);
+    let args: Array<any> = buildArgumentsForCollection(consumerType, element, index);
+    consume(consumer, args);
+}
+
+export function consumeMapEntry(consumer: Consumer<any> | Consumer2<any, any> | Function, entry: MapEntry<any, any>): void {
+    let consumerType:ConsumerType = judgeConsumerType(consumer);
+    let args: Array<any> = buildArgumentsForMap(consumerType, entry);
+    consume(consumer, args);
+}
+
+export function callConsumer(consumer:  Consumer<any> | Consumer2<any, any> | Function, ...args):void {
+    if (isPredicate(consumer)) {
+        consume(consumer, args);
+    }
+}
+
 
 export enum ConsumerType {
     UNKNOWN,
@@ -166,6 +203,20 @@ export function judgeConsumerType(consumer: Consumer<any> | Consumer2<any, any> 
     return ConsumerType.UNKNOWN;
 }
 
+export function noopConsumer(): Consumer<any> {
+    return {
+        accept(i: any) {
+        }
+    };
+}
+
+export function noopConsumer2(): Consumer2<any, any> {
+    return {
+        accept(i: any, i2: any) {
+        }
+    };
+}
+
 export interface Supplier0<O> {
     get(): O;
 }
@@ -192,6 +243,47 @@ export enum PredicateType {
     PREDICATE,
     PREDICATE2,
     FUNCTION
+}
+
+
+export function test(predicate: Predicate<any> | Predicate2<any, any> | Function, ...args): any {
+    let predicateType = judgePredicateType(predicate);
+    let result;
+    switch (predicateType) {
+        case PredicateType.PREDICATE:
+            result = (<Func<any, any>>predicate).apply(args[0]);
+            break;
+        case PredicateType.PREDICATE2:
+            result = (<Func2<any, any, any>>predicate).apply(args[0], args[1]);
+            break;
+        case PredicateType.FUNCTION:
+            result = (<Function>predicate).apply({}, args);
+            break;
+    }
+    return result;
+}
+
+export function testCollectionElement(predicate: Predicate<any> | Predicate2<any, any> | Function, element: any, index: number): any {
+    let predicateType:PredicateType = judgePredicateType(predicate);
+    let args: Array<any> = buildArgumentsForCollection(predicateType, element, index);
+    return test(predicate, args);
+}
+
+export function testMapEntry(predicate: Predicate<any> | Predicate2<any, any> | Function, entry: MapEntry<any, any>): any {
+    let predicateType:PredicateType = judgePredicateType(predicate);
+    let args: Array<any> = buildArgumentsForMap(predicateType, entry);
+    return test(predicate, args);
+}
+
+export function callPredicate(predicate: any | Predicate<any> | Predicate2<any, any> | Function, ...args): boolean {
+    if (isPredicate(predicate)) {
+        test(predicate, args);
+    }
+    return false;
+}
+
+export function isPredicate(predicate?: any | Predicate<any> | Predicate2<any, any> | Function): boolean {
+    return judgePredicateType(predicate) != PredicateType.UNKNOWN;
 }
 
 export function judgePredicateType(predicate?: Predicate<any> | Predicate2<any, any> | Function | undefined | null): PredicateType {
@@ -473,10 +565,9 @@ export function falsePredicate(): BooleanPredicate {
 
 export function wrappedPredicate2(comparator: Comparator<any> | Func2<any, any, any> | Function): Predicate2<any, any> {
     let comp: Comparator<any>;
-    if(comparator==null){
+    if (comparator == null) {
         comp = new IsComparator();
-    }else
-    if (Comparators.isComparator(comparator)) {
+    } else if (Comparators.isComparator(comparator)) {
         comp = <Comparator<any>>comparator;
     } else {
         let funcType: FunctionType = judgeFuncType(comparator);
