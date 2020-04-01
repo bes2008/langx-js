@@ -2,6 +2,11 @@ import * as Types from "./Types";
 import * as Preconditions from "./Preconditions";
 import * as Collects from "./Collects";
 import * as Objects from "./Objects";
+import * as Emptys from "./Emptys";
+import {ArrayList, MapEntry} from "./Iterables";
+import {IllegalArgumentException} from "./Exceptions";
+import * as Comparators from "./Comparators";
+import {Comparator, FunctionComparator, IsComparator} from "./Comparators";
 
 export interface Func<I, O> {
     apply(input: I): O;
@@ -18,7 +23,7 @@ export enum FunctionType {
     FUNCTION
 }
 
-export function judgeFuncType(mapper?: Func<any, any> | Func2<any, any, any> | Function): FunctionType {
+export function judgeFuncType(mapper?: any | Func<any, any> | Func2<any, any, any> | Function): FunctionType {
     if (mapper == null) {
         return FunctionType.UNKNOWN;
     }
@@ -41,6 +46,12 @@ export function judgeFuncType(mapper?: Func<any, any> | Func2<any, any, any> | F
         }
     }
     return FunctionType.UNKNOWN;
+}
+
+export function callFunction(func: Func<any, any> | Func2<any, any, any> | Function, ...args: any): any {
+    let type: FunctionType = judgeFuncType(func);
+    Preconditions.checkTrue(type != FunctionType.UNKNOWN, "not a function");
+    return mapping(func, args);
 }
 
 /**
@@ -123,8 +134,8 @@ export interface Consumer2<I1, I2> {
     accept(i1: I1, i2: I2);
 }
 
-export interface IndexedConsumer2<I1,I2> extends Consumer2<I1, I2> {
-    index:number;
+export interface IndexedConsumer2<I1, I2> extends Consumer2<I1, I2> {
+    index: number;
 }
 
 export enum ConsumerType {
@@ -204,10 +215,6 @@ export function judgePredicateType(predicate?: Predicate<any> | Predicate2<any, 
     return PredicateType.UNKNOWN;
 }
 
-
-import * as Emptys from "./Emptys";
-import {ArrayList, MapEntry} from "./Iterables";
-import {IllegalArgumentException} from "./Exceptions";
 
 export class IsNullPredicate implements Predicate<any> {
     test(i: any): boolean {
@@ -462,4 +469,23 @@ export function truePredicate(): BooleanPredicate {
 
 export function falsePredicate(): BooleanPredicate {
     return booleanPredicate(false);
+}
+
+export function wrappedPredicate2(comparator: Comparator<any> | Func2<any, any, any> | Function): Predicate2<any, any> {
+    let comp: Comparator<any>;
+    if(comparator==null){
+        comp = new IsComparator();
+    }else
+    if (Comparators.isComparator(comparator)) {
+        comp = <Comparator<any>>comparator;
+    } else {
+        let funcType: FunctionType = judgeFuncType(comparator);
+        Preconditions.checkTrue(funcType != FunctionType.UNKNOWN, "argument not a comparator or a function");
+        comp = new FunctionComparator(comparator);
+    }
+    return {
+        test(e1: any, e2: any) {
+            return comp.compare(e1, e2) == 0;
+        }
+    }
 }
