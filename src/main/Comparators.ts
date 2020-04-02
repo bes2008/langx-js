@@ -198,3 +198,34 @@ export class ToStringComparator extends DelegatableComparator<any> {
     }
 
 }
+
+export class ObjectComparator extends AbstractComparator<any> {
+    compare(e1: any, e2: any): number {
+        if (e1 == e2) {
+            return 0;
+        }
+        if (e1 == null) {
+            return -1;
+        }
+        if (e2 == null) {
+            return 1;
+        }
+        let type1 = Types.getType(e1);
+        let type2 = Types.getType(e2);
+        if (type1 === type2) {
+            if (type1 == String) {
+                return new StringComparator().compare(e1, e2);
+            }
+            if (type1 == Number) {
+                return new NumberComparator().compare(e1, e2);
+            }
+            if (type2 == Boolean) {
+                return new BooleanComparator().compare(e1, e2);
+            }
+            if (type1 == Date) {
+                return new DateComparator().compare(e1, e2);
+            }
+        }
+        return new HashedComparator().compare(e1, e2);
+    }
+}
