@@ -237,7 +237,7 @@ export function findLastIndex(array: Array<any>, predicate?: string | object | A
 }
 
 export function first(array: Array<any>): any {
-    return Collects.findFirst(array, null);
+    return nth(array,0);
 }
 
 export function flatten(array: Array<any> | any): Array<any> {
@@ -379,10 +379,7 @@ export function join(array: Array<any>, separator?: string): string {
 }
 
 export function last(array: Array<any>): any {
-    let list: List<any> = Collects.asList(array);
-    if (list.size() > 0) {
-        return list.get(list.size() - 1);
-    }
+    return nth(array,array.length-1);
 }
 
 export function lastIndexOf(array: Array<any>, value: any, fromIndex?: number): number {
@@ -398,7 +395,7 @@ export function nth(array: Array<any>, n: number): any {
     if (n < 0) {
         n = list.size() - 1 + n;
     }
-    if (n >= list.size()) {
+    if (n >= list.size() || n < 0) {
         return null;
     }
     return list.get(n);
