@@ -2,7 +2,9 @@ import * as Objects from "./Objects";
 import * as Preconditions from "./Preconditions";
 import * as Types from "./Types";
 import * as Functions from "./Functions";
-import {Func2, FunctionType} from "./Functions";
+import {Func2, FunctionType, truePredicate} from "./Functions";
+import {List} from "./Iterables";
+import * as Collects from "./Collects";
 
 export interface Comparator<E> {
     compare(e1: E, e2: E): number;
@@ -13,15 +15,15 @@ export abstract class AbstractComparator<E> implements Comparator<E> {
 }
 
 export function isComparator(c: any) {
-    if(Objects.isNull(c)){
+    if (Objects.isNull(c)) {
         return false;
     }
-    if(c instanceof AbstractComparator) {
+    if (c instanceof AbstractComparator) {
         return true;
     }
-    if(Types.isFunction(c["compare"])){
-        let func:Function = <Function> c["compare"];
-        return func.length>=2;
+    if (Types.isFunction(c["compare"])) {
+        let func: Function = <Function>c["compare"];
+        return func.length >= 2;
     }
     return false;
 }
@@ -108,17 +110,59 @@ export class EqualsComparator<E> extends AbstractComparator<E> {
     }
 }
 
-export class FunctionComparator<E> extends AbstractComparator<E> {
-    private readonly comp: Function|Func2<any, any, any>|Comparator<any>;
+export class DelegatableComparator<E> extends AbstractComparator<E> {
+    protected readonly comp: Comparator<E>;
 
-    constructor(f: Function|Func2<any, any, any>|Comparator<any>) {
+    constructor(comparator: Comparator<any>) {
         super();
-        Preconditions.checkTrue(Functions.judgeFuncType(f)!=FunctionType.UNKNOWN, "argument is not a function");
+        this.comp = comparator;
+    }
+
+    compare(e1: E, e2: E): number {
+        return this.comp.compare(e1, e2);
+    }
+}
+
+export class CompositeComparator<E> extends AbstractComparator<E> {
+    private readonly comps: List<Comparator<E>> = Collects.newArrayList();
+    private started: boolean = false;
+
+    constructor() {
+        super();
+    }
+
+    addComparator(comparator: Func2<any, any, any> | Comparator<any> | Function) {
+        if (!this.started) {
+            this.comps.add(new FunctionComparator(comparator));
+        }
+    }
+
+    compare(e1: E, e2: E): number {
+        this.started = true;
+        Preconditions.checkTrue(!this.comps.isEmpty());
+        let result: number = 0;
+        Collects.forEach(this.comps, (comparator: Comparator<any>) => {
+            result = comparator.compare(e1, e2);
+        }, truePredicate(), () => {
+            return result != 0;
+        });
+        return result;
+    }
+
+}
+
+
+export class FunctionComparator<E> extends AbstractComparator<E> {
+    private readonly comp: Function | Func2<any, any, any> | Comparator<any>;
+
+    constructor(f: Function | Func2<any, any, any> | Comparator<any>) {
+        super();
+        Preconditions.checkTrue(Functions.judgeFuncType(f) != FunctionType.UNKNOWN, "argument is not a function");
         this.comp = f;
     }
 
     compare(e1: E, e2: E): number {
-        let ret =isComparator(this.comp)? (<Comparator<any>>this.comp).compare(e1,e2): Functions.callFunction(<Function>this.comp, e1, e2);
+        let ret = isComparator(this.comp) ? (<Comparator<any>>this.comp).compare(e1, e2) : Functions.callFunction(<Function>this.comp, e1, e2);
         if (ret) {
             return 0;
         }
@@ -129,6 +173,28 @@ export class FunctionComparator<E> extends AbstractComparator<E> {
     }
 }
 
-export function wrapComparator(f: Function|Func2<any, any, any>|Comparator<any>) {
+export function functionComparator(f: Function | Func2<any, any, any> | Comparator<any>): FunctionComparator<any> {
     return new FunctionComparator(f);
+}
+
+export function wrapComparators(...funcs: Array<Function | Func2<any, any, any> | Comparator<any>>): CompositeComparator<any> {
+    let comparator: CompositeComparator<any> = new CompositeComparator<any>();
+    Collects.forEach(funcs, (c: Function | Func2<any, any, any> | Comparator<any>) => {
+        comparator.addComparator(c);
+    }, (c: Function | Func2<any, any, any> | Comparator<any>) => {
+        return c != null;
+    });
+    return comparator;
+}
+
+export class ToStringComparator extends DelegatableComparator<any> {
+
+    constructor() {
+        super(new StringComparator());
+    }
+
+    compare(e1: any, e2: any): number {
+        return this.comp.compare(e1 == null ? e1 : e1.toString(), e2 == null ? e2 : e2.toString());
+    }
+
 }
