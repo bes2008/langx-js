@@ -11,6 +11,13 @@ export interface Comparator<E> {
 }
 
 export abstract class AbstractComparator<E> implements Comparator<E> {
+    /**
+     * @param e1 the new element
+     * @param e2 the element in a collection
+     * @return if e1 > e2 , return a positive number;
+     *          if e1 < e2 , return a negative number;
+     *          if e1 equals e2, return 0;
+     */
     abstract compare(e1: E, e2: E): number;
 }
 
