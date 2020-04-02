@@ -298,7 +298,7 @@ export function forEach(iterable: Iterable<any> | null | undefined, consumer: Co
 }
 
 
-export function map(iterable: Iterable<any> | null | undefined, mapper: Func<any, any> | Func2<any, any, any> | Function): undefined | List<any> | LikeJavaMap<any, any> {
+export function map(iterable: Iterable<any> | null | undefined, mapper: Func<any, any> | Func2<any, any, any> | Function): List<any> | LikeJavaMap<any, any> {
     let mapperType = Functions.judgeFuncType(mapper);
     Preconditions.checkTrue(mapperType != FunctionType.UNKNOWN, "illegal mapper");
 
@@ -477,7 +477,7 @@ export function noneMatch(iterable: Iterable<any> | undefined | null, predicate:
 }
 
 
-export function removeIf(iterable: Iterable<any>, predicate: Predicate<any> | Predicate2<any, any> | Function) {
+export function removeIf(iterable: Iterable<any>, predicate: Predicate<any> | Predicate2<any, any> | Function):Iterable<any> {
     if (predicate == null) {
         return iterable;
     }
@@ -487,7 +487,7 @@ export function removeIf(iterable: Iterable<any>, predicate: Predicate<any> | Pr
     if (Types.isArray(iterable)) {
         let array: Array<any> = <Array<any>>iterable;
         // clear all
-        array.splice(0)
+        array.splice(0);
         array.push(...iterable);
     } else if (Types.isJsSet(iterable)) {
         let set: Set<any> = <Set<any>>iterable;
