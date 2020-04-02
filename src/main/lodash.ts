@@ -7,7 +7,7 @@ import * as Types from "./Types";
 import * as Preconditions from "./Preconditions";
 import {Comparator} from "./Comparators";
 import * as Functions from "./Functions";
-import {Func2, Predicate, Predicate2, truePredicate} from "./Functions";
+import {Func, Func2, Predicate, Predicate2, truePredicate} from "./Functions";
 
 
 export function chunk(array: Array<any>, size?: number): Array<Array<any>> {
@@ -129,6 +129,11 @@ function _buildArrayPredicate(predicate: string | object | Array<any> | Function
         p = Functions.truePredicate();
     }
     return p;
+}
+
+
+function _buildArrayMapper(mapper: string | object | Array<any> | Function): Function | Func<any, any> | Func2<any,any,any> {
+
 }
 
 
@@ -269,6 +274,33 @@ export function initial(array: Array<any>) {
     }
     return array;
 }
+
+export function intersection( ...arrays:Array<any>) {
+    if(arrays.length<1){
+        return [];
+    }
+    let pipeline = Pipeline.of(arrays.shift());
+    while (arrays.length>0 && !pipeline.isEmpty()){
+        let arr2 :Array<any> = arrays.shift();
+        pipeline = pipeline.intersection(arr2);
+    }
+    return pipeline.toArray();
+}
+
+export function intersectionBy( arrays:Array<Array<any>>, predicate:string | object | Array<any> | Function) {
+    if(arrays.length<1){
+        return [];
+    }
+    let p:Function = <Function>_buildArrayPredicate(predicate);
+
+    let pipeline = Pipeline.of(arrays.shift());
+    while (arrays.length>0 && !pipeline.isEmpty()){
+        let arr2:Array<any>|undefined = arrays.shift();
+        pipeline = pipeline.intersection(arr2);
+    }
+    return pipeline.toArray();
+}
+
 
 export function lastIndexOf(array: Array<any>, value: any, fromIndex?: number): number {
     fromIndex = (fromIndex == null || fromIndex >= array.length) ? (array.length - 1) : fromIndex;
