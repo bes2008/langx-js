@@ -132,8 +132,37 @@ function _buildArrayPredicate(predicate: string | object | Array<any> | Function
 }
 
 
-function _buildArrayMapper(mapper: string | object | Array<any> | Function): Function | Func<any, any> | Func2<any,any,any> {
+function _buildArrayMapper(mapper: string | object | Array<any> | Function): Function | Func<any, any> | Func2<any, any, any> {
+    Preconditions.checkNonNull(mapper);
+    let m: Function | Func<any, any> | Func2<any, any, any>;
 
+    // [0] property
+    // [1] value
+    if (Types.isArray(mapper)) {
+        let properties: Array<any> = <Array<any>>mapper;
+        Preconditions.checkTrue(properties.length >= 1);
+        m = function (element) {
+            let obj = {};
+            for (let property of properties) {
+                obj[property] = element[property];
+            }
+            return obj;
+        }
+    } else
+        // .property
+    if (Types.isString(mapper)) {
+        let property = mapper;
+        m = function (element) {
+            return element[<string>property];
+        };
+    } else if (Functions.isPredicate(mapper)) {
+        m = <Function>mapper;
+    } else if (Types.isSimpleObject(mapper)) {
+        m = Functions.noopFunction();
+    } else {
+        m = Functions.noopFunction();
+    }
+    return m;
 }
 
 
@@ -275,28 +304,37 @@ export function initial(array: Array<any>) {
     return array;
 }
 
-export function intersection( ...arrays:Array<any>) {
-    if(arrays.length<1){
+export function intersection(...arrays: Array<any>) {
+    if (arrays.length < 1) {
         return [];
     }
     let pipeline = Pipeline.of(arrays.shift());
-    while (arrays.length>0 && !pipeline.isEmpty()){
-        let arr2 :Array<any> = arrays.shift();
+    while (arrays.length > 0 && !pipeline.isEmpty()) {
+        let arr2: Array<any> = arrays.shift();
         pipeline = pipeline.intersection(arr2);
     }
     return pipeline.toArray();
 }
 
-export function intersectionBy( arrays:Array<Array<any>>, predicate:string | object | Array<any> | Function) {
-    if(arrays.length<1){
+export function intersectionBy(arrays: Array<Array<any>>, mapper: string | object | Array<any> | Function) {
+    if (arrays.length < 1) {
         return [];
     }
-    let p:Function = <Function>_buildArrayPredicate(predicate);
+    let m: Function = <Function>_buildArrayMapper(mapper);
 
     let pipeline = Pipeline.of(arrays.shift());
-    while (arrays.length>0 && !pipeline.isEmpty()){
-        let arr2:Array<any>|undefined = arrays.shift();
-        pipeline = pipeline.intersection(arr2);
+    while (arrays.length > 0 && !pipeline.isEmpty()) {
+        let array: Array<any> = <Array<any>>arrays.shift();
+        if (array != null) {
+            let arr2 = Collects.map(array, m);
+            pipeline = pipeline.filter({
+                test(element: any) {
+                    return Collects.contains(arr2, Functions.mapping(m, element));
+                }
+            });
+        } else {
+            return [];
+        }
     }
     return pipeline.toArray();
 }

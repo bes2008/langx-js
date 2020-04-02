@@ -23,6 +23,28 @@ export enum FunctionType {
     FUNCTION
 }
 
+export function noopFunction():Function {
+    return function () {
+
+    };
+}
+
+export function noopFunc():Func<any, any> {
+    return {
+        apply(i:any){
+            return i;
+        }
+    };
+}
+
+export function noopFunc2():Func2<any, any, any> {
+    return {
+        apply(i:any, i2:any){
+            return i;
+        }
+    };
+}
+
 export function judgeFuncType(mapper?: any | Func<any, any> | Func2<any, any, any> | Function): FunctionType {
     if (mapper == null) {
         return FunctionType.UNKNOWN;
