@@ -41,13 +41,13 @@ export enum ObjectPropertiesIterateType {
 export class ObjectPropertiesIterator extends AbstractIterator<any> implements IterableIterator<any> {
     private readonly obj: Object;
     private keysIter: Iterator<any>;
-    private readonly iterateType:ObjectPropertiesIterateType;
+    private readonly iterateType: ObjectPropertiesIterateType;
 
-    constructor(object: Object, iterateType?:ObjectPropertiesIterateType) {
+    constructor(object: Object, iterateType?: ObjectPropertiesIterateType) {
         super();
         this.obj = object;
         this.keysIter = new ArrayList(Object.keys(object))[Symbol.iterator]();
-        if(iterateType==null){
+        if (iterateType == null) {
             iterateType = ObjectPropertiesIterateType.KEY_VALUE;
         }
         this.iterateType = iterateType;
@@ -59,16 +59,16 @@ export class ObjectPropertiesIterator extends AbstractIterator<any> implements I
 
     next(...args: [] | [undefined]): IteratorResult<any> {
         let keyResult: IteratorResult<any> = this.keysIter.next();
-        let value:any;
+        let value: any;
         switch (this.iterateType) {
             case ObjectPropertiesIterateType.KEY:
-                value =keyResult.value;
+                value = keyResult.value;
                 break;
             case ObjectPropertiesIterateType.VALUE:
                 value = this.obj[keyResult.value];
                 break;
             default:
-                value={
+                value = {
                     key: keyResult.value,
                     value: this.obj[keyResult.value]
                 };
@@ -243,7 +243,7 @@ export class ArrayList<E> extends AbstractList<E> {
         return new ArrayList<E>();
     };
 
-    constructor(arraylist?: Collection<E> | Array<E> | Set<E> | Iterable<E> | IterableIterator<E>|undefined|null) {
+    constructor(arraylist?: Collection<E> | Array<E> | Set<E> | Iterable<E> | IterableIterator<E> | undefined | null) {
         super();
         if (arraylist == null) {
             this.array = [];
@@ -405,7 +405,7 @@ export class LinkedList<E> extends AbstractList<E> {
     first: LinkedListNode<E>;
     last: LinkedListNode<E>;
 
-    constructor(c?: Collection<E> | Array<E> | Set<E> | Iterable<E> | IterableIterator<E>|undefined|null) {
+    constructor(c?: Collection<E> | Array<E> | Set<E> | Iterable<E> | IterableIterator<E> | undefined | null) {
         super();
         this.first = this.last = <LinkedListNode<E>>Objects.unknownNull();
         if (c != null) {
@@ -734,7 +734,7 @@ abstract class AbstractMapBasedSet<E extends any> extends AbstractSet<E> {
 
 export class HashSet<E> extends AbstractMapBasedSet<E> {
 
-    constructor(list?: Collection<E> | Array<E> | Set<E> | Iterable<E> | IterableIterator<E>|undefined|null) {
+    constructor(list?: Collection<E> | Array<E> | Set<E> | Iterable<E> | IterableIterator<E> | undefined | null) {
         super();
         this.map = new HashMap<E, null>();
         if (list != null) {
@@ -751,7 +751,7 @@ export class HashSet<E> extends AbstractMapBasedSet<E> {
 
 export class LinkedHashSet<E extends any> extends AbstractMapBasedSet<E> {
 
-    constructor(list?: Collection<E> | Array<E> | Set<E> | Iterable<E> | IterableIterator<E>|undefined|null) {
+    constructor(list?: Collection<E> | Array<E> | Set<E> | Iterable<E> | IterableIterator<E> | undefined | null) {
         super();
         this.map = new LinkedHashMap<E, null>();
         if (list != null) {
@@ -768,7 +768,7 @@ export class LinkedHashSet<E extends any> extends AbstractMapBasedSet<E> {
 
 export class TreeSet<E extends any> extends AbstractMapBasedSet<E> {
 
-    constructor(list?: Collection<E> | Array<E> | Set<E> | Iterable<E> | IterableIterator<E>|undefined|null, comparator?: Comparator<E>) {
+    constructor(list?: Collection<E> | Array<E> | Set<E> | Iterable<E> | IterableIterator<E> | undefined | null, comparator?: Comparator<E>) {
         super();
         this.map = new TreeMap<E, null>(<TreeMap<E, null>>Objects.unknownNull(), comparator);
         if (list != null) {
@@ -782,11 +782,11 @@ export class TreeSet<E extends any> extends AbstractMapBasedSet<E> {
         }
     }
 
-    getComparator():Comparator<E>{
+    getComparator(): Comparator<E> {
         return (<TreeMap<E, null>>this.map).getComparator();
     }
 
-    setComparator(comparator:Comparator<E>):void{
+    setComparator(comparator: Comparator<E>): void {
         (<TreeMap<E, null>>this.map).setComparator(comparator);
     }
 
@@ -800,18 +800,18 @@ export interface MapEntry<K, V> {
     hashCode(): number;
 }
 
-export function isLikeMapEntry(obj:object) {
-    if(Objects.isNull(obj)){
+export function isLikeMapEntry(obj: object) {
+    if (Objects.isNull(obj)) {
         return false;
     }
-    return Objects.hasProperty(obj,"key") && Objects.hasProperty(obj,"value");
+    return Objects.hasProperty(obj, "key") && Objects.hasProperty(obj, "value");
 }
 
-export function toMapEntry(object):MapEntry<any, any>|null {
-    if(isLikeMapEntry(object)){
+export function toMapEntry(object): MapEntry<any, any> | null {
+    if (isLikeMapEntry(object)) {
         return null;
     }
-    return new SimpleMapEntry(object["key"],object["value"]);
+    return new SimpleMapEntry(object["key"], object["value"]);
 }
 
 export class MapEntryKeyComparator<K, V> implements Comparator<MapEntry<K, V>>, Delegatable<Comparator<K>> {
@@ -926,7 +926,7 @@ export class TreeMap<K extends any, V extends any> extends AbstractMap<K, V> {
     private comparator: MapEntryKeyComparator<K, V> = <MapEntryKeyComparator<K, V>>Objects.unknownNull();
 
 
-    constructor(map?: LikeJavaMap<K, V> | Map<K, V>|undefined|null, comparator?: Comparator<K>) {
+    constructor(map?: LikeJavaMap<K, V> | Map<K, V> | undefined | null, comparator?: Comparator<K>) {
         super();
         if (map != null) {
             if (map instanceof Map) {
@@ -953,7 +953,7 @@ export class TreeMap<K extends any, V extends any> extends AbstractMap<K, V> {
         return this.comparator.getDelegate();
     }
 
-    setComparator(comparator:Comparator<K>):void{
+    setComparator(comparator: Comparator<K>): void {
         this.comparator.setDelegate(comparator);
     }
 
@@ -993,7 +993,7 @@ export class TreeMap<K extends any, V extends any> extends AbstractMap<K, V> {
             return value;
         }
         let newEntry: MapEntry<K, V> = new SimpleMapEntry(key, value);
-        let searchResult: SearchResult<MapEntry<K, V>> = binarySearch(this.list, newEntry, this.comparator, 0, this.list.size() - 1);
+        let searchResult: SearchResult<MapEntry<K, V>> = binarySearch(this.list, newEntry, this.comparator, true, 0, this.list.size() - 1);
         let oldValue: V;
         if (searchResult.value != null) {
             let entry: MapEntry<K, V> = searchResult.value;
@@ -1009,7 +1009,7 @@ export class TreeMap<K extends any, V extends any> extends AbstractMap<K, V> {
 
     remove(key: K): V | undefined {
         let newEntry: MapEntry<K, V> = new SimpleMapEntry(key, <V>Objects.unknownNull());
-        let searchResult: SearchResult<MapEntry<K, V>> = binarySearch(this.list, newEntry, this.comparator, 0, this.list.size() - 1);
+        let searchResult: SearchResult<MapEntry<K, V>> = binarySearch(this.list, newEntry, this.comparator, true, 0, this.list.size() - 1);
         let value: V = <V>Objects.unknownNull();
         if (searchResult.value != null) {
             value = <V>this.map.remove(key);
@@ -1036,7 +1036,7 @@ export class HashMap<K extends any, V extends any> extends AbstractMap<K, V> {
     protected array: Array<List<MapEntry<K, V>>> = [];
     private readonly MAX_SLOT: number = 48;
 
-    constructor(map?: LikeJavaMap<K, V> | Map<K, V>|undefined|null) {
+    constructor(map?: LikeJavaMap<K, V> | Map<K, V> | undefined | null) {
         super();
         if (map != null) {
             if (this instanceof Map) {
@@ -1191,7 +1191,7 @@ export class HashMap<K extends any, V extends any> extends AbstractMap<K, V> {
 export class LinkedHashMap<K, V extends any> extends HashMap<K, V> {
     private readonly orders: List<MapEntry<K, V>> = new ArrayList<MapEntry<K, V>>();
 
-    constructor(map?: LikeJavaMap<K, V> | Map<K, V>|undefined|null) {
+    constructor(map?: LikeJavaMap<K, V> | Map<K, V> | undefined | null) {
         super(map);
     }
 
