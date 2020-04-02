@@ -23,10 +23,11 @@ export class SearchResult<E extends any> {
  * @param sortedArray the sorted array
  * @param fromIndex
  * @param toIndex
- * @param e
+ * @param e the value will to search
+ * @param asc search from left to right if true, else search from right to left
  * @param comparator
  */
-export function binarySearch(sortedArray: ArrayList<any>, e: any, comparator: Comparator<any>, fromIndex?: number, toIndex?: number): SearchResult<any> {
+export function binarySearch(sortedArray: ArrayList<any>, e: any, comparator: Comparator<any>, asc?: boolean, fromIndex?: number, toIndex?: number): SearchResult<any> {
     if (Emptys.isEmpty(sortedArray)) {
         return new SearchResult<any>(0, null);
     }
@@ -36,29 +37,53 @@ export function binarySearch(sortedArray: ArrayList<any>, e: any, comparator: Co
     if (toIndex == null || toIndex >= sortedArray.size()) {
         toIndex = sortedArray.size() - 1;
     }
+    asc = asc == null || asc;
 
+    if (asc) {
+        // compare the first of current scope
+        let cFirst = comparator.compare(e, sortedArray.get(fromIndex));
+        if (cFirst <= 0) {
+            return new SearchResult<any>(fromIndex, cFirst == 0 ? sortedArray.get(fromIndex) : null);
+        }
 
-    // compare the first of current scope
-    let cFirst = comparator.compare(e, sortedArray.get(fromIndex));
-    if (cFirst <= 0) {
-        return new SearchResult<any>(fromIndex, cFirst == 0 ? sortedArray.get(fromIndex) : null);
+        if (fromIndex == toIndex) {
+            return new SearchResult<any>(toIndex + 1, null);
+        }
+
+        // compare the last of current scope
+        let cLast = comparator.compare(e, sortedArray.get(toIndex));
+        if (cLast >= 0) {
+            return new SearchResult<any>(cLast == 0 ? toIndex : (toIndex + 1), cLast == 0 ? sortedArray.get(toIndex) : null);
+        }
+        if (toIndex - fromIndex == 1) {
+            // has no middle element
+            return new SearchResult<any>(toIndex, null);
+        }
+    } else {
+        // compare the last of current scope
+        let cLast = comparator.compare(e, sortedArray.get(toIndex));
+        if (cLast >= 0) {
+            return new SearchResult<any>(cLast == 0 ? toIndex : (toIndex + 1), cLast == 0 ? sortedArray.get(toIndex) : null);
+        }
+
+        if (fromIndex == toIndex) {
+            return new SearchResult<any>(toIndex - 1, null);
+        }
+
+        // compare the first of current scope
+        let cFirst = comparator.compare(e, sortedArray.get(fromIndex));
+        if (cFirst <= 0) {
+            return new SearchResult<any>(fromIndex, cFirst == 0 ? sortedArray.get(fromIndex) : null);
+        }
+
+        if (toIndex - fromIndex == 1) {
+            // has no middle element
+            return new SearchResult<any>(toIndex, null);
+        }
     }
 
-    if (fromIndex == toIndex) {
-        return new SearchResult<any>(toIndex + 1, null);
-    }
-
-    // compare the last of current scope
-    let cLast = comparator.compare(e, sortedArray.get(toIndex));
-    if (cLast >= 0) {
-        return new SearchResult<any>(cLast == 0 ? toIndex : (toIndex + 1), cLast == 0 ? sortedArray.get(toIndex) : null);
-    }
-    if (toIndex - fromIndex == 1) {
-        // has no middle element
-        return new SearchResult<any>(toIndex, null);
-    }
     // compare the middle of current scope
-    let middleIndex = Math.floor(fromIndex + toIndex+1) / 2;
+    let middleIndex = Math.floor((fromIndex + toIndex + 1) / 2);
     let cMiddle = comparator.compare(e, sortedArray.get(middleIndex));
     if (cMiddle == 0) {
         return new SearchResult<any>(middleIndex, sortedArray.get(middleIndex));
@@ -69,13 +94,13 @@ export function binarySearch(sortedArray: ArrayList<any>, e: any, comparator: Co
             // end
             return new SearchResult<any>(middleIndex, null);
         }
-        return binarySearch(sortedArray, e, comparator, fromIndex + 1, middleIndex - 1);
+        return binarySearch(sortedArray, e, comparator, asc, fromIndex + 1, middleIndex - 1);
     } else {
         // go to the right
         if (toIndex - 1 <= middleIndex) {
             // end
             return new SearchResult<any>(middleIndex + 1, null);
         }
-        return binarySearch(sortedArray, e, comparator, middleIndex + 1, toIndex - 1);
+        return binarySearch(sortedArray, e, comparator, asc, middleIndex + 1, toIndex - 1);
     }
 }
