@@ -254,9 +254,11 @@ function _judgeBreakConsumeListItem(index: number, element: any, breakPredicateT
 }
 
 
-export function forEach(iterable: Iterable<any>, consumer: Consumer<any> | Consumer2<number, any> | Function, consumePredicate?: Predicate<any> | Predicate2<any, any> | Function | undefined | null, breakPredicate?: Predicate<any> | Predicate2<any, any> | Function | undefined | null): void {
-    Preconditions.checkNonNull(iterable);
-    Preconditions.checkTrue(Iterables.isIterable(iterable));
+export function forEach(iterable: Iterable<any> | null | undefined, consumer: Consumer<any> | Consumer2<number, any> | Function, consumePredicate?: Predicate<any> | Predicate2<any, any> | Function | undefined | null, breakPredicate?: Predicate<any> | Predicate2<any, any> | Function | undefined | null): void {
+    if (iterable == null) {
+        return;
+    }
+    iterable = Iterables.asIterable(iterable);
     consumePredicate = consumePredicate == null ? truePredicate() : consumePredicate;
     let consumePredicateType = Functions.judgePredicateType(consumePredicate);
     let consumerType: ConsumerType = Functions.judgeConsumerType(consumer);
@@ -296,8 +298,7 @@ export function forEach(iterable: Iterable<any>, consumer: Consumer<any> | Consu
 }
 
 
-export function map(iterable: Iterable<any>, mapper: Func<any, any> | Func2<any, any, any> | Function): undefined | List<any> | LikeJavaMap<any, any> {
-    Preconditions.checkNonNull(iterable);
+export function map(iterable: Iterable<any> | null | undefined, mapper: Func<any, any> | Func2<any, any, any> | Function): undefined | List<any> | LikeJavaMap<any, any> {
     let mapperType = Functions.judgeFuncType(mapper);
     Preconditions.checkTrue(mapperType != FunctionType.UNKNOWN, "illegal mapper");
 
@@ -347,8 +348,7 @@ export function map(iterable: Iterable<any>, mapper: Func<any, any> | Func2<any,
     }
 }
 
-export function filter(iterable: Iterable<any>, predicate: Predicate<any> | Predicate2<any, any> | Function, breakPredicate?: Predicate<any> | Predicate2<any, any> | Function): Iterable<any> {
-    Preconditions.checkNonNull(iterable);
+export function filter(iterable: Iterable<any> | undefined | null, predicate: Predicate<any> | Predicate2<any, any> | Function, breakPredicate?: Predicate<any> | Predicate2<any, any> | Function): Iterable<any> {
     let predicateType = Functions.judgePredicateType(predicate);
     Preconditions.checkTrue(predicateType != PredicateType.UNKNOWN, "illegal predicate");
     let isMap = Types.isMap(iterable);
@@ -368,7 +368,7 @@ export function filter(iterable: Iterable<any>, predicate: Predicate<any> | Pred
 }
 
 
-export function findN(iterable: Iterable<any>, predicate: undefined | null | Predicate<any> | Predicate2<any, any> | Function, count: number): any {
+export function findN(iterable: Iterable<any> | undefined | null, predicate: undefined | null | Predicate<any> | Predicate2<any, any> | Function, count: number): any {
     Preconditions.checkTrue(Numbers.isInteger(count) && count > 0);
     if (iterable == null) {
         return null;
@@ -406,7 +406,7 @@ export function findN(iterable: Iterable<any>, predicate: undefined | null | Pre
     }
 }
 
-export function findFirst(iterable: Iterable<any>, predicate: Predicate<any> | Predicate2<any, any> | Function | null | undefined): any {
+export function findFirst(iterable: Iterable<any> | undefined | null, predicate: Predicate<any> | Predicate2<any, any> | Function | null | undefined): any {
     let list = asList(findN(iterable, predicate, 1));
     if (list.isEmpty()) {
         return null;
@@ -416,9 +416,11 @@ export function findFirst(iterable: Iterable<any>, predicate: Predicate<any> | P
 
 export function flatMap(list: Array<LinearCollection> | Collection<LinearCollection> | Set<LinearCollection>, mapper?: Func<any, any> | Func2<any, any, any> | Function): List<any> {
     let array: Array<any> = [];
-    for (let collection of list) {
-        if (collection != null) {
-            array = array.concat([...collection]);
+    if (list != null) {
+        for (let collection of list) {
+            if (collection != null) {
+                array = array.concat([...collection]);
+            }
         }
     }
     const list0: List<any> = newArrayList(array);
@@ -428,7 +430,7 @@ export function flatMap(list: Array<LinearCollection> | Collection<LinearCollect
     return list0;
 }
 
-export function anyMatch(iterable: Iterable<any> | undefined, predicate: Predicate<any> | Predicate2<any, any> | Function): boolean {
+export function anyMatch(iterable: Iterable<any> | undefined | null, predicate: Predicate<any> | Predicate2<any, any> | Function): boolean {
     if (iterable == null) {
         return false;
     }
@@ -444,7 +446,7 @@ export function anyMatch(iterable: Iterable<any> | undefined, predicate: Predica
 
 }
 
-export function allMatch(iterable: Iterable<any> | undefined, predicate: Predicate<any> | Predicate2<any, any> | Function): boolean {
+export function allMatch(iterable: Iterable<any> | undefined | null, predicate: Predicate<any> | Predicate2<any, any> | Function): boolean {
     if (iterable == null) {
         return false;
     }
@@ -459,7 +461,7 @@ export function allMatch(iterable: Iterable<any> | undefined, predicate: Predica
 }
 
 
-export function noneMatch(iterable: Iterable<any> | undefined, predicate: Predicate<any> | Predicate2<any, any> | Function): boolean {
+export function noneMatch(iterable: Iterable<any> | undefined | null, predicate: Predicate<any> | Predicate2<any, any> | Function): boolean {
     if (iterable == null) {
         return true;
     }
@@ -514,7 +516,10 @@ export function removeIf(iterable: Iterable<any>, predicate: Predicate<any> | Pr
 }
 
 
-export function limit(iterable: Iterable<any>, limit: number): List<any> {
+export function limit(iterable: Iterable<any> | null | undefined, limit: number): List<any> {
+    if (iterable == null) {
+        return emptyArrayList();
+    }
     Preconditions.checkTrue(limit >= 0);
     let list = iterable instanceof AbstractList ? <List<any>>iterable : newArrayList(iterable);
     if (list.size() <= limit) {
@@ -523,7 +528,10 @@ export function limit(iterable: Iterable<any>, limit: number): List<any> {
     return list.subList(0, limit);
 }
 
-export function skip(iterable: Iterable<any>, skip: number) {
+export function skip(iterable: Iterable<any> | null | undefined, skip: number) {
+    if (iterable == null) {
+        return emptyArrayList();
+    }
     Preconditions.checkTrue(skip >= 0);
     let list = iterable instanceof AbstractList ? <List<any>>iterable : newArrayList(iterable);
     if (list.size() <= skip) {
@@ -536,7 +544,10 @@ export function distinct(iterable: Iterable<any>, comparator?: Comparator<any>):
     return newTreeSet(iterable, comparator);
 }
 
-export function reverse(iterable: Iterable<any>, newOne?: boolean) {
+export function reverse(iterable: Iterable<any>, newOne?: boolean): Iterable<any> {
+    if (iterable == null) {
+        return [];
+    }
     if (newOne == null) {
         newOne = true;
     }
@@ -686,7 +697,7 @@ export function addAll(iterable: Iterable<any>, appendment: Iterable<any>): void
     }
 }
 
-export function contains(iterable: Iterable<any> | undefined, element: any, deep?: boolean): boolean {
+export function contains(iterable: Iterable<any> | undefined | null, element: any, deep?: boolean): boolean {
     if (Emptys.isEmpty(iterable)) {
         return false;
     }
@@ -700,7 +711,7 @@ export function contains(iterable: Iterable<any> | undefined, element: any, deep
  * @param iterable
  * @param judgement
  */
-export function containsAll(iterable: Iterable<any>, judgement: Iterable<any>, deep?: boolean): boolean {
+export function containsAll(iterable: Iterable<any> | null | undefined, judgement: Iterable<any>, deep?: boolean): boolean {
     if (Emptys.isEmpty(iterable)) {
         return false;
     }
@@ -710,7 +721,7 @@ export function containsAll(iterable: Iterable<any>, judgement: Iterable<any>, d
     });
 }
 
-export function containsAny(iterable: Iterable<any>, judgement: Iterable<any>, deep?: boolean): boolean {
+export function containsAny(iterable: Iterable<any> | null | undefined, judgement: Iterable<any>, deep?: boolean): boolean {
     if (Emptys.isEmpty(iterable)) {
         return false;
     }
@@ -720,7 +731,7 @@ export function containsAny(iterable: Iterable<any>, judgement: Iterable<any>, d
     });
 }
 
-export function containsNone(iterable: Iterable<any>, judgement: Iterable<any>, deep?: boolean): boolean {
+export function containsNone(iterable: Iterable<any> | null | undefined, judgement: Iterable<any>, deep?: boolean): boolean {
     if (Emptys.isEmpty(iterable)) {
         return true;
     }
@@ -729,8 +740,8 @@ export function containsNone(iterable: Iterable<any>, judgement: Iterable<any>, 
     });
 }
 
-export function intersection(iterable1: Iterable<any>|undefined|null, iterable2: Iterable<any>|undefined|null): Iterable<any> {
-    if(iterable2==null || iterable1==null){
+export function intersection(iterable1: Iterable<any> | undefined | null, iterable2: Iterable<any> | undefined | null): Iterable<any> {
+    if (iterable2 == null || iterable1 == null) {
         return [];
     }
     let isMapOfIterable1 = Types.isMap(iterable1);
@@ -763,7 +774,7 @@ export function intersection(iterable1: Iterable<any>|undefined|null, iterable2:
     }
 }
 
-export function union(iterable1: Iterable<any>, iterable2: Iterable<any>) {
+export function union(iterable1: Iterable<any> | undefined | null, iterable2: Iterable<any> | undefined | null) {
     let isMapOfIterable1 = Types.isMap(iterable1);
     let isMapOfIterable2 = Types.isMap(iterable2);
     Preconditions.checkTrue(isMapOfIterable1 == isMapOfIterable2);
@@ -786,12 +797,12 @@ export function groupBy(classifier: Func<any, any> | Func2<any, any, any> | Func
     return <LikeJavaMap<any, List<any>>>this.collect(Collectors.groupingBy(classifier, mapFactory));
 }
 
-export function partitionBy(iterable: Iterable<any>, classifier: Func<any, any> | Func2<any, any, any> | Function): List<List<any>> {
+export function partitionBy(iterable: Iterable<any> | undefined | null, classifier: Func<any, any> | Func2<any, any, any> | Function): List<List<any>> {
     let map: LikeJavaMap<any, List<any>> = <LikeJavaMap<any, List<any>>>Collectors.collect(iterable, partioningBy(classifier));
     return asList(map.values())
 }
 
-export function partitionBySize(iterable: Iterable<any>, size: number): List<List<any>> {
+export function partitionBySize(iterable: Iterable<any> | undefined | null, size: number): List<List<any>> {
     Preconditions.checkTrue(size > 0);
     return partitionBy(iterable, {
         apply(index: number, element: any) {
@@ -803,7 +814,6 @@ export function partitionBySize(iterable: Iterable<any>, size: number): List<Lis
 
 /**
  * append to collection
- * @param collection
  */
 export function concat(collection: Set<any> | Array<any> | Collection<any>, appentments: Set<any> | Array<any> | Collection<any>): Array<any> {
     let newList: Array<any> = [];

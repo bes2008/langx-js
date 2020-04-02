@@ -74,7 +74,7 @@ export function collect1(obj: object, containerFactory: Supplier0<Iterable<any>>
     });
 }
 
-export function collect(iterable: Iterable<any>, collector: Collector<any, Iterable<any>>): Iterable<any> {
+export function collect(iterable: Iterable<any>| undefined | null, collector: Collector<any, Iterable<any>>): Iterable<any> {
     let collection = collector.supplier().get();
     let consumer = collector.accumulator();
     let consumePredicate: Predicate<any> | Predicate2<any, any> | Function;
