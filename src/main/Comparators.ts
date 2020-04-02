@@ -128,3 +128,7 @@ export class FunctionComparator<E> extends AbstractComparator<E> {
         return 1;
     }
 }
+
+export function wrapComparator(f: Function|Func2<any, any, any>|Comparator<any>) {
+    return new FunctionComparator(f);
+}

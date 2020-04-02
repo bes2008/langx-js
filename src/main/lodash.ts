@@ -1,10 +1,11 @@
 import * as Objects from "./Objects";
 import * as Numbers from "./Numbers";
 import * as Collects from "./Collects";
-import {ObjectPropertiesIterateType, ObjectPropertiesIterator} from "./Iterables";
+import {List, ObjectPropertiesIterateType, ObjectPropertiesIterator} from "./Iterables";
 import * as Pipeline from "./Pipeline";
 import * as Types from "./Types";
 import * as Preconditions from "./Preconditions";
+import * as Comparators from "./Comparators";
 import {Comparator} from "./Comparators";
 import * as Functions from "./Functions";
 import {Func, Func2, Predicate, Predicate2, truePredicate} from "./Functions";
@@ -340,10 +341,65 @@ export function intersectionBy(arrays: Array<Array<any>>, mapper: string | objec
 }
 
 
+export function intersectionWith(arrays: Array<Array<any>>, comparator: Comparator<any> | Func2<any, any, any> | Function) {
+    if (arrays.length < 1) {
+        return [];
+    }
+    let _comparator: Comparator<any> = Comparators.wrapComparator(comparator);
+
+    let pipeline = Pipeline.of(arrays.shift());
+    while (arrays.length > 0 && !pipeline.isEmpty()) {
+        let array: Array<any> = <Array<any>>arrays.shift();
+        if (array != null) {
+            pipeline = pipeline.filter({
+                test(element: any) {
+                    return Collects.anyMatch(array, {
+                        test(element2: any) {
+                            return _comparator.compare(element, element2) == 0;
+                        }
+                    })
+                }
+            });
+        } else {
+            return [];
+        }
+    }
+    return pipeline.toArray();
+}
+
+export function join(array: Array<any>, separator?: string): string {
+    let str = "";
+    separator = separator == null || !Types.isString(separator) ? "," : separator;
+    Collects.forEach(array, (element: any, index: number) => {
+        str = str + (index == 0 ? "" : separator) + element.toString();
+    }, (element: any, index: number) => {
+        return element != null;
+    });
+    return str;
+}
+
+export function last(array: Array<any>): any {
+    let list: List<any> = Collects.asList(array);
+    if (list.size() > 0) {
+        return list.get(list.size() - 1);
+    }
+}
+
 export function lastIndexOf(array: Array<any>, value: any, fromIndex?: number): number {
     fromIndex = (fromIndex == null || fromIndex >= array.length) ? (array.length - 1) : fromIndex;
     if (fromIndex < 0) {
         return -1;
     }
     return Collects.newArrayList(array.slice(0, fromIndex + 1)).lastIndexOf(value);
+}
+
+export function nth(array: Array<any>, n: number): any {
+    let list: List<any> = Collects.asList(array);
+    if (n < 0) {
+        n = list.size() - 1 + n;
+    }
+    if (n >= list.size()) {
+        return null;
+    }
+    return list.get(n);
 }
