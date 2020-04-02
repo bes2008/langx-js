@@ -10,6 +10,7 @@ import {Comparator, FunctionComparator, ObjectComparator} from "./Comparators";
 import * as Functions from "./Functions";
 import {Func, Func2, Predicate, Predicate2, truePredicate} from "./Functions";
 import * as Algorithms from "./Algorithms";
+import {SearchResult} from "./Algorithms";
 
 
 export function chunk(array: Array<any>, size?: number): Array<Array<any>> {
@@ -478,7 +479,7 @@ export function slice(array: Array<any>, start?: number, end?: number): Array<an
 }
 
 export function sortedIndex(array: Array<any>, value: any): number {
-    return Algorithms.binarySearch(Collects.newArrayList(array), value, new ObjectComparator()).index;
+    return Algorithms.binarySearch(Collects.newArrayList(array), value, new ObjectComparator(), true).index;
 }
 
 export function sortedIndexBy(array: Array<any>, value: any, mapper: string | object | Array<any> | Function): number {
@@ -487,5 +488,13 @@ export function sortedIndexBy(array: Array<any>, value: any, mapper: string | ob
         e1 = Functions.mapping(e1);
         e2 = Functions.mapping(e2);
         return new ObjectComparator().compare(e1, e2);
-    })).index;
+    }), true).index;
+}
+
+export function sortedIndexOf(array: Array<any>, value: any): number {
+    let result:SearchResult<any> =  Algorithms.binarySearch(Collects.newArrayList(array), value, new ObjectComparator(), true);
+    if(result.value==null){
+        return  -1;
+    }
+    return result.index;
 }
