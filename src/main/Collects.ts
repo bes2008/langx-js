@@ -627,17 +627,17 @@ export function reverse(iterable: Iterable<any>, newOne?: boolean) {
     return iterable;
 }
 
-export function count(iterable: Iterable<any>, predicate?:Function|Predicate<any>|Predicate2<any, any>): number {
-    if(predicate==null){
+export function count(iterable: Iterable<any>, predicate?: Function | Predicate<any> | Predicate2<any, any>): number {
+    if (predicate == null) {
         return Emptys.getLength(iterable);
     }
-    if(iterable==null){
+    if (iterable == null) {
         return 0;
     }
-    let count =0;
+    let count = 0;
     forEach(iterable, function () {
         count++;
-    },predicate);
+    }, predicate);
     return count;
 }
 
@@ -729,7 +729,10 @@ export function containsNone(iterable: Iterable<any>, judgement: Iterable<any>, 
     });
 }
 
-export function intersection(iterable1: Iterable<any>, iterable2: Iterable<any>) {
+export function intersection(iterable1: Iterable<any>|undefined|null, iterable2: Iterable<any>|undefined|null): Iterable<any> {
+    if(iterable2==null || iterable1==null){
+        return [];
+    }
     let isMapOfIterable1 = Types.isMap(iterable1);
     let isMapOfIterable2 = Types.isMap(iterable2);
     Preconditions.checkTrue(isMapOfIterable1 == isMapOfIterable2);
@@ -802,7 +805,7 @@ export function partitionBySize(iterable: Iterable<any>, size: number): List<Lis
  * append to collection
  * @param collection
  */
-export function concat(collection: Set<any> | Array<any> | Collection<any>, appentments: Set<any> | Array<any> | Collection<any>): Array<any>{
+export function concat(collection: Set<any> | Array<any> | Collection<any>, appentments: Set<any> | Array<any> | Collection<any>): Array<any> {
     let newList: Array<any> = [];
     if (collection != null) {
         addAll(newList, collection);

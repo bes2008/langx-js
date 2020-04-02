@@ -91,8 +91,12 @@ export class Pipeline<E extends any> {
         return new Pipeline<E>(Collects.reverse(this.collection));
     }
 
-    count(): number {
-        return Collects.count(this.collection);
+    count(predicate?: Function | Predicate<any> | Predicate2<any, any>): number {
+        return Collects.count(this.collection, predicate);
+    }
+
+    isEmpty(): boolean {
+        return this.count() == 0;
     }
 
     addAll(appendment: Iterable<any>): Pipeline<any> {
@@ -124,8 +128,16 @@ export class Pipeline<E extends any> {
         return Collects.groupBy(classifier, mapFactory);
     }
 
-    partitionBy(classifier: Func<any, any> | Func2<any, any, any> | Function):List<List<any>> {
-        return Collects.partitionBy(this.collection,classifier);
+    partitionBy(classifier: Func<any, any> | Func2<any, any, any> | Function): List<List<any>> {
+        return Collects.partitionBy(this.collection, classifier);
+    }
+
+    intersection(iterable2: Iterable<any>|null|undefined): Pipeline<any> {
+        return of(Collects.intersection(this.collection, iterable2));
+    }
+
+    union(iterable2: Iterable<any>): Pipeline<any> {
+        return of(Collects.union(this.collection, iterable2));
     }
 }
 

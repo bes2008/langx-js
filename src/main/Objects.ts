@@ -224,7 +224,7 @@ export function objectToMap(obj: object) {
 }
 
 export function equals(obj1: any, obj2: any, deep?: boolean) {
-    if (obj1 == obj2) {
+    if (obj1 === obj2) {
         return true;
     }
 
