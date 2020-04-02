@@ -5,7 +5,7 @@ import {ArrayList} from "./Iterables";
 
 /**
  * if value== null: not found, the index is the suitable index
- * if value !=null: found, the index is the values's index
+ * if value !=null: found, the index is the matched value's index
  */
 export class SearchResult<E extends any> {
     value: E;
@@ -49,7 +49,7 @@ export function binarySearch(sortedArray: ArrayList<any>, e: any, comparator: Co
     }
 
     // compare the last of current scope
-    let cLast = comparator.compare(e, sortedArray.get(toIndex))
+    let cLast = comparator.compare(e, sortedArray.get(toIndex));
     if (cLast >= 0) {
         return new SearchResult<any>(cLast == 0 ? toIndex : (toIndex + 1), cLast == 0 ? sortedArray.get(toIndex) : null);
     }
