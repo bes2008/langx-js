@@ -435,15 +435,15 @@ export function putAllWith(array: Array<any>, values: Array<any>, comparator: Co
     return array;
 }
 
-export function putAt(array: Array<any>, ...indexes:Array<number>):Array<any> {
-    let removed:Array<any> =[];
-    let unremoved:Array<any> =[];
-    Collects.forEach(array,(element:any, index:number)=>{
-       if(Collects.contains(indexes,index)){
-           removed.push(element);
-       }else{
-           unremoved.push(element);
-       }
+export function putAt(array: Array<any>, ...indexes: Array<number>): Array<any> {
+    let removed: Array<any> = [];
+    let unremoved: Array<any> = [];
+    Collects.forEach(array, (element: any, index: number) => {
+        if (Collects.contains(indexes, index)) {
+            removed.push(element);
+        } else {
+            unremoved.push(element);
+        }
     });
     array.splice(0);
     array.push(unremoved);
@@ -466,7 +466,7 @@ export function remove(array: Array<any>, predicate: string | object | Array<any
 }
 
 export function reverse(array: Array<any>): Array<any> {
-    return array.reverse();
+    return <Array<any>>Collects.reverse(array, false);
 }
 
 export function slice(array: Array<any>, start?: number, end?: number): Array<any> {
@@ -492,9 +492,79 @@ export function sortedIndexBy(array: Array<any>, value: any, mapper: string | ob
 }
 
 export function sortedIndexOf(array: Array<any>, value: any): number {
-    let result:SearchResult<any> =  Algorithms.binarySearch(Collects.newArrayList(array), value, new ObjectComparator(), true);
-    if(result.value==null){
-        return  -1;
+    let result: SearchResult<any> = Algorithms.binarySearch(Collects.newArrayList(array), value, new ObjectComparator(), true);
+    if (result.value == null) {
+        return -1;
     }
     return result.index;
+}
+
+
+export function sortedLastIndex(array: Array<any>, value: any): number {
+    return Algorithms.binarySearch(Collects.newArrayList(array), value, new ObjectComparator(), false).index;
+}
+
+export function sortedLastIndexBy(array: Array<any>, value: any, mapper: string | object | Array<any> | Function): number {
+    let m = _buildArrayMapper(mapper);
+    return Algorithms.binarySearch(Collects.newArrayList(array), value, new FunctionComparator((e1: any, e2: any) => {
+        e1 = Functions.mapping(e1);
+        e2 = Functions.mapping(e2);
+        return new ObjectComparator().compare(e1, e2);
+    }), false).index;
+}
+
+export function sortedLastIndexOf(array: Array<any>, value: any): number {
+    let result: SearchResult<any> = Algorithms.binarySearch(Collects.newArrayList(array), value, new ObjectComparator(), false);
+    if (result.value == null) {
+        return -1;
+    }
+    return result.index;
+}
+
+export function sortedUniq(array: Array<any>): Array<any> {
+    return Collects.newTreeSet(array, new ObjectComparator()).toArray([]);
+}
+
+export function sortedUniqBy(array: Array<any>, mapper: string | object | Array<any> | Function) {
+    return Collects.newTreeSet(array, new FunctionComparator((e1: any, e2: any) => {
+        e1 = Functions.mapping(e1);
+        e2 = Functions.mapping(e2);
+        return new ObjectComparator().compare(e1, e2);
+    })).toArray([]);
+}
+
+export function tail(array: Array<any>): Array<any> {
+    let length = Objects.getLength(array);
+    if (length < 2) {
+        return [];
+    }
+    return Pipeline.of(array).filter((element: any, index: number) => {
+        return index > 0;
+    }).toArray();
+}
+
+export function take(array: Array<any>, n: number): Array<any> {
+    return Pipeline.of(array).filter(truePredicate(),(element: any, index: number) => {
+        return index >= n;
+    }).toArray();
+}
+
+export function takeRight(array: Array<any>, n: number): Array<any> {
+    return Pipeline.of(array).reverse(true).filter((element: any, index: number) => {
+        return index < n;
+    }).toArray();
+}
+
+export function takeWhile(array: Array<any>, predicate: string | object | Array<any> | Function): Array<any> {
+    let _predicate = _buildArrayPredicate(predicate);
+    return Pipeline.of(array).filter(_predicate,(element:any, index:number)=>{
+        return !Functions.test(_predicate, element,index);
+    }).toArray();
+}
+
+export function takeRightWhile(array: Array<any>, predicate: string | object | Array<any> | Function): Array<any> {
+    let _predicate = _buildArrayPredicate(predicate);
+    return Pipeline.of(array).reverse(true).filter(_predicate,(element:any, index:number)=>{
+        return !Functions.test(_predicate, element,index);
+    }).toArray();
 }

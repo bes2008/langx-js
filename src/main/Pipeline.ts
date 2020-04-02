@@ -87,7 +87,7 @@ export class Pipeline<E extends any> {
         return new Pipeline<E>(Collects.distinct(this.collection));
     }
 
-    reverse(): Pipeline<E> {
+    reverse(newOne?: boolean): Pipeline<E> {
         return new Pipeline<E>(Collects.reverse(this.collection));
     }
 
