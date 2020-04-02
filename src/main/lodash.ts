@@ -1,14 +1,15 @@
 import * as Objects from "./Objects";
 import * as Numbers from "./Numbers";
 import * as Collects from "./Collects";
-import {List, ObjectPropertiesIterateType, ObjectPropertiesIterator} from "./Iterables";
+import {ArrayList, List, ObjectPropertiesIterateType, ObjectPropertiesIterator} from "./Iterables";
 import * as Pipeline from "./Pipeline";
 import * as Types from "./Types";
 import * as Preconditions from "./Preconditions";
 import * as Comparators from "./Comparators";
-import {Comparator} from "./Comparators";
+import {Comparator, FunctionComparator, ObjectComparator} from "./Comparators";
 import * as Functions from "./Functions";
 import {Func, Func2, Predicate, Predicate2, truePredicate} from "./Functions";
+import * as Algorithms from "./Algorithms";
 
 
 export function chunk(array: Array<any>, size?: number): Array<Array<any>> {
@@ -48,17 +49,18 @@ export function difference(array: Array<any>, a2: Array<any>) {
     }).toArray([]);
 }
 
-export function differenceBy(array: Array<any>, a2: Array<any>, mapper: Function) {
+export function differenceBy(array: Array<any>, a2: Array<any>, mapper: string | object | Array<any> | Function): Array<any> {
     if (Objects.isNull(mapper)) {
         return difference(array, a2);
     }
     if (Objects.isEmpty(a2)) {
         return Collects.toArray(array, []);
     }
-    let list2: Iterable<any> | undefined = Collects.map(a2, mapper);
+    let m: Function = <Function>_buildArrayMapper(mapper);
+    let list2: Iterable<any> | undefined = Collects.map(a2, m);
     return Pipeline.of(array).filter({
-        test(element: any) {
-            return Collects.contains(list2, mapper(element), false);
+        test(element: any, index: number) {
+            return Collects.contains(list2, Functions.mapping(m, element, index), false);
         }
     }).toArray();
 }
@@ -237,7 +239,7 @@ export function findLastIndex(array: Array<any>, predicate?: string | object | A
 }
 
 export function first(array: Array<any>): any {
-    return nth(array,0);
+    return nth(array, 0);
 }
 
 export function flatten(array: Array<any> | any): Array<any> {
@@ -345,7 +347,7 @@ export function intersectionWith(arrays: Array<Array<any>>, comparator: Comparat
     if (arrays.length < 1) {
         return [];
     }
-    let _comparator: Comparator<any> = Comparators.wrapComparator(comparator);
+    let _comparator: Comparator<any> = Comparators.functionComparator(comparator);
 
     let pipeline = Pipeline.of(arrays.shift());
     while (arrays.length > 0 && !pipeline.isEmpty()) {
@@ -379,7 +381,7 @@ export function join(array: Array<any>, separator?: string): string {
 }
 
 export function last(array: Array<any>): any {
-    return nth(array,array.length-1);
+    return nth(array, array.length - 1);
 }
 
 export function lastIndexOf(array: Array<any>, value: any, fromIndex?: number): number {
@@ -399,4 +401,91 @@ export function nth(array: Array<any>, n: number): any {
         return null;
     }
     return list.get(n);
+}
+
+export function put(array: Array<any>, ...values: any): Array<any> {
+    let list: List<any> = Collects.asList(Collects.asIterable(values));
+    Collects.removeIf(array, (element: any) => {
+        return list.contains(element);
+    });
+    return array;
+}
+
+export function putAll(array: Array<any>, values: Array<any>): Array<any> {
+    return put(array, ...values);
+}
+
+export function putAllBy(array: Array<any>, values: Array<any>, mapper: string | object | Array<any> | Function): Array<any> {
+    let m: Function = <Function>_buildArrayMapper(mapper);
+    let list: List<any> = <List<any>>Collects.map(values, m);
+    Collects.removeIf(array, (element: any, index: number) => {
+        return list.contains(Functions.mapping(m, element, index));
+    });
+    return array;
+}
+
+export function putAllWith(array: Array<any>, values: Array<any>, comparator: Comparator<any> | Func2<any, any, any> | Function): Array<any> {
+    let _comparator: Comparator<any> = Comparators.functionComparator(comparator);
+    Collects.removeIf(array, (element: any) => {
+        Collects.anyMatch(values, (value: any) => {
+            return _comparator.compare(element, value) == 0;
+        })
+    });
+    return array;
+}
+
+export function putAt(array: Array<any>, ...indexes:Array<number>):Array<any> {
+    let removed:Array<any> =[];
+    let unremoved:Array<any> =[];
+    Collects.forEach(array,(element:any, index:number)=>{
+       if(Collects.contains(indexes,index)){
+           removed.push(element);
+       }else{
+           unremoved.push(element);
+       }
+    });
+    array.splice(0);
+    array.push(unremoved);
+    return removed;
+}
+
+export function remove(array: Array<any>, predicate: string | object | Array<any> | Function): Array<any> {
+    let removed: Array<any> = [];
+    let _predicate = _buildArrayPredicate(predicate);
+    for (let i = 0; i < array.length;) {
+        let element = array[i];
+        if (Functions.test(_predicate, element, i)) {
+            removed.push(element);
+            array.slice(i, 1);
+        } else {
+            i++;
+        }
+    }
+    return removed;
+}
+
+export function reverse(array: Array<any>): Array<any> {
+    return array.reverse();
+}
+
+export function slice(array: Array<any>, start?: number, end?: number): Array<any> {
+    end = end == null || !Types.isNumber(end) || end < 0 || end >= array.length ? array.length : end;
+    start = start == null || !Types.isNumber(start) || start < 0 ? 0 : start;
+    if (start > end || start >= array.length) {
+        return array;
+    }
+    return array.slice(start, end);
+}
+
+export function sortedIndex(array: Array<any>, value: any): number {
+    return Algorithms.binarySearch(Collects.newArrayList(array), value, new ObjectComparator()).index;
+}
+
+export function sortedIndexBy(array: Array<any>, value: any, mapper: string | object | Array<any> | Function): number {
+    let m = _buildArrayMapper(mapper);
+    return Algorithms.binarySearch(Collects.newArrayList(array), value, new FunctionComparator((e1: any, e2: any) => {
+        e1 = Functions.mapping(e1);
+        e2 = Functions.mapping(e2);
+        return new ObjectComparator().compare(e1, e2);
+    })).index;
 }
