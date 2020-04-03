@@ -7,7 +7,7 @@ import * as Booleans from "./Booleans";
 import * as Pipeline from "./Pipeline";
 import {emptyArrayList} from "./Collects";
 import {UnsupportOperationException} from "./Exceptions";
-import {Comparator, HashedComparator} from "./Comparators";
+import {Comparator, HashedComparator, ObjectComparator} from "./Comparators";
 import {Delegatable} from "./Delegatables";
 import {binarySearch, SearchResult} from "./Algorithms";
 
@@ -939,13 +939,13 @@ export class TreeMap<K extends any, V extends any> extends AbstractMap<K, V> {
                     this.comparator = new MapEntryKeyComparator<K, V>((<TreeMap<K, V>>map).getComparator());
                 }
                 if (this.comparator == null) {
-                    this.comparator = new MapEntryKeyComparator<K, V>(new HashedComparator());
+                    this.comparator = new MapEntryKeyComparator<K, V>(new ObjectComparator());
                 }
                 this.putAll(map);
             }
         }
         if (this.comparator == null) {
-            this.comparator = new MapEntryKeyComparator<K, V>(new HashedComparator());
+            this.comparator = new MapEntryKeyComparator<K, V>(new ObjectComparator());
         }
     }
 

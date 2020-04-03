@@ -446,7 +446,7 @@ export function putAt(array: Array<any>, ...indexes: Array<number>): Array<any> 
         }
     });
     array.splice(0);
-    array.push(unremoved);
+    array.push(...unremoved);
     return removed;
 }
 
@@ -484,10 +484,11 @@ export function sortedIndex(array: Array<any>, value: any): number {
 
 export function sortedIndexBy(array: Array<any>, value: any, mapper: string | object | Array<any> | Function): number {
     let m = _buildArrayMapper(mapper);
+    let comparator = new ObjectComparator();
     return Algorithms.binarySearch(Collects.newArrayList(array), value, new FunctionComparator((e1: any, e2: any) => {
-        e1 = Functions.mapping(e1);
-        e2 = Functions.mapping(e2);
-        return new ObjectComparator().compare(e1, e2);
+        e1 = Functions.mapping(m, e1);
+        e2 = Functions.mapping(m, e2);
+        return comparator.compare(e1, e2);
     }), true).index;
 }
 
@@ -506,10 +507,11 @@ export function sortedLastIndex(array: Array<any>, value: any): number {
 
 export function sortedLastIndexBy(array: Array<any>, value: any, mapper: string | object | Array<any> | Function): number {
     let m = _buildArrayMapper(mapper);
+    let comparator: ObjectComparator = new ObjectComparator();
     return Algorithms.binarySearch(Collects.newArrayList(array), value, new FunctionComparator((e1: any, e2: any) => {
-        e1 = Functions.mapping(e1);
-        e2 = Functions.mapping(e2);
-        return new ObjectComparator().compare(e1, e2);
+        e1 = Functions.mapping(m, e1);
+        e2 = Functions.mapping(m, e2);
+        return comparator.compare(e1, e2);
     }), false).index;
 }
 
@@ -526,10 +528,12 @@ export function sortedUniq(array: Array<any>): Array<any> {
 }
 
 export function sortedUniqBy(array: Array<any>, mapper: string | object | Array<any> | Function) {
+    let comparator: ObjectComparator = new ObjectComparator();
+    let m = _buildArrayMapper(mapper);
     return Collects.newTreeSet(array, new FunctionComparator((e1: any, e2: any) => {
-        e1 = Functions.mapping(e1);
-        e2 = Functions.mapping(e2);
-        return new ObjectComparator().compare(e1, e2);
+        e1 = Functions.mapping(m, e1);
+        e2 = Functions.mapping(m, e2);
+        return comparator.compare(e1, e2);
     })).toArray([]);
 }
 
@@ -544,7 +548,7 @@ export function tail(array: Array<any>): Array<any> {
 }
 
 export function take(array: Array<any>, n: number): Array<any> {
-    return Pipeline.of(array).filter(truePredicate(),(element: any, index: number) => {
+    return Pipeline.of(array).filter(truePredicate(), (element: any, index: number) => {
         return index >= n;
     }).toArray();
 }
@@ -557,14 +561,40 @@ export function takeRight(array: Array<any>, n: number): Array<any> {
 
 export function takeWhile(array: Array<any>, predicate: string | object | Array<any> | Function): Array<any> {
     let _predicate = _buildArrayPredicate(predicate);
-    return Pipeline.of(array).filter(_predicate,(element:any, index:number)=>{
-        return !Functions.test(_predicate, element,index);
+    return Pipeline.of(array).filter(_predicate, (element: any, index: number) => {
+        return !Functions.test(_predicate, element, index);
     }).toArray();
 }
 
 export function takeRightWhile(array: Array<any>, predicate: string | object | Array<any> | Function): Array<any> {
     let _predicate = _buildArrayPredicate(predicate);
-    return Pipeline.of(array).reverse(true).filter(_predicate,(element:any, index:number)=>{
-        return !Functions.test(_predicate, element,index);
+    return Pipeline.of(array).reverse(true).filter(_predicate, (element: any, index: number) => {
+        return !Functions.test(_predicate, element, index);
     }).toArray();
+}
+
+export function union(array: Array<Array<any>>) {
+    let set = Collects.newLinkedHashSet();
+    Collects.forEach(array, (element: Array<any>) => {
+        set.addAll(element);
+    }, (element: Array<any>) => {
+        return element != null && Types.isCollection(element);
+    });
+    return set.toArray();
+}
+
+export function unionBy(array: Array<Array<any>>, mapper: string | object | Array<any> | Function) {
+    let comparator: ObjectComparator = new ObjectComparator();
+    let m = _buildArrayMapper(mapper);
+    let set = Collects.newTreeSet(null, new FunctionComparator((e1: any, e2: any) => {
+        e1 = Functions.mapping(m, e1);
+        e2 = Functions.mapping(m, e2);
+        comparator.compare(e1, e2);
+    }));
+    Collects.forEach(array, (element: Array<any>) => {
+        set.addAll(element);
+    }, (element: Array<any>) => {
+        return element != null && Types.isCollection(element);
+    });
+    return set.toArray();
 }
