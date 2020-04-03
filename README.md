@@ -4,6 +4,9 @@ JavaScript language extensions,  a replacement or a supplement of the lodash. Wr
 ## Versions
 [![npm](https://img.shields.io/badge/npm-v1.0.7-green.svg)](https://www.npmjs.com/package/langx-js/v/1.0.7)
 
+## Overwrite lodash
+1. Array utilities
+
 ## Migrate [Java API](https://docs.oracle.com/javase/7/docs/api/)
 
 All java collection written in Iterables.ts module
