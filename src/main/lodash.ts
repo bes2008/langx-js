@@ -610,7 +610,3 @@ export function unionWith(array: Array<Array<any>>, comparator: Comparator<any> 
     });
     return set.toArray();
 }
-
-export function unzip() {
-
-}
