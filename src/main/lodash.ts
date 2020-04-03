@@ -598,3 +598,19 @@ export function unionBy(array: Array<Array<any>>, mapper: string | object | Arra
     });
     return set.toArray();
 }
+
+
+export function unionWith(array: Array<Array<any>>, comparator: Comparator<any> | Function | Func2<any, any, any>) {
+    let _comparator: FunctionComparator<any> = Comparators.functionComparator(comparator);
+    let set = Collects.newTreeSet(null, _comparator);
+    Collects.forEach(array, (element: Array<any>) => {
+        set.addAll(element);
+    }, (element: Array<any>) => {
+        return element != null && Types.isCollection(element);
+    });
+    return set.toArray();
+}
+
+export function unzip() {
+
+}
