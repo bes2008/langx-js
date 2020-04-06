@@ -6,7 +6,7 @@ import * as Pipeline from "./Pipeline";
 import * as Types from "./Types";
 import * as Preconditions from "./Preconditions";
 import * as Comparators from "./Comparators";
-import {Comparator, FunctionComparator, ObjectComparator} from "./Comparators";
+import {Comparator, EqualsComparator, FunctionComparator, IsComparator, ObjectComparator} from "./Comparators";
 import * as Functions from "./Functions";
 import {Func, Func2, Predicate, Predicate2, truePredicate} from "./Functions";
 import * as Algorithms from "./Algorithms";
@@ -609,4 +609,23 @@ export function unionWith(array: Array<Array<any>>, comparator: Comparator<any> 
         return element != null && Types.isCollection(element);
     });
     return set.toArray();
+}
+
+export function uniq(array: Array<any>) {
+    return Collects.newTreeSet(array, new IsComparator()).toArray([]);
+}
+
+export function uniqBy( array: Array<any>, mapper: string | object | Array<any> | Function) {
+    let m = _buildArrayMapper(mapper);
+    let comparator: ObjectComparator = new ObjectComparator();
+    return Collects.newTreeSet(array, new FunctionComparator((e1: any, e2: any) => {
+        e1 = Functions.mapping(m, e1);
+        e2 = Functions.mapping(m, e2);
+        comparator.compare(e1, e2);
+    })).toArray([]);
+}
+
+export function uniqWith( array: Array<any>, comparator: Comparator<any> | Function | Func2<any, any, any>) {
+    let _comparator:FunctionComparator<any>= Comparators.functionComparator(comparator);
+    return Collects.newTreeSet(array, _comparator).toArray([]);
 }
