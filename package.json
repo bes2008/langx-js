@@ -37,6 +37,7 @@
     "compile": "tsc -b ./tsconfig.cjs.json ./tsconfig.esm.json ./tsconfig.types.json ",
     "build:clean": "shx rm -rf ./dist",
     "build:package": "npm install && npm-run-all build:clean compile",
+    "publish": "npm run build:package && npm publish",
     "test": "jest",
     "debug": "node --inspect ./node_modules/jest/bin/jest --runInBand --watch"
   },
