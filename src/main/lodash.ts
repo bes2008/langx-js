@@ -1,7 +1,7 @@
 import * as Objects from "./Objects";
 import * as Numbers from "./Numbers";
 import * as Collects from "./Collects";
-import {ArrayList, List, ObjectPropertiesIterateType, ObjectPropertiesIterator} from "./Iterables";
+import {ArrayList, HashMap, List, MapEntry, ObjectPropertiesIterateType, ObjectPropertiesIterator} from "./Iterables";
 import * as Pipeline from "./Pipeline";
 import * as Types from "./Types";
 import * as Preconditions from "./Preconditions";
@@ -11,6 +11,7 @@ import * as Functions from "./Functions";
 import {Func, Func2, Predicate, Predicate2, truePredicate} from "./Functions";
 import * as Algorithms from "./Algorithms";
 import {SearchResult} from "./Algorithms";
+import {IllegalArgumentException} from "./Exceptions";
 
 
 export function chunk(array: Array<any>, size?: number): Array<Array<any>> {
@@ -615,7 +616,7 @@ export function uniq(array: Array<any>) {
     return Collects.newTreeSet(array, new IsComparator()).toArray([]);
 }
 
-export function uniqBy( array: Array<any>, mapper: string | object | Array<any> | Function) {
+export function uniqBy(array: Array<any>, mapper: string | object | Array<any> | Function) {
     let m = _buildArrayMapper(mapper);
     let comparator: ObjectComparator = new ObjectComparator();
     return Collects.newTreeSet(array, new FunctionComparator((e1: any, e2: any) => {
@@ -625,7 +626,159 @@ export function uniqBy( array: Array<any>, mapper: string | object | Array<any> 
     })).toArray([]);
 }
 
-export function uniqWith( array: Array<any>, comparator: Comparator<any> | Function | Func2<any, any, any>) {
-    let _comparator:FunctionComparator<any>= Comparators.functionComparator(comparator);
+export function uniqWith(array: Array<any>, comparator: Comparator<any> | Function | Func2<any, any, any>) {
+    let _comparator: FunctionComparator<any> = Comparators.functionComparator(comparator);
     return Collects.newTreeSet(array, _comparator).toArray([]);
+}
+
+export function unzip(arrays: Array<Array<any>>): Array<Array<any>> {
+    if (Objects.isEmpty(arrays)) {
+        return [];
+    }
+    let length = -1;
+    Collects.forEach(arrays, function (array: Array<any>) {
+        throw new IllegalArgumentException("the length of every array is not equals");
+    }, function (array: Array<any>) {
+        if (!Types.isArray(array)) {
+            return true;
+        }
+        let l = Objects.getLength(array);
+        if (length != -1 && l !== length) {
+            return true;
+        }
+        length = l;
+    });
+    let result: Array<Array<any>> = [];
+    for (let i = 0; i < length; i++) {
+        let temp: Array<any> = [];
+        Collects.forEach(arrays, (array: Array<any>) => {
+            temp.push(array[i]);
+        });
+        result.push(temp);
+    }
+    return result;
+}
+
+
+export function unzipWith(arrays: Array<Array<any>>, mapper: Function | Func2<any, any, any>): Array<any> {
+    arrays = unzip(arrays);
+    let result: Array<any> = [];
+    Collects.forEach(arrays, (array: Array<any>) => {
+        if (array.length > 0) {
+            let tmp: any = array[0];
+            for (let i = 1; i < array.length; i++) {
+                tmp = Functions.mapping(mapper, tmp, array[i]);
+            }
+            result.push(tmp);
+        } else {
+            result.push([]);
+        }
+    });
+    return result;
+}
+
+export function without(array: Array<any>, values: Array<any>) {
+    let vs = Collects.newArrayList(values);
+    Collects.removeIf(array, (element: any) => {
+        return vs.contains(element);
+    }, true);
+
+}
+
+export function xor(...arrays: Array<any>): Array<any> {
+    let map: HashMap<any, any> = Collects.newLinkedHashMap();
+    Pipeline.of(arrays).flatMap().forEach((element: any) => {
+        let count = map.get(element);
+        if (count == null) {
+            map.put(element, 1);
+        } else {
+            map.put(element, ++count);
+        }
+    });
+    let result: Array<any> = [];
+    Collects.forEach(map, (entry: MapEntry<any, any>) => {
+        if (entry.value == 1) {
+            result.push(entry.key);
+        }
+    });
+    return result;
+}
+
+export function xorBy(arrays: Array<Array<any>>, mapper: string | object | Array<any> | Function): Array<any> {
+    let m = _buildArrayMapper(mapper);
+    let mappedValueToOriginalValueMap: HashMap<any, any> = Collects.newLinkedHashMap();
+    let map: HashMap<any, any> = Collects.newLinkedHashMap();
+    Pipeline.of(arrays).flatMap().forEach((element: any) => {
+        let mappedValue = Functions.mapping(m, element);
+        if (!mappedValueToOriginalValueMap.containsKey(mappedValue)) {
+            mappedValueToOriginalValueMap.put(mappedValue, element);
+        }
+        let count = map.get(mappedValue);
+        if (count == null) {
+            map.put(mappedValue, 1);
+        } else {
+            map.put(mappedValue, ++count);
+        }
+    });
+    let result: Array<any> = [];
+    Collects.forEach(map, (entry: MapEntry<any, any>) => {
+        if (entry.value == 1) {
+            result.push(mappedValueToOriginalValueMap.get(entry.key));
+        }
+    });
+    return result;
+}
+
+export function xorWith(arrays: Array<Array<any>>, comparator: Comparator<any> | Func2<any, any, any> | Function): Array<any> {
+    let _comparator: FunctionComparator<any> = Comparators.functionComparator(comparator);
+    // mappedValue is the first occurs value
+    let mappedValueToCountMap: HashMap<any, any> = Collects.newLinkedHashMap();
+    Pipeline.of(arrays).flatMap().forEach((element: any) => {
+        let mappedValue: any = Collects.findFirst(mappedValueToCountMap.keySet(), (mappedValue0: any) => {
+            if (_comparator.compare(element, mappedValue0) == 0) {
+                return mappedValue0;
+            }
+        });
+        if (mappedValue == null) {
+            mappedValueToCountMap.put(element, 1);
+        } else {
+            let count = mappedValueToCountMap.get(mappedValue);
+            mappedValueToCountMap.put(mappedValue, ++count);
+        }
+    });
+    let result: Array<any> = [];
+    Collects.forEach(mappedValueToCountMap, (entry: MapEntry<any, any>) => {
+        if (entry.value == 1) {
+            result.push(entry.key);
+        }
+    });
+    return result;
+}
+
+export function zip(...arrays: Array<any>): Array<Array<any>> {
+    if (Objects.isEmpty(arrays)) {
+        return [];
+    }
+    let length = -1;
+    Collects.forEach(arrays, function (array: Array<any>) {
+        throw new IllegalArgumentException("the length of every array is not equals");
+    }, function (array: Array<any>) {
+        if (!Types.isArray(array)) {
+            return true;
+        }
+        let l = Objects.getLength(array);
+        if (length != -1 && l !== length) {
+            return true;
+        }
+        length = l;
+    });
+    let result: Array<Array<any>> = [];
+    for (let i = 0; i < length; i++) {
+        let temp: Array<any> = [];
+        Collects.forEach(arrays, (array: Array<any>) => {
+            temp.push(array[i]);
+        });
+        result.push(temp);
+    }
+    return result;
 }
