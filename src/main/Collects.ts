@@ -477,12 +477,16 @@ export function noneMatch(iterable: Iterable<any> | undefined | null, predicate:
 }
 
 
-export function removeIf(iterable: Iterable<any>, predicate: Predicate<any> | Predicate2<any, any> | Function):Iterable<any> {
+export function removeIf(iterable: Iterable<any>, predicate: Predicate<any> | Predicate2<any, any> | Function, returnNewIterable?:boolean):Iterable<any> {
     if (predicate == null) {
         return iterable;
     }
+    returnNewIterable = returnNewIterable==null? false:returnNewIterable;
     // step 1: find all will not removed
     let newCollection = filter(iterable, Functions.nonPredicateAny(predicate));
+    if(returnNewIterable){
+        return newCollection;
+    }
     // step 2: clear all and fill all will not removed
     if (Types.isArray(iterable)) {
         let array: Array<any> = <Array<any>>iterable;
