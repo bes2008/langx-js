@@ -54,3 +54,9 @@ All java collection written in Iterables.ts module
 + [Jest](https://jestjs.io/) | [Jest 快速访问站点](https://www.w3cschool.cn/doc_jest/)
 + [Node.js Debugging Guide](https://nodejs.org/en/docs/guides/debugging-getting-started/) | [Jest TypeScript Debugging Guide](https://www.cnblogs.com/f1194361820/p/12497298.html)
 
+## 推广
++ langx 系列
+    - langx-js：TypeScript, JavaScript tools
+    - langx-java: Java tools 
++ easyjson: 
+    
