@@ -57,7 +57,7 @@ All java collection written in Iterables.ts module
 ## 推广
 + langx 系列
     - langx-js：TypeScript, JavaScript tools
-    - langx-java: Java tools 
+    - langx-java: Java tools ，可以替换guava, apache commons-lang,io, hu-tool等
 + easyjson: 一个通用的JSON库门面，可以无缝的在各个JSON库之间切换，就像slf4j那样。
 + sqlhelper: SQL工具套件（通用分页、DDL Dump、SQLParser、URL Parser、批量操作工具等）。
 + esmvc: ElasticSearch 通用客户端，就像MyBatis Mapper那样顺滑
